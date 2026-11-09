@@ -220,6 +220,9 @@ func initials(username string) string {
 // routesStatic registers the files the shell and pages load, and the health check.
 func (s *Server) routesStatic(mux *http.ServeMux) {
 	static, _ := fs.Sub(staticFS, "static")
+	mux.HandleFunc("GET /favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFileFS(w, r, static, "favicon.ico")
+	})
 	mux.Handle("GET /static/fonts/", anyOrigin(http.StripPrefix("/static/", http.FileServerFS(static))))
 	handleKit(mux)
 	mux.Handle("GET /vendor/{runtime}/{file}", anyOrigin(http.HandlerFunc(serveVendor)))

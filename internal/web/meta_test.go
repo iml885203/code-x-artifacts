@@ -159,6 +159,8 @@ func TestTheManifestAndIconsAreServedToAnyone(t *testing.T) {
 	h := newHarness(t)
 	for path, typ := range map[string]string{
 		"/static/manifest.webmanifest": "application/manifest+json",
+		"/favicon.ico":                 "image/x-icon",
+		"/static/favicon.ico":          "image/x-icon",
 		"/static/apple-touch-icon.png": "image/png",
 		"/static/icon-192.png":         "image/png",
 		"/static/icon-512.png":         "image/png",

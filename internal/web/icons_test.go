@@ -2,6 +2,7 @@ package web
 
 import (
 	"bytes"
+	"encoding/binary"
 	"image"
 	"image/color"
 	"image/draw"
@@ -134,6 +135,47 @@ func TestTheIconsAndTheSharePreviewAreTheMarkAsDesignMdDrawsIt(t *testing.T) {
 					t.Fatalf("%s differs from the mark at (%d,%d); PICTOR_UPDATE_ICONS=1 redraws it", name, x, y)
 				}
 			}
+		}
+	}
+}
+
+// ico encodes the same mark at the sizes used by desktop browser tabs.
+func iconFile(t *testing.T) []byte {
+	sizes := []uint8{16, 32, 48}
+	var out bytes.Buffer
+	_ = binary.Write(&out, binary.LittleEndian, [3]uint16{0, 1, 3})
+	offset := 6 + 16*len(sizes)
+	var images [][]byte
+	for _, size := range sizes {
+		data := encode(t, squareIcon(int(size)))
+		out.Write([]byte{size, size, 0, 0})
+		_ = binary.Write(&out, binary.LittleEndian, [2]uint16{1, 32})
+		_ = binary.Write(&out, binary.LittleEndian, [2]uint32{uint32(len(data)), uint32(offset)}) //nolint:gosec // G115: fixed 16–48px PNGs are far below uint32 limits.
+		offset += len(data)
+		images = append(images, data)
+	}
+	for _, data := range images {
+		out.Write(data)
+	}
+	return out.Bytes()
+}
+
+func TestTheICOContainsTheBrandMarkAtDesktopTabSizes(t *testing.T) {
+	t.Parallel()
+	want := iconFile(t)
+	for _, path := range []string{"static/favicon.ico", "../../website/favicon.ico"} {
+		if os.Getenv("PICTOR_UPDATE_ICONS") != "" {
+			if err := os.WriteFile(path, want, 0o644); err != nil { //nolint:gosec // G306: public static assets.
+				t.Fatal(err)
+			}
+			continue
+		}
+		got, err := os.ReadFile(path) //nolint:gosec // G304: paths are fixed repository assets.
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("%s differs from the brand mark; PICTOR_UPDATE_ICONS=1 redraws it", path)
 		}
 	}
 }
