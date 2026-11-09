@@ -55,12 +55,10 @@ const agentSvg = document.querySelector('.agent-wires');
 const agentClients = [...document.querySelectorAll('.agent-client')];
 const agentHub = document.querySelector('.agent-hub');
 const agentDestination = document.querySelector('.agent-destination');
-const agentPause = document.querySelector('.agent-motion-toggle');
 let agentVisible = false;
-let agentUserPaused = false;
 let agentFrame = 0;
 const syncAgentMotion = () => {
-  agentSection.classList.toggle('is-paused', !agentVisible || agentUserPaused || document.hidden || motion.matches);
+  agentSection.classList.toggle('is-paused', !agentVisible || document.hidden || motion.matches);
 };
 const drawAgentWires = () => {
   const map = agentMap.getBoundingClientRect();
@@ -114,12 +112,6 @@ new IntersectionObserver(entries => {
   agentVisible = entries[0].isIntersecting;
   syncAgentMotion();
 }, {threshold: .1}).observe(agentSection);
-agentPause.addEventListener('click', () => {
-  agentUserPaused = !agentUserPaused;
-  agentPause.setAttribute('aria-pressed', String(agentUserPaused));
-  agentPause.textContent = agentUserPaused ? 'Resume animation' : 'Pause animation';
-  syncAgentMotion();
-});
 motion.addEventListener('change', syncAgentMotion);
 document.addEventListener('visibilitychange', syncAgentMotion);
 syncAgentMotion();

@@ -15,7 +15,7 @@ RESPONSIVE / CONSTRAINTS: 320–1440px; no overflow; 44px touch targets; visible
 
 SCREENSHOT TRUTH: Captured from the local running Go + React application at 1440×960. No reconstructed UI. Five types match displayedKinds: Web page, Doc, Slides, Design, Board; HTML/React share Web page. Screenshots display in place; clicking an image does not open a new tab.
 
-AGENT CONNECTIONS: The final section is visual only: five static named MCP clients feed MCP and CodeXArtifacts. Native SVG paths adapt at 900px. Packet animation pauses offscreen, in hidden tabs, on user request and for reduced motion. No per-client selection, setup text or repeated connect CTAs. Keep a concise connection-illustration caption and pause control.
+AGENT CONNECTIONS: The final section is visual only: five static named MCP clients feed MCP and CodeXArtifacts. Native SVG paths adapt at 900px. Packet animation pauses offscreen, in hidden tabs and for reduced motion. No per-client selection, setup text or repeated connect CTAs. Keep a concise connection-illustration caption with no visible animation controls.
 
 PRODUCT VIEWS: The real library Overview is the default view in one native radio group with Web page, Doc, Slides, Design and Board. It is a view, not another type. Images are real product captures with demonstration content, unlinked and uncropped. One shared disclosure replaces per-panel prose.
 

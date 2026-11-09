@@ -231,8 +231,8 @@ labels, 14px hub and 18px destination. Labels are 70px high (54px compact). At 9
 and below they form two columns with the fifth centered and paths in side gutters.
 
 Berry packets run along paths over 4s with staggered delays, only while the section
-is visible and the document active. A pause/resume button preserves manual choice;
-reduced motion removes packet animation and hides that unnecessary control. No
+is visible and the document active. Reduced motion removes packet animation.
+The owner requested no visible animation controls. No
 animation library or Astryx dependency is added; the reference informed the interaction.
 
 ## Do's and Don'ts
