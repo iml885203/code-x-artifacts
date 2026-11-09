@@ -210,7 +210,7 @@ Theme and language remain in the account menu; sign-in exposes language in its
 footer. Keep loading, errors, empty states and recovery paths visible.
 The website's native radio tabs select five actual displayed types: Web page, Doc,
 Slides, Design and Board. HTML and React belong to Web page. Screenshot images
-are static WebP files; each has a full-size image link that opens a new tab.
+are static WebP files displayed in place, with no image links or new-tab action.
 Specimen and format links select the radio, focus it, and scroll to the workspace.
 The website theme button updates its accessible label and pressed state, starts
 in light mode and does not persist or change the account theme. Website actions
