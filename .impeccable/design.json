@@ -120,6 +120,12 @@
       "breakpoint": "900px",
       "motion": "4s linear packet paths; pause offscreen, hidden tab, reduced motion or user request",
       "truth": "Connection illustration, not live activity; token authentication with existing artifact permissions"
+    },
+    "libraryOverview": {
+      "source": "Actual application browser screenshot, 1440x790, demonstration artifacts",
+      "placement": "After hero, before individual artifact types",
+      "interaction": "Static in-page image, no image link",
+      "galleryFooter": "Type icon aligned to title top; natural title height clamped to two lines; 8px gap before time/author"
     }
   },
   "components": [

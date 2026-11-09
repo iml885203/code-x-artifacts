@@ -279,7 +279,6 @@ describe("the gallery", () => {
     const css = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "gallery.css"), "utf8");
     const rule = /\.card-title \{([^}]*)\}/.exec(css)?.[1] ?? "";
     expect(rule).toMatch(/-webkit-line-clamp:\s*2\b/);
-    expect(rule).toMatch(/min-height:\s*2\.7em/);
   });
 
   it("puts pin and more in one corner group beside the card link, and neither opens the artifact", async () => {

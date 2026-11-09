@@ -50,16 +50,16 @@
 .lib-grid .card:not(.plate):hover, .lib-grid .card:not(.plate):focus-within { transform: translateY(-4px); border-color: var(--edge); }
 .lib-grid .card-link { display: flex; flex: 1; align-items: stretch; flex-direction: column; padding: 0; border-radius: var(--r-card); color: inherit; }
 .lib-grid .card .card-link:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
-.lib-grid .card .card-title { display: -webkit-box; min-height: 2.7em; margin: 0; padding: 0; color: var(--text); overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 15px; line-height: 1.35; font-weight: 600; letter-spacing: 0; overflow-wrap: anywhere; }
+.lib-grid .card .card-title { display: -webkit-box; margin: 0; padding: 0; color: var(--text); overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 15px; line-height: 1.35; font-weight: 600; letter-spacing: 0; overflow-wrap: anywhere; }
 .title-field { width: calc(100% - var(--space-2)); margin: var(--space-2) var(--space-1); font: 600 15px/1.35 var(--font-sans); }
 
 /* The footer is the link's last block and the link takes the spare height, so it sits at the bottom of every card in a row: kind, title with its time and author, then the open state. */
-.card-meta { display: flex; flex: 1; align-items: center; gap: var(--space-3); min-width: 0; margin: 0; padding: var(--space-3); color: var(--muted); font-size: 13px; line-height: 1.4; }
-.card-text { display: grid; grid-template-columns: minmax(0, 1fr); flex: 1; gap: 2px; min-width: 0; }
+.card-meta { display: flex; flex: 1; align-items: flex-start; gap: var(--space-3); min-width: 0; margin: 0; padding: var(--space-3); color: var(--muted); font-size: 13px; line-height: 1.4; }
+.card-text { display: grid; grid-template-columns: minmax(0, 1fr); flex: 1; gap: var(--space-2); min-width: 0; }
 /* The author takes the next line when the time leaves no room for the whole name, so a long time never cuts the name to a letter. */
 .card-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 2px var(--space-2); min-width: 0; }
 .card-meta time { flex: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.card-meta .audience { flex: none; }
+.card-meta .audience { flex: none; margin-top: 3px; }
 .library .audience.open { color: var(--text-2); }
 .card-meta .comments-new { flex: none; white-space: nowrap; }
 .card-author { display: inline-flex; flex: 0 1 auto; align-items: center; gap: var(--space-1); min-width: 0; }

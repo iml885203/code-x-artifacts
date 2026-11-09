@@ -155,8 +155,8 @@ rendered typography; screenshot content is not a source of website style tokens.
 
 The website uses a 1440px maximum container with clamp(22px, 5vw, 72px)
 horizontal padding. A centered two-line brand and value proposition sit among
-rotated Doc, Slides and Board screenshots. A dark five-type product screenshot
-selector follows, then asymmetric two-column workflow and format sections and
+rotated Doc, Slides and Board screenshots. The actual Artifacts library overview follows the hero, then a dark five-type product screenshot
+selector, then asymmetric two-column workflow and format sections and
 a berry closing invitation. This replaces the previous A website composition;
 it does not redefine the application layout or released kits.
 
@@ -250,3 +250,9 @@ animation library or Astryx dependency is added; the reference informed the inte
 - Do keep website categories aligned with displayedKinds and translated product labels;
   do not list HTML and React as separate UI types or advertise reserved kinds.
 - Don't introduce the paused TS/Cloudflare architecture into this release.
+
+The website library overview is a real 1440×790 browser screenshot with demonstration
+artifacts, displayed without links before the five-type selector. It preserves the
+search, grouping, sidebar and multiple artifact cards in one view. Gallery card
+footers align type icons to the first title line; titles occupy only their actual
+height (clamped at two lines), with the time and author directly below at an 8px gap.
