@@ -135,11 +135,10 @@ a:focus-visible,button:focus-visible,input:focus-visible + .format-tab { outline
 .agent-destination > strong { font-size:30px; font-weight:600; letter-spacing:-.03em; margin-top:15px; }
 .agent-details { display:flex; justify-content:space-between; align-items:start; gap:30px; margin:26px 5px 0; }
 .agent-disclosure { max-width:80ch; margin:8px 0 0; color:var(--muted); font-size:12px; line-height:1.6; }
-.agent-motion-toggle { min-height:44px; flex-shrink:0; padding:10px 15px; border:1px solid var(--line); border-radius:999px; color:var(--ink); background:transparent; cursor:pointer; font-size:12px; }
 .agents.is-paused .agent-packet { animation-play-state:paused; }
 @keyframes agent-flow { from { stroke-dashoffset:100; } to { stroke-dashoffset:0; } }
-@media (max-width:900px) { .agents { padding-block:65px 45px; } .agents-heading { display:block; margin-bottom:30px; } .agent-map { padding:22px 16px; border-radius:22px; } .agent-clients { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 24px; } .agent-client { min-height:54px; font-size:15px; } .agent-client:last-child { grid-column:1/-1; width:50%; justify-self:center; } .agent-hub { margin-top:65px; } .agent-destination { margin-top:54px; padding:28px 12px; } .agent-destination > strong { font-size:27px; } .agent-details { display:block; } .agent-motion-toggle { margin-top:16px; } }
-@media (prefers-reduced-motion:reduce) { .agent-packet { animation:none; } .agent-motion-toggle { display:none; } }
+@media (max-width:900px) { .agents { padding-block:65px 45px; } .agents-heading { display:block; margin-bottom:30px; } .agent-map { padding:22px 16px; border-radius:22px; } .agent-clients { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 24px; } .agent-client { min-height:54px; font-size:15px; } .agent-client:last-child { grid-column:1/-1; width:50%; justify-self:center; } .agent-hub { margin-top:65px; } .agent-destination { margin-top:54px; padding:28px 12px; } .agent-destination > strong { font-size:27px; } .agent-details { display:block; } }
+@media (prefers-reduced-motion:reduce) { .agent-packet { animation:none; } }
 
 
 /* A single visual sequence: product views, then agent connectivity. */
@@ -150,4 +149,4 @@ a:focus-visible,button:focus-visible,input:focus-visible + .format-tab { outline
 .agent-details { align-items:center; margin-top:16px; }
 .agent-disclosure { margin:0; }
 .footer-start { display:inline-flex; align-items:center; gap:16px; min-height:44px; font-size:14px; text-decoration:underline; }
-@media (max-width:900px) { .agent-hub { margin-top:60px; } .agent-destination { margin-top:48px; } .agent-details { display:flex; flex-wrap:wrap; gap:12px; } .agent-motion-toggle { margin-top:0; } }
+@media (max-width:900px) { .agent-hub { margin-top:60px; } .agent-destination { margin-top:48px; } .agent-details { display:flex; flex-wrap:wrap; gap:12px; } }
