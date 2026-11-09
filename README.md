@@ -48,15 +48,17 @@ Prefer containers? Follow the [Docker Compose instructions](docs/deployment.md#d
 ## Connect your agent
 
 ```mermaid
-flowchart TB
-  clients["Claude Code · Codex · Cursor<br/>OpenCode · other MCP clients"]
-  workspace["CodeXArtifacts<br/>The same artifacts, files and versions"]
-  clients -->|MCP + personal token| workspace
+flowchart LR
+  clients["AI agents"]
+  workspace["CodeXArtifacts"]
+  clients -->|MCP| workspace
   classDef client fill:#f5f3ed,stroke:#d8d1d1,color:#211e20;
   classDef shared fill:#f5e8ed,stroke:#ad4968,color:#211e20;
   class clients client;
   class workspace shared;
 ```
+
+Claude Code, Codex, Cursor, OpenCode and other compatible MCP clients can use the same workspace.
 
 1. Open **Connect your agent** in the app.
 2. Create a personal token and copy the connection settings for your client.
