@@ -233,3 +233,14 @@ a:focus-visible,button:focus-visible,input:focus-visible + .format-tab { outline
 @media (hover:hover) and (pointer:fine) { .agent-client:hover { transform:translateY(-3px); border-color:var(--berry); } }
 @media (max-width:900px) { .agents { padding-block:65px 45px; } .agents-heading { display:block; margin-bottom:30px; } .agents-heading p { font-size:16px; } .agents-heading > a { margin-top:16px; } .agent-map { padding:22px 16px; border-radius:22px; } .agent-clients { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 24px; } .agent-client { min-height:54px; font-size:15px; } .agent-client:last-child { grid-column:1/-1; width:50%; justify-self:center; } .agent-hub { margin-top:65px; } .agent-destination { margin-top:54px; padding:28px 12px; } .agent-destination > strong { font-size:27px; } .agent-artifacts { gap:12px; } .agent-details { display:block; } .agent-description { min-height:72px; font-size:14px; } .agent-motion-toggle { margin-top:16px; } }
 @media (prefers-reduced-motion:reduce) { .agent-packet { animation:none; } .agent-motion-toggle { display:none; } }
+
+.overview { padding-block:80px 0; background:var(--surface); border-radius:36px 36px 0 0; }
+.overview-heading { display:grid; grid-template-columns:1fr .7fr; align-items:end; gap:50px; margin-bottom:38px; }
+.overview-heading h2 { margin:0; font-size:clamp(32px,4.3vw,58px); line-height:1.02; font-weight:500; letter-spacing:-.035em; }
+.overview-heading p { max-width:440px; margin:0; font-size:16px; line-height:1.65; color:var(--muted); }
+.overview-figure { margin:0; }
+.overview-screen { padding:12px; background:var(--night); border-radius:16px; }
+.overview-screen img { width:100%; height:auto; border-radius:8px; }
+.overview-figure figcaption { max-width:75ch; margin-top:16px; color:var(--muted); font-size:13px; line-height:1.65; }
+.overview + .demo { border-radius:0; padding-top:90px; }
+@media (max-width:900px) { .overview { padding-top:55px; border-radius:25px 25px 0 0; } .overview-heading { display:block; margin-bottom:27px; } .overview-heading h2 { font-size:38px; } .overview-heading p { margin-top:22px; font-size:15px; } .overview-screen { padding:7px; border-radius:12px; } .overview + .demo { padding-top:60px; } }
