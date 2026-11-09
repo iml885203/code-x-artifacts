@@ -127,9 +127,9 @@ of truth for full light/dark tokens is `internal/web/static/style.css`; website
 surface tokens live in `website/styles.css`. Reading contrast is checked in tests.
 The website defaults to warm paper with charcoal text; its theme switch changes
 only the website stage. Dark website tokens are separately named in frontmatter.
-The dark illustrative workspace remains dark in both themes, and its pale demo
-interiors locally fix `--berry-dark: #8e3451` so outer-theme accent text cannot
-reduce their contrast. The closing invitation also keeps its fixed deep berry fill.
+The screenshot selector remains dark in both themes. Its images retain the actual
+application light theme captured from the local instance; switching the website
+theme does not recolor or reconstruct the product screenshots. The closing invitation also keeps its fixed deep berry fill.
 Kind-specific colors identify formats, with a distinct icon as well as color.
 
 **The Action Contrast Rule.** Keep the brand accent distinct from the app's
@@ -148,35 +148,32 @@ CodeX / Artifacts brand composition uses the website-brand role (including its
 website-only -0.04em tracking); the actual h1 uses website-hero, with its second
 line at 650 weight. Website section headings use website-heading. At 900px and
 below the brand uses clamp(68px, 14vw, 96px), the h1 is 28px, demo heading 38px,
-and workflow/formats headings 42px. Georgia appears only inside
-labelled synthetic artifact illustrations. It is not the website's interface or
-product display face, and illustration-specific type, colors and corners are not
-shared application tokens.
+and workflow/formats headings 42px. Product screenshots preserve their original
+rendered typography; screenshot content is not a source of website style tokens.
 
 ## Layout
 
 The website uses a 1440px maximum container with clamp(22px, 5vw, 72px)
 horizontal padding. A centered two-line brand and value proposition sit among
-rotated document, slide and board specimens. A dark six-format illustrative
-workspace follows, then asymmetric two-column workflow and format sections and
+rotated Doc, Slides and Board screenshots. A dark five-type product screenshot
+selector follows, then asymmetric two-column workflow and format sections and
 a berry closing invitation. This replaces the previous A website composition;
 it does not redefine the application layout or released kits.
 
-At 1100px and below specimens tighten, the preview becomes two columns, and its
-continuation panel moves below. At 900px and below specimens enter normal flow
+At 1100px and below specimens tighten while the main screenshot retains its full
+3:2 proportions. At 900px and below specimens enter normal flow
 in two columns, the small board disappears, preview tabs become three columns
 with 44px minimum height, and preview/workflow/formats become single-column.
-Compact tabs use 12px labels; illustration labels remain at least 11px. The app
+Tabs use 13px labels; screenshot captions remain at least 11px. The app
 retains its existing library/sidebar and viewer bar; sign-in stacks at 899px.
 Validate 320, 375, 768, 1024 and 1440px without page overflow.
 
 ## Elevation & Depth
 
 App surfaces use tonal layers and quiet borders. Menus use the existing soft
-`--float` shadow. Website depth belongs to the authored specimens: document shadow
-`0 22px 40px #33242b18`, slide shadow `0 24px 45px #3e182921`, and board shadow
-`0 16px 30px #302b2512`. The main workspace has no shadow. Content inside it
-remains clearly labelled as synthetic illustration.
+`--float` shadow. Website depth belongs to the floating screenshot images through
+`0 20px 45px #33242b24`. The main screenshot selector has no shadow. Captions
+identify actual application screenshots with purpose-made demonstration content.
 
 ## Shapes
 
@@ -184,13 +181,12 @@ The mark has two offset polygons: `M3 3H15V9L9 15H3Z` and
 `M16 10H22V22H10V16Z` on a 24px field. Standalone brand marks on the
 website, README, sign-in page, favicon and share assets use brand berry
 `#AD4968`; the wordmark keeps its neutral foreground. Product navigation uses
-monochrome marks that follow the current theme. The website's illustrative
-workspace uses the same monochrome product treatment. Sign-in reuses the fixed
+monochrome marks that follow the current theme. Product screenshots preserve the captured application marks and theme. Sign-in reuses the fixed
 brand token `--mark-amber` for its mark, independently of action shades.
 Icon/navigation controls use 8px corners, standard buttons and fields use 10px,
 and app cards use 12px. Website actions and GitHub navigation use pill corners; the theme switch and
-scroll control are circles. Website tabs use 7px, workspace 16px (12px compact),
-slide specimen and document toolbar 14px, mini board 12px, section shells 36px
+scroll control are circles. Website tabs use 7px, screenshot selector 16px,
+main image 8px and floating screenshot images 9px, section shells 36px
 (25px compact), and closing shell 28px (20px compact). These website surface
 roles do not replace the app's 8/10/12px geometry. These roles are not interchangeable. Do not restore the pixel-easel mark.
 
@@ -212,14 +208,16 @@ Existing state transitions use 120–320ms ease-out motion. Radix owns menus and
 keyboard behavior.
 Theme and language remain in the account menu; sign-in exposes language in its
 footer. Keep loading, errors, empty states and recovery paths visible.
-The website's radio tabs change the labelled format example without network work.
+The website's native radio tabs select five actual displayed types: Web page, Doc,
+Slides, Design and Board. HTML and React belong to Web page. Screenshot images
+are static WebP files; each has a full-size image link that opens a new tab.
 Specimen and format links select the radio, focus it, and scroll to the workspace.
 The website theme button updates its accessible label and pressed state, starts
 in light mode and does not persist or change the account theme. Website actions
 have a 48px minimum height and 3px berry focus outline with 5px offset.
 
 Website easing is cubic-bezier(.19, 1, .22, 1): buttons lift 3px over 250ms,
-specimen hover rotation/lift takes 600ms, and preview arrival takes 350ms.
+specimen hover rotation/lift takes 600ms, and screenshot arrival takes 300ms.
 Fine-pointer hero movement is requestAnimationFrame-bounded to 6/-8/4px per
 specimen, resets on pointer leave or preference change, and has no ongoing loop.
 Reduced motion removes transitions, animation, smooth scrolling and specimen
@@ -231,5 +229,7 @@ translation. Touch and coarse pointers do not trigger depth.
 - Do keep lowercase `pictor` API/settings identifiers compatible where documented.
 - Do respect reduced motion and both light/dark themes.
 - Do preserve sandbox, sharing and browser focus behavior during visual work.
-- Do label illustration as illustration; do not invent usage or acceptance claims.
+- Do distinguish actual application screenshots from their demonstration content.
+- Do keep website categories aligned with displayedKinds and translated product labels;
+  do not list HTML and React as separate UI types or advertise reserved kinds.
 - Don't introduce the paused TS/Cloudflare architecture into this release.

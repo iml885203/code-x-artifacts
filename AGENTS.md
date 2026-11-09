@@ -10,7 +10,7 @@ Do not migrate the backend to TypeScript or Cloudflare native in this scope.
 - Product name: CodeXArtifacts. Existing lowercase `pictor` protocol identifiers
   and environment variables remain compatible; do not bulk-rename versioned runtimes.
 - Brand: approved offset-field mark, berry #AD4968, charcoal and warm paper;
-  approved A website composition. English README and website, bilingual product UI.
+  approved Astryx-inspired website with actual product screenshots. English README and website, bilingual product UI.
 - No company-specific hosts, real user data, credentials, private research or
   upstream internal Git history in the publication set.
 - Read scoped AGENTS.md before editing a module.

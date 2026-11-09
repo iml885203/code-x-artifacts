@@ -85,6 +85,23 @@
         "displayName": "Website Heading",
         "purpose": "Public website only; application display typography is unchanged."
       }
+    },
+    "websiteScreenshotPolicy": {
+      "types": [
+        "Web page",
+        "Doc",
+        "Slides",
+        "Design",
+        "Board"
+      ],
+      "source": "Actual locally running application; purpose-made demonstration content",
+      "format": "WebP, 1440x960; original app chrome and aspect ratio",
+      "selectorRadius": "16px",
+      "mainImageRadius": "8px",
+      "floatingImageRadius": "9px",
+      "captionSize": "13px",
+      "motion": "300ms screenshot arrival; native radios remain functional without JavaScript",
+      "webCategory": "HTML and React are both Web page"
     }
   },
   "components": [
@@ -154,7 +171,7 @@
     "rules": [
       {
         "name": "The Action Contrast Rule",
-        "body": "Keep the brand accent distinct from the app's text-safe action shades; use `--star`, `--on-star`, `--star-edge` and `--star-hover` together. Kit v5 shares those app tokens. Released kit v1\u2013v4 remain immutable and do not inherit the berry update.",
+        "body": "Keep the brand accent distinct from the app's text-safe action shades; use `--star`, `--on-star`, `--star-edge` and `--star-hover` together. Kit v5 shares those app tokens. Released kit v1–v4 remain immutable and do not inherit the berry update.",
         "section": "colors"
       }
     ],
