@@ -68,6 +68,19 @@ func squareIcon(size int) *image.NRGBA {
 	return img
 }
 
+// transparentIcon keeps only the berry mark for browser tab backgrounds.
+func transparentIcon(size int) *image.NRGBA {
+	img := squareIcon(size)
+	for y := range size {
+		for x := range size {
+			if img.NRGBAAt(x, y) != (color.NRGBA{173, 73, 104, 255}) {
+				img.SetNRGBA(x, y, color.NRGBA{})
+			}
+		}
+	}
+	return img
+}
+
 // shareImage is the 1200 × 630 preview: the mark on the night, with a little dust.
 func shareImage() *image.NRGBA {
 	img := image.NewNRGBA(image.Rect(0, 0, 1200, 630))
@@ -103,7 +116,7 @@ func encode(t *testing.T, img image.Image) []byte {
 func TestTheIconsAndTheSharePreviewAreTheMarkAsDesignMdDrawsIt(t *testing.T) {
 	t.Parallel()
 	want := map[string]*image.NRGBA{
-		"favicon.png":          squareIcon(16),
+		"favicon.png":          transparentIcon(16),
 		"apple-touch-icon.png": squareIcon(180),
 		"icon-192.png":         squareIcon(192),
 		"icon-512.png":         squareIcon(512),
@@ -147,7 +160,7 @@ func iconFile(t *testing.T) []byte {
 	offset := 6 + 16*len(sizes)
 	var images [][]byte
 	for _, size := range sizes {
-		data := encode(t, squareIcon(int(size)))
+		data := encode(t, transparentIcon(int(size)))
 		out.Write([]byte{size, size, 0, 0})
 		_ = binary.Write(&out, binary.LittleEndian, [2]uint16{1, 32})
 		_ = binary.Write(&out, binary.LittleEndian, [2]uint32{uint32(len(data)), uint32(offset)}) //nolint:gosec // G115: fixed 16–48px PNGs are far below uint32 limits.
