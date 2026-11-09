@@ -223,6 +223,23 @@ specimen, resets on pointer leave or preference change, and has no ongoing loop.
 Reduced motion removes transitions, animation, smooth scrolling and specimen
 translation. Touch and coarse pointers do not trigger depth.
 
+The website's agent section sits between product screenshots and the workflow.
+Five semantic buttons name Claude Code, Codex, Cursor, OpenCode and Any MCP client.
+Native SVG paths connect their measured positions through the MCP protocol label to
+CodeXArtifacts; the SVG is decorative and the labels remain real, selectable text.
+This is a connection illustration, never a live status panel or orchestration claim.
+The section uses existing website tokens: 28px map shell (22px compact), 12px client
+buttons, 14px hub and 18px destination. Client controls are 70px high (54px compact).
+At 900px and below clients form a two-column group with the fifth centered; paths
+route through side gutters so they do not cross labels.
+
+Client selection highlights its path, updates aria-pressed and announces a short
+connection explanation. The setup link uses the README's connect-your-agent section.
+Berry packets run along paths over 4s with staggered delays, only while the section
+is visible and the document active. A pause/resume button preserves manual choice;
+reduced motion removes packet animation and hides that unnecessary control. No
+animation library or Astryx dependency is added; the reference informed the interaction.
+
 ## Do's and Don'ts
 
 - Do keep product prose and headings named CodeXArtifacts.

@@ -14,3 +14,5 @@ SIGNATURE INTERACTION: Pointer-responsive depth on the first-view specimens (fin
 RESPONSIVE / CONSTRAINTS: 320–1440px; no overflow; 44px touch targets; visible focus; reduced motion removes depth and transitions. No backend, app or API changes. No copied Astryx code, logos, imagery or product claims. External links use verified existing repo routes. ICO preserved.
 
 SCREENSHOT TRUTH: Captured from the local running Go + React application at 1440×960. No reconstructed UI. Five types match displayedKinds: Web page, Doc, Slides, Design, Board; HTML/React share Web page. Screenshots display in place; clicking an image does not open a new tab.
+
+AGENT CONNECTIONS: After real product screenshots, add a native interactive diagram: Claude Code, Codex, Cursor, OpenCode, Any MCP client → MCP → CodeXArtifacts. Native text/buttons and measured SVG connections adapt at 900px; selecting a client highlights its path and explains token setup. Packet animation pauses offscreen, in hidden tabs, on user request, and for reduced motion. This is illustrative connectivity, not live activity or autonomous orchestration. The generated 3D image stays an unused local concept.

@@ -102,6 +102,24 @@
       "captionSize": "13px",
       "motion": "300ms screenshot arrival; native radios remain functional without JavaScript",
       "webCategory": "HTML and React are both Web page"
+    },
+    "agentConnections": {
+      "implementation": "Semantic HTML client buttons and measured decorative SVG paths; no animation dependency",
+      "clients": [
+        "Claude Code",
+        "Codex",
+        "Cursor",
+        "OpenCode",
+        "Any MCP client"
+      ],
+      "mapRadius": "28px (22px compact)",
+      "clientRadius": "12px",
+      "hubRadius": "14px",
+      "destinationRadius": "18px",
+      "clientHeight": "70px (54px compact)",
+      "breakpoint": "900px",
+      "motion": "4s linear packet paths; pause offscreen, hidden tab, reduced motion or user request",
+      "truth": "Connection illustration, not live activity; token authentication with existing artifact permissions"
     }
   },
   "components": [
