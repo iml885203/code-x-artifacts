@@ -66,7 +66,6 @@ rounded:
   website-workspace: "16px"
   website-specimen: "14px"
   website-section: "36px"
-  website-closing: "28px"
 spacing:
   small: "8px"
   medium: "16px"
@@ -129,7 +128,7 @@ The website defaults to warm paper with charcoal text; its theme switch changes
 only the website stage. Dark website tokens are separately named in frontmatter.
 The screenshot selector remains dark in both themes. Its images retain the actual
 application light theme captured from the local instance; switching the website
-theme does not recolor or reconstruct the product screenshots. The closing invitation also keeps its fixed deep berry fill.
+theme does not recolor or reconstruct the product screenshots.
 Kind-specific colors identify formats, with a distinct icon as well as color.
 
 **The Action Contrast Rule.** Keep the brand accent distinct from the app's
@@ -148,25 +147,24 @@ CodeX / Artifacts brand composition uses the website-brand role (including its
 website-only -0.04em tracking); the actual h1 uses website-hero, with its second
 line at 650 weight. Website section headings use website-heading. At 900px and
 below the brand uses clamp(68px, 14vw, 96px), the h1 is 28px, demo heading 38px,
-and workflow/formats headings 42px. Product screenshots preserve their original
+and agent heading uses its responsive display scale. Product screenshots preserve their original
 rendered typography; screenshot content is not a source of website style tokens.
 
 ## Layout
 
-The website uses a 1440px maximum container with clamp(22px, 5vw, 72px)
-horizontal padding. A centered two-line brand and value proposition sit among
-rotated Doc, Slides and Board screenshots. The actual Artifacts library overview follows the hero, then a dark five-type product screenshot
-selector, then asymmetric two-column workflow and format sections and
-a berry closing invitation. This replaces the previous A website composition;
-it does not redefine the application layout or released kits.
+The website has three visual sections: the brand hero, a single product-view
+selector, and the agent connection diagram. The 1440px maximum container uses
+clamp(22px, 5vw, 72px) horizontal padding. Overview is selected by default in the
+same native radio group as Web page, Doc, Slides, Design and Board. Overview is a
+library view, not a sixth artifact type. Screenshots remain in-page and unlinked.
+The redundant workflow, repeated format directory, setup CTAs and large closing
+invitation were removed at the owner's request to prioritize visual proof.
 
-At 1100px and below specimens tighten while the main screenshot retains its full
-3:2 proportions. At 900px and below specimens enter normal flow
-in two columns, the small board disappears, preview tabs become three columns
-with 44px minimum height, and preview/workflow/formats become single-column.
-Tabs use 13px labels; screenshot captions remain at least 11px. The app
-retains its existing library/sidebar and viewer bar; sign-in stacks at 899px.
-Validate 320, 375, 768, 1024 and 1440px without page overflow.
+At 1100px specimens tighten. At 900px and below specimens enter normal flow in
+two columns, the board disappears, and product-view tabs become a three-column,
+two-row group with 44px minimum targets. The agent diagram uses two client columns.
+The application layout and released kits remain unchanged. Validate 320, 375,
+768, 900, 1024 and 1440px without page overflow.
 
 ## Elevation & Depth
 
@@ -187,7 +185,7 @@ Icon/navigation controls use 8px corners, standard buttons and fields use 10px,
 and app cards use 12px. Website actions and GitHub navigation use pill corners; the theme switch and
 scroll control are circles. Website tabs use 7px, screenshot selector 16px,
 main image 8px and floating screenshot images 9px, section shells 36px
-(25px compact), and closing shell 28px (20px compact). These website surface
+(25px compact). These website surface
 roles do not replace the app's 8/10/12px geometry. These roles are not interchangeable. Do not restore the pixel-easel mark.
 
 ## Components
@@ -208,8 +206,8 @@ Existing state transitions use 120–320ms ease-out motion. Radix owns menus and
 keyboard behavior.
 Theme and language remain in the account menu; sign-in exposes language in its
 footer. Keep loading, errors, empty states and recovery paths visible.
-The website's native radio tabs select five actual displayed types: Web page, Doc,
-Slides, Design and Board. HTML and React belong to Web page. Screenshot images
+The website's native radio tabs select the Overview or one of five actual types:
+Web page, Doc, Slides, Design and Board. HTML and React belong to Web page. Screenshot images
 are static WebP files displayed in place, with no image links or new-tab action.
 Specimen and format links select the radio, focus it, and scroll to the workspace.
 The website theme button updates its accessible label and pressed state, starts
@@ -223,18 +221,15 @@ specimen, resets on pointer leave or preference change, and has no ongoing loop.
 Reduced motion removes transitions, animation, smooth scrolling and specimen
 translation. Touch and coarse pointers do not trigger depth.
 
-The website's agent section sits between product screenshots and the workflow.
-Five semantic buttons name Claude Code, Codex, Cursor, OpenCode and Any MCP client.
-Native SVG paths connect their measured positions through the MCP protocol label to
-CodeXArtifacts; the SVG is decorative and the labels remain real, selectable text.
-This is a connection illustration, never a live status panel or orchestration claim.
-The section uses existing website tokens: 28px map shell (22px compact), 12px client
-buttons, 14px hub and 18px destination. Client controls are 70px high (54px compact).
-At 900px and below clients form a two-column group with the fifth centered; paths
-route through side gutters so they do not cross labels.
+The website's agent section follows the product showcase. Five static text labels
+name Claude Code, Codex, Cursor, OpenCode and Any MCP client. Decorative native SVG
+paths connect their measured positions through MCP to the brand mark and wordmark.
+Client selection, per-client setup descriptions and repeated connect links were
+removed; the visual is a connection illustration, never a live status panel.
+The section uses existing tokens: 28px map shell (22px compact), 12px client
+labels, 14px hub and 18px destination. Labels are 70px high (54px compact). At 900px
+and below they form two columns with the fifth centered and paths in side gutters.
 
-Client selection highlights its path, updates aria-pressed and announces a short
-connection explanation. The setup link uses the README's connect-your-agent section.
 Berry packets run along paths over 4s with staggered delays, only while the section
 is visible and the document active. A pause/resume button preserves manual choice;
 reduced motion removes packet animation and hides that unnecessary control. No
@@ -252,7 +247,7 @@ animation library or Astryx dependency is added; the reference informed the inte
 - Don't introduce the paused TS/Cloudflare architecture into this release.
 
 The website library overview is a real 1440×790 browser screenshot with demonstration
-artifacts, displayed without links before the five-type selector. It preserves the
+artifacts, selected by default inside the same product-view selector. It preserves the
 search, grouping, sidebar and multiple artifact cards in one view. Gallery card
 footers align type icons to the first title line; titles occupy only their actual
 height (clamped at two lines), with the time and author directly below at an 8px gap.

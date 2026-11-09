@@ -101,10 +101,18 @@
       "floatingImageRadius": "9px",
       "captionSize": "13px",
       "motion": "300ms screenshot arrival; native radios remain functional without JavaScript",
-      "webCategory": "HTML and React are both Web page"
+      "webCategory": "HTML and React are both Web page",
+      "views": [
+        "Overview",
+        "Web page",
+        "Doc",
+        "Slides",
+        "Design",
+        "Board"
+      ]
     },
     "agentConnections": {
-      "implementation": "Semantic HTML client buttons and measured decorative SVG paths; no animation dependency",
+      "implementation": "Static semantic client labels and measured decorative SVG paths; no per-client selection or setup descriptions",
       "clients": [
         "Claude Code",
         "Codex",
@@ -116,16 +124,33 @@
       "clientRadius": "12px",
       "hubRadius": "14px",
       "destinationRadius": "18px",
-      "clientHeight": "70px (54px compact)",
+      "clientHeight": "70px label height (54px compact)",
       "breakpoint": "900px",
       "motion": "4s linear packet paths; pause offscreen, hidden tab, reduced motion or user request",
       "truth": "Connection illustration, not live activity; token authentication with existing artifact permissions"
     },
     "libraryOverview": {
       "source": "Actual application browser screenshot, 1440x790, demonstration artifacts",
-      "placement": "After hero, before individual artifact types",
+      "placement": "Default Overview view in the single product-view selector",
       "interaction": "Static in-page image, no image link",
       "galleryFooter": "Type icon aligned to title top; natural title height clamped to two lines; 8px gap before time/author"
+    },
+    "websiteSimplification": {
+      "structure": [
+        "Hero",
+        "Product views",
+        "Agent connections"
+      ],
+      "removed": [
+        "Separate overview section",
+        "Repeated workflow explanation",
+        "Repeated format directory",
+        "Repeated connect-your-agent links",
+        "Per-client setup descriptions",
+        "Large closing invitation"
+      ],
+      "primaryAction": "Get started: README quick start",
+      "proof": "One product view selector and one connection diagram; real product screenshots with one short disclosure"
     }
   },
   "components": [
