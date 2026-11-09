@@ -53,3 +53,23 @@ python3 -m http.server 4176 --bind 127.0.0.1 --directory website
 
 Open http://localhost:4176. Preserve `website/CNAME` when publishing. Product
 screenshots use demonstration content and must match the actual interface.
+
+## Website sharing and search metadata
+
+`website/index.html` contains the canonical HTTPS URL, page summary, Open Graph,
+X card metadata, and WebSite/WebPage JSON-LD. Keep these URLs, `website/CNAME`,
+`robots.txt` and `sitemap.xml` aligned when moving domains. The sitemap lists the
+single public landing page; section anchors are not separate pages.
+
+The sharing card is `website/social/og.png` (1200×630 PNG). Its editable source
+is `scripts/website-og.html`, using the existing brand mark, local font and actual
+library screenshot. With the browser-test dependencies and Chrome available:
+
+```sh
+node scripts/render-website-og.mjs
+```
+
+The renderer also records the asset source in `website/social/og.png.json`.
+Review the card before publishing; use demonstration content only.
+Metadata and crawl files improve how the site is described; search engines and
+sharing platforms choose when to refresh their cached copies.
