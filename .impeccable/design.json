@@ -95,6 +95,11 @@
         "name": "The Action Contrast Rule",
         "body": "Keep the brand accent distinct from the app's text-safe action shades; use `--star`, `--on-star`, `--star-edge` and `--star-hover` together. Kit v5 shares those app tokens. Released kit v1–v4 remain immutable and do not inherit the berry update.",
         "section": "colors"
+      },
+      {
+        "name": "Brand mark color by context",
+        "body": "Use brand berry #AD4968 for standalone website, README, sign-in, favicon and share marks with neutral wordmarks. Product navigation and the website illustrative workspace use theme-aware monochrome marks.",
+        "section": "colors"
       }
     ],
     "dos": [

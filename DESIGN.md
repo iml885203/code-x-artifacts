@@ -111,7 +111,12 @@ content inside it remains clearly labelled as synthetic illustration.
 ## Shapes
 
 The mark has two offset polygons: `M3 3H15V9L9 15H3Z` and
-`M16 10H22V22H10V16Z` on a 24px field. It takes foreground color from context.
+`M16 10H22V22H10V16Z` on a 24px field. Standalone brand marks on the
+website, README, sign-in page, favicon and share assets use brand berry
+`#AD4968`; the wordmark keeps its neutral foreground. Product navigation uses
+monochrome marks that follow the current theme. The website's illustrative
+workspace uses the same monochrome product treatment. Sign-in reuses the fixed
+brand token `--mark-amber` for its mark, independently of action shades.
 Icon/navigation controls use 8px corners, standard buttons and fields use 10px,
 and app cards use 12px. Website action controls use 4px corners. These roles are
 not interchangeable. Do not restore the pixel-easel mark.

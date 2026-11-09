@@ -12,13 +12,14 @@
   padding-block: 48px;
 }
 .signin-hero { width: 100%; padding-block: 32px; }
-.signin-field-mark { width: 104px; color: var(--star-text); margin-bottom: 40px; }
+.signin-field-mark { width: 104px; color: var(--mark-amber); margin-bottom: 40px; }
 .signin-field-mark svg { display: block; width: 100%; fill: currentColor; }
 .signin-hero h2 { max-width: 12ch; margin: 0 0 24px; font-size: clamp(36px, 4.5vw, 60px); font-weight: 600; line-height: 1.05; letter-spacing: -0.035em; }
 .signin-hero p { max-width: 42ch; color: var(--text-2); font-size: 17px; line-height: 1.65; }
 .signin-formats { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 36px; color: var(--muted); font-size: 13px; }
 .signin-account { position: relative; z-index: 1; display: flex; flex-direction: column; gap: var(--space-6); min-width: 0; }
 .signin-account > .brand { min-height: 36px; }
+.signin-account > .brand .mark { color: var(--mark-amber); }
 .signin-account .wordmark { font-size: 22px; }
 .signin-panel { display: grid; width: 100%; border: 1px solid var(--line); gap: 18px; padding: 28px; border-radius: var(--r-login); background: var(--plate); box-shadow: none; }
 .signin-panel h1 { margin: 0; font-size: 18px; line-height: 22px; font-weight: 600; }
