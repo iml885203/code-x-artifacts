@@ -9,6 +9,7 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon" sizes="16x16 32x32 48x48">
   <link rel="icon" href="mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
+  <script src="site.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -17,25 +18,45 @@
     <nav aria-label="Main navigation">
       <a href="#formats">Formats</a>
       <a href="#workflow">How it works</a>
+      <button class="theme-toggle" type="button" aria-label="Switch to dark website theme" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4a8.5 8.5 0 1 0 11.5 11.5Z"/></svg></button>
       <a class="nav-status" href="https://github.com/iml885203/code-x-artifacts"><span class="status-dot" aria-hidden="true"></span>View on GitHub</a>
     </nav>
   </header>
 
   <main id="main">
-    <section class="hero wrap" aria-labelledby="hero-title">
-
-      <h1 id="hero-title">Turn ideas into artifacts.<br><span>Keep creating value.</span></h1>
-      <p class="hero-description">Create useful web, document, design, board and slide artifacts with your preferred AI. Keep the context close so people and other agents can continue the work.</p>
-      <div class="hero-actions">
-        <a class="button" href="https://github.com/iml885203/code-x-artifacts#quick-start">Get started <span aria-hidden="true">↘</span></a>
-        <a class="quiet-link" href="#workflow">See how work continues</a>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy wrap">
+        <div class="hero-brand" aria-label="CodeXArtifacts"><span>CodeX</span><span>Artifacts<span class="brand-period" aria-hidden="true">.</span></span></div>
+        <h1 id="hero-title">Turn ideas into artifacts.<br><span>Keep creating value.</span></h1>
+        <p class="hero-description">A self-hosted home for work you and your AI can keep building on.</p>
+        <div class="hero-actions">
+          <a class="button" href="https://github.com/iml885203/code-x-artifacts#quick-start">Get started <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+          <a class="button button-secondary" href="#artifact-demo">Explore the formats</a>
+        </div>
+        <p class="hero-meta">Open source. Your server. Your preferred AI.</p>
       </div>
+      <div class="artifact-orbit" aria-label="Explore synthetic artifact examples">
+        <a class="specimen specimen-doc" href="#format-docs" data-format="docs" aria-label="Explore the Docs example">
+          <div class="specimen-toolbar"><span class="file-symbol">D</span><span>Working notes</span><span class="specimen-arrow" aria-hidden="true">↗</span></div>
+          <div class="paper-sheet"><span class="sample-label">FIELD NOTES</span><h2>Good ideas<br>deserve a<br>second draft.</h2><p>Keep the thinking. Find the thread.<br>Make something worth continuing.</p><div class="paper-rule"></div><div class="paper-lines" aria-hidden="true"><i></i><i></i><i></i></div><span class="paper-comment">What could this become?</span></div>
+          <span class="specimen-caption">Docs · Synthetic example</span>
+        </a>
+        <a class="specimen specimen-slide" href="#format-slides" data-format="slides" aria-label="Explore the Slides example">
+          <div class="slide-specimen"><span>STUDIO NOTES / 01</span><h2>A small idea.<br>A bigger<br>possibility.</h2><svg class="specimen-mark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3H15V9L9 15H3Z M16 10H22V22H10V16Z"/></svg><div class="slide-bottom"><span>The next chapter starts here.</span><span>01—06</span></div></div>
+          <span class="specimen-caption">Slides · Synthetic example</span>
+        </a>
+        <a class="specimen specimen-board" href="#format-board" data-format="board" aria-label="Explore the Board example">
+          <div class="mini-board"><svg viewBox="0 0 270 100" fill="none" aria-hidden="true"><path d="M64 50H205" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 5"/></svg><span>What if?</span><b>Make it real.</b></div>
+          <span class="specimen-caption">Board · Synthetic example</span>
+        </a>
+      </div>
+      <div class="hero-foot wrap"><span>From the first thought to the next version.</span><a href="#artifact-demo" aria-label="Scroll to format showcase"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 4v16m-6-6 6 6 6-6"/></svg></a></div>
     </section>
 
     <section class="demo wrap" id="artifact-demo" aria-labelledby="demo-title">
       <div class="demo-heading">
-        <div><h2 id="demo-title">A place for the work to continue.</h2></div>
-        <p>Choose a format. Each preview is a synthetic example that changes locally in your browser.</p>
+        <div><h2 id="demo-title">One idea.<br>So many ways to make it real.</h2></div>
+        <p>Web, documents, design, boards and slides. Pick a format and see the work take shape. These are synthetic examples.</p>
       </div>
 
       <fieldset class="workspace" aria-label="Choose an illustrative artifact format">
@@ -102,15 +123,25 @@
     </section>
 
     <section class="workflow wrap" id="workflow" aria-labelledby="workflow-title">
-      <div class="workflow-copy"><h2 id="workflow-title">Start with an idea.<br>Keep the work moving.</h2><p>Make the result tangible, keep the useful context nearby, then leave a clear next step.</p></div>
-      <ol class="workflow-steps"><li><span class="step-index">01</span><div><h3>Create</h3><p>Give an idea a useful form with the AI you prefer.</p></div></li><li><span class="step-index">02</span><div><h3>Continue</h3><p>Keep its context and next edit close to the artifact.</p></div></li><li><span class="step-index">03</span><div><h3>Use</h3><p>Share and use the work beyond its first conversation.</p></div></li></ol>
+      <div class="workflow-copy"><h2 id="workflow-title">The conversation<br>is just the beginning.</h2><p>Make the result tangible, keep the useful context nearby, then leave a clear next step.</p><a class="quiet-link" href="https://github.com/iml885203/code-x-artifacts#connect-your-agent">Connect your agent <span aria-hidden="true">↗</span></a></div>
+      <ol class="workflow-steps">
+        <li><span class="step-index">01</span><div><h3>Give an idea a form.</h3><p>Create with your preferred AI. Bring web, documents, design, boards and slides into a shared workspace.</p></div></li>
+        <li><span class="step-index">02</span><div><h3>Leave a thread to follow.</h3><p>Keep the context, files and versions beside the artifact, ready for people and agents to pick up.</p></div></li>
+        <li><span class="step-index">03</span><div><h3>Keep building on it.</h3><p>Revise, collaborate and share. Use the work beyond the conversation that started it.</p></div></li>
+      </ol>
     </section>
-
     <section class="formats wrap" id="formats" aria-labelledby="formats-title">
-      <div><h2 id="formats-title">Choose the form<br>the work needs.</h2></div>
-      <ul class="format-list" aria-label="Illustrative artifact formats"><li><b>HTML</b><small>Web</small></li><li><b>React</b><small>Web</small></li><li><b>Docs</b><small>Documents</small></li><li><b>Design</b><small>Visual work</small></li><li><b>Board</b><small>Maps · flows</small></li><li><b>Slides</b><small>Presentations</small></li></ul>
-      <p class="formats-note">A self-hosted workspace for artifacts people and agents can keep building on.</p>
+      <div><h2 id="formats-title">Different forms.<br>One place to continue.</h2><p class="formats-intro">Follow the idea, wherever it takes you.</p></div>
+      <div class="format-list" aria-label="Explore illustrative artifact formats">
+        <a href="#format-html" data-format="html"><b>HTML</b><span>Pages for the web</span><span aria-hidden="true">↗</span></a>
+        <a href="#format-react" data-format="react"><b>React</b><span>Interactive possibilities</span><span aria-hidden="true">↗</span></a>
+        <a href="#format-docs" data-format="docs"><b>Docs</b><span>Thinking, made tangible</span><span aria-hidden="true">↗</span></a>
+        <a href="#format-design" data-format="design"><b>Design</b><span>A direction you can see</span><span aria-hidden="true">↗</span></a>
+        <a href="#format-board" data-format="board"><b>Board</b><span>Room for connections</span><span aria-hidden="true">↗</span></a>
+        <a href="#format-slides" data-format="slides"><b>Slides</b><span>A story worth sharing</span><span aria-hidden="true">↗</span></a>
+      </div>
     </section>
+    <section class="closing" aria-labelledby="closing-title"><div class="closing-inner wrap"><img src="mark-mono.svg" width="52" height="52" alt=""><h2 id="closing-title">Your next idea<br>needs a home.</h2><p>Make it yours. Host it yourself.<br>Keep creating value.</p><a class="button" href="https://github.com/iml885203/code-x-artifacts#quick-start">Build your workspace <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a><a class="closing-source" href="https://github.com/iml885203/code-x-artifacts">Explore the source on GitHub <span aria-hidden="true">↗</span></a></div></section>
   </main>
 
   <footer class="footer wrap" id="status">
