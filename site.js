@@ -48,3 +48,95 @@ const resetDepth = () => {
 hero.addEventListener('pointerleave', resetDepth);
 motion.addEventListener('change', resetDepth);
 fine.addEventListener('change', resetDepth);
+
+const agentSection = document.querySelector('.agents');
+const agentMap = document.querySelector('.agent-map');
+const agentSvg = document.querySelector('.agent-wires');
+const agentButtons = [...document.querySelectorAll('.agent-client')];
+const agentHub = document.querySelector('.agent-hub');
+const agentDestination = document.querySelector('.agent-destination');
+const agentPause = document.querySelector('.agent-motion-toggle');
+const agentDescriptions = {
+  claude: 'Claude Code: add the remote MCP server with your personal token, then publish and continue artifacts from your terminal.',
+  codex: 'Codex: connect the remote MCP server with a token environment variable and keep working on the same artifacts.',
+  cursor: 'Cursor: configure the remote MCP URL and token header in your client, then use the shared artifact workspace.',
+  opencode: 'OpenCode: configure a remote MCP server with your personal token. Use token authentication for this workspace.',
+  other: 'Use an MCP client that supports Streamable HTTP and a Bearer token. The client receives your existing artifact permissions.',
+};
+let selectedAgent = '';
+let agentVisible = false;
+let agentUserPaused = false;
+let agentFrame = 0;
+const syncAgentMotion = () => {
+  agentSection.classList.toggle('is-paused', !agentVisible || agentUserPaused || document.hidden || motion.matches);
+};
+const setAgentSelection = key => {
+  selectedAgent = key;
+  agentMap.classList.toggle('has-selection', Boolean(key));
+  agentButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.client === key)));
+  agentSvg.querySelectorAll('[data-wire]').forEach(path => path.classList.toggle('is-selected', path.dataset.wire === key));
+  document.querySelector('.agent-description').textContent = agentDescriptions[key] || 'Different clients. One MCP endpoint. Select a client to explore the connection.';
+};
+agentButtons.forEach(button => button.addEventListener('click', () => setAgentSelection(selectedAgent === button.dataset.client ? '' : button.dataset.client)));
+const drawAgentWires = () => {
+  const map = agentMap.getBoundingClientRect();
+  const hub = agentHub.getBoundingClientRect();
+  const target = agentDestination.getBoundingClientRect();
+  agentSvg.setAttribute('viewBox', `0 0 ${map.width} ${map.height}`);
+  const fragment = document.createDocumentFragment();
+  const pathPair = (d, key, index, trunk = false) => {
+    for (const packet of [false, true]) {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('class', `${packet ? 'agent-packet' : 'agent-wire'}${trunk ? ' agent-trunk' : ''}${key && key === selectedAgent ? ' is-selected' : ''}`);
+      path.setAttribute('pathLength', '100');
+      if (key) path.dataset.wire = key;
+      if (packet) path.style.animationDelay = `${index * -.7}s`;
+      fragment.append(path);
+    }
+  };
+  const hx = hub.left - map.left + hub.width / 2;
+  const hy = hub.top - map.top;
+  const compact = matchMedia('(max-width:900px)').matches;
+  agentButtons.forEach((button, index) => {
+    const box = button.getBoundingClientRect();
+    let x = box.left - map.left + box.width / 2;
+    let y = box.bottom - map.top;
+    let d;
+    if (compact && index < 4) {
+      const left = index % 2 === 0;
+      x = (left ? box.left : box.right) - map.left;
+      y = box.top - map.top + box.height / 2;
+      const side = left ? 6 + index * 2 : map.width - 6 - index * 2;
+      d = `M${x},${y} C${side},${y} ${side},${y} ${side},${y + 24} L${side},${hy - 26} Q${side},${hy + 12} ${hx},${hy + 12}`;
+    } else {
+      const endX = hx + (index - 2) * 9;
+      const reach = Math.max(30, (hy - y) * .6);
+      d = `M${x},${y} C${x},${y + reach} ${endX},${hy - reach} ${endX},${hy}`;
+    }
+    pathPair(d, button.dataset.client, index);
+  });
+  const fromY = hub.bottom - map.top;
+  const toY = target.top - map.top;
+  pathPair(`M${hx},${fromY} L${hx},${toY}`, '', 5, true);
+  agentSvg.replaceChildren(fragment);
+};
+const scheduleAgentWires = () => {
+  if (agentFrame) return;
+  agentFrame = requestAnimationFrame(() => { agentFrame = 0; drawAgentWires(); });
+};
+new ResizeObserver(scheduleAgentWires).observe(agentMap);
+document.fonts.ready.then(scheduleAgentWires);
+new IntersectionObserver(entries => {
+  agentVisible = entries[0].isIntersecting;
+  syncAgentMotion();
+}, {threshold: .1}).observe(agentSection);
+agentPause.addEventListener('click', () => {
+  agentUserPaused = !agentUserPaused;
+  agentPause.setAttribute('aria-pressed', String(agentUserPaused));
+  agentPause.textContent = agentUserPaused ? 'Resume animation' : 'Pause animation';
+  syncAgentMotion();
+});
+motion.addEventListener('change', syncAgentMotion);
+document.addEventListener('visibilitychange', syncAgentMotion);
+syncAgentMotion();
