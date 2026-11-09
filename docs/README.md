@@ -12,6 +12,10 @@ Start with the [quick start](../README.md#quick-start) and
 - [Activity](agent-activity.md), [viewers](viewers.md), [usage](usage.md)
 - [Browser downloads](page-downloads.md), [runtime imports](runtime.md)
 
+## Contributing
+
+- [Development, verification and website preview](development.md)
+
 ## Architecture
 
 - [Realtime synchronization](realtime.md)

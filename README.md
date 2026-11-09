@@ -1,24 +1,32 @@
 # CodeXArtifacts
 
-![CodeXArtifacts — Turn ideas into artifacts. Keep creating value.](docs/assets/readme-hero.png)
+A self-hosted workspace for artifacts you and your AI agents can keep building on.
 
-[Website](https://iml885203.github.io/code-x-artifacts/) · [Quick start](#quick-start) · [Connect your agent](#connect-your-agent)
+Connect an agent, create something useful, then return to it in the browser.
+Keep web pages, documents, slides, designs and boards together—with sharing and version history.
 
-A self-hosted home for work you and your AI agents can keep building on.
-Create web pages, documents, designs, boards and slides; give them stable links,
-share them deliberately, and continue editing beyond the conversation.
+[Website](https://code-x-artifacts.ilogan.app/) · [Quick start](#quick-start) · [Connect your agent](#connect-your-agent) · [Documentation](docs/README.md)
 
-- **Create with your preferred agent.** Connect Claude Code, Codex or another MCP client.
-- **Continue together.** Edit Docs, Design and Board in the browser, with shared live rooms.
-- **Keep control.** Private by default, explicit sharing, version history and local storage.
+![CodeXArtifacts library showing web pages, documents, slides, designs and boards together](docs/assets/artifacts-overview.png)
 
-Go + React. SQLite. One server. No Cloudflare account or company directory required.
-Early open-source release; see the [limitations](#limitations) before deploying.
+*Actual application screenshot with demonstration content.*
+
+## Formats
+
+| Type in the app | What you can make |
+|---|---|
+| **Web page** | HTML and React pages, interactive tools |
+| **Doc** | Notes, project briefs and documents |
+| **Slides** | Presentations with editable slides |
+| **Design** | Page layouts with desktop and mobile frames |
+| **Board** | Whiteboards, flows and connected ideas |
+
+Docs, Design and Board support live browser collaboration. Artifacts start private;
+you choose who can view or edit them. See [format details and exports](docs/artifact-types.md).
 
 ## Quick start
 
-Requires Go 1.27.1, Git and Make. The build installs its pinned Node 24.22.0 locally,
-verifies the download checksum, and installs locked npm dependencies.
+Install **Go 1.27.1, Git and Make**, then run:
 
 ```sh
 git clone https://github.com/iml885203/code-x-artifacts.git
@@ -28,94 +36,52 @@ make build
 ./bin/codexartifacts
 ```
 
-Open **http://localhost:8080**, sign in as `admin`, and read the generated password
-from `.local/admin-password`. Save it in a password manager, then delete that
-plaintext file. `.local/users.json` contains only the bcrypt hash; keep it private.
-The initializer never overwrites existing files.
+The build downloads its pinned Node.js locally; you do not need to install Node separately.
 
-Data persists under `.local/`: SQLite and artifact assets. Use `localhost`, not
-its IP address: browser sessions use Secure cookies and rely on the localhost exception.
+Open **http://localhost:8080**. Sign in as **admin** using the password in
+`.local/admin-password`. Save the password, then delete that plaintext file.
+Keep the rest of `.local/` private—it holds your accounts, database and files.
+Use `localhost` rather than its IP address for local sign-in.
 
-### Docker Compose
-
-```sh
-docker compose build
-docker compose run --rm app init /data
-docker compose run --rm password cat /data/admin-password
-docker compose up -d
-```
-
-The second one-off helper reads the password from the same named volume. Save it
-securely, then remove the plaintext password file with the helper described in
-[deployment](docs/deployment.md). The application runs as a non-root user;
-port 8080 binds to loopback and the `data` volume persists accounts, SQLite and assets.
+Prefer containers? Follow the [Docker Compose instructions](docs/deployment.md#docker).
 
 ## Connect your agent
 
-Sign in and open **Account → Connect your agent**. Create an individually revocable
-personal token, choose your client, and copy the generated connection details.
-MCP uses streamable HTTP at `/api/mcp`; it requires `Authorization: Bearer <token>`.
-The server name and `PICTOR_TOKEN` environment variable remain compatible with Pictor.
-No plugin is required. Tokens grant the same artifact permissions as their owner.
-
-Ask your agent: “Publish a one-page project overview to CodeXArtifacts.” Have it read
-the server's `kinds` guide for the format before publishing. Browser OAuth is not supported.
-
-## Formats
-
-| Format | Create and continue | Export |
-|---|---|---|
-| Web | HTML or React/TSX, optional versioned files and shared-data bridge | HTML for single-file HTML; browser print |
-| Docs | Markdown publishing, browser block editor and live collaboration | Markdown, experimental DOCX, browser print |
-| Design | HTML frames, visual canvas, live editing and agent operations | ZIP, browser print |
-| Board | Excalidraw canvas, live collaboration and image assets | SVG, browser PNG |
-| Slides | Structured slides, playback and focused slide editing | Browser print |
-
-The actual formats, validation and limitations are described in the
-[artifact contracts](docs/artifact-types.md). A rendered React artifact is not an
-arbitrary npm project: its imports use a pinned, embedded runtime.
-
-## Sharing and storage
-
-Artifacts start private. Authors can invite named editors or share with signed-in
-workspace members. Public links are disabled unless the operator explicitly sets
-`PICTOR_PUBLIC_LINKS=true`. HTML and React execute in an opaque-origin sandbox;
-HTTP and MCP share authorization checks.
-
-SQLite stores metadata, versions and accepted room updates; files live beside it.
-Quiet rooms become version snapshots after two minutes. Run **one replica**.
-Back up the entire data directory while the server is stopped; do not copy only the
-SQLite main file while WAL writes are active. See [deployment](docs/deployment.md).
-
-## Development
-
-```sh
-make hooks
-GO_TEST_FLAGS=-p=2 VERIFY_BUDGET=240 make verify
-make web-dev    # optional Vite hot reload in front of the running Go server
+```mermaid
+flowchart TB
+  clients["Claude Code · Codex · Cursor<br/>OpenCode · other MCP clients"]
+  workspace["CodeXArtifacts<br/>The same artifacts, files and versions"]
+  clients -->|MCP + personal token| workspace
+  classDef client fill:#f5f3ed,stroke:#d8d1d1,color:#211e20;
+  classDef shared fill:#f5e8ed,stroke:#ad4968,color:#211e20;
+  class clients client;
+  class workspace shared;
 ```
 
-The explicit budget accommodates first-run tool installation and race compilation;
-Go package concurrency is bounded for a shared development host, and
-individual test-unit limits stay enabled. `make verify` runs formatting, lint, contracts, frontend and Go tests and build checks.
-Browser tests are separate: `make e2e-browser`, then `make e2e`.
-The [website](website/) is static HTML/CSS: preview with
-`python3 -m http.server 4176 --bind 127.0.0.1 --directory website`.
+1. Open **Connect your agent** in the app.
+2. Create a personal token and copy the connection settings for your client.
+3. Add the MCP server in that client, then ask:
+
+   > Publish a one-page project overview to CodeXArtifacts.
+
+You can connect multiple clients to the same workspace. Tokens use your existing
+artifact permissions and can be revoked individually. Clients need Streamable HTTP
+and Bearer-token support; browser OAuth is not supported.
 
 ## Limitations
 
-- Early release; production hardening and external security review are not claimed.
-- Local accounts are operator-managed in a private JSON file. Optional LDAP needs
-  your own explicit settings. There is no self-registration, reset-email or browser OAuth.
-- Use HTTPS and login rate limits at a trusted reverse proxy for remote access.
-- Live room coordination requires one running server. Multi-replica operation is unsupported.
-- DOCX layout has not been qualified in native Microsoft Word. Slides do not use the
-  same collaborative room model as Docs, Design and Board.
-- The website previews are labelled synthetic illustrations, not application screenshots.
-- A TypeScript backend and Cloudflare-native deployment are deferred.
+- **Early release.** No external security review or production-readiness claim.
+- **One server instance.** Go + React, SQLite and local files; multiple replicas are unsupported.
+- **Operator-managed accounts.** No self-registration or email password reset; LDAP is optional.
+- **Remote hosting needs HTTPS.** Public links are off by default. See [deployment and backups](docs/deployment.md).
+- **Format-specific limits apply.** React uses a bundled runtime; DOCX export is experimental.
+  Slides have a different editing model from Docs, Design and Board. See [artifact contracts](docs/artifact-types.md).
 
-## License and attribution
+## Development
 
-[MIT](LICENSE). This independent release is based on owner-authorized Pictor source,
-with a clean public history. Third-party code and fonts retain their own licenses;
-see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and the embedded runtime notices.
+See the [development guide](docs/development.md) for builds, checks, browser tests and the website preview.
+
+## License
+
+[MIT](LICENSE). Based on owner-authorized Pictor source.
+Third-party code and fonts keep their own licenses: [third-party notices](THIRD_PARTY_NOTICES.md).

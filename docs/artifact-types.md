@@ -1,7 +1,7 @@
 # Artifact 的種類（kind）
 
 `kind` 決定內容如何驗證、如何在 sandbox 畫出來，以及有哪些匯出。分享、編輯權、版本、留言、資產與共享資料仍由共用 service 處理。
-網站把 `html` 與 `react` 都標為「網頁」；Docs、Slides、Design 各有種類圖示；Board 也有。種類不等於 beta 驗收範圍，見[文件索引](README.md#範圍與限制)。
+網站把 `html` 與 `react` 都標為「網頁」；Docs、Slides、Design 各有種類圖示；Board 也有。種類不等於 beta 驗收範圍，見[文件索引](README.md#scope-and-limitations)。
 
 ## 目前的內容契約
 
@@ -12,7 +12,7 @@
 | `doc` | 格式 `2` 的分頁與穩定 id 區塊 JSON；Markdown 是寫入、讀回與匯出形式 | 人直接在 ProseMirror 編輯，agent 用 `publish` 或 `doc_edit`；兩者讀寫同一份 room | Markdown、Word；瀏覽器列印 PDF |
 | `design` | 格式 `1` 的 `design.json` 與 `frames/*.html`，每個 frame 有穩定 id 與元素 `data-pid`，共用具名 token | 人在 sandbox frame 的外層畫布選取／改字／移動／調整屬性；agent 用版本檔案發佈與讀回，live 時合併進 room | 離線 ZIP；瀏覽器列印 PDF |
 | `board` | 格式 `1` 的 JSON `{version, elements}`，元素是 Excalidraw 的元素；存成正規形式（不含已刪除的元素、依繪製順序、標籤依框排好），見 [boardfmt](../internal/boardfmt/AGENTS.md) | 用來畫想法（流程、架構、討論草圖）；可以從「New」開一張空白的；登入的人在 viewer 裡用 Excalidraw 一起畫（看得到彼此的游標，讀者只能看），agent 用 `publish`（可以只寫骨架：框的 `label`、箭頭的 `from`／`to`，server 展開成綁好的元素）、`board_edit`（只改幾個元素，以 `ifHash` 保護）與 `read`；圖片是上傳到白板的檔案（人貼上或拖進來，agent 用 `upload_asset` 再加 `image` 元素）；兩者讀寫同一份 room。舊版本、完整頁面、未登入的讀者與圖庫卡片看到 server 畫的 SVG（`/raw`，線條整齊、不是手繪風格，沒有 script） | SVG（server 畫的，agent 用 `export`）；開著白板的人匯出的 SVG 與 PNG 是編輯器自己畫的（手繪風格；SVG 只寫字型名稱，不帶字型檔）；沒開編輯器時 PNG 由瀏覽器從 server 的 SVG 轉成 |
-| `slides` | 格式 `1` 的結構化 JSON（版面、元素與備忘稿） | 平台 renderer 與播放模式；有權限的人在 viewer 的縮圖列新增、複製、拖曳排序、刪除投影片，在舞台上就地改投影片上的字（標題、文字、清單、表格、卡片等）、從左上的工具插入文字、清單、表格、卡片或大數字，可復原與重做（同一組 slide 路由，改字與插入是 `replace_slide`）；agent 用 `publish` 或一次改一頁的 `get_slide`／`replace_slide`／`insert_slide`／`move_slide`／`delete_slide`；沒有 Docs／Design 的 live 編輯器 | 瀏覽器列印 PDF（一張投影片一頁、16:9、依順序） |
+| `slides` | 格式 `1` 的結構化 JSON（版面、元素與備忘稿） | 平台 renderer 與播放模式；有權限的人在 viewer 的縮圖列新增、複製、拖曳排序、刪除投影片，在舞台上就地改投影片上的字（標題、文字、清單、表格、卡片等）、從左上的工具插入文字、清單、表格、卡片或大數字，可復原與重做（同一組 slide 路由，改字與插入是 `replace_slide`）；agent 用 `publish` 或一次改一頁的 `get_slide`／`replace_slide`／`insert_slide`／`move_slide`／`delete_slide`；沒有 Docs／Design 的 live 編輯器 | PowerPoint（`.pptx`）；瀏覽器列印 PDF（一張投影片一頁、16:9、依順序） |
 
 Design token 的變數語法、允許值、live 傳播與離線 ZIP／列印行為見 [Design 格式](design-format.md) 與 [Design room](design-room.md)。
 
