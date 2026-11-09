@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-09T14:15:12.714513+00:00",
+  "generatedAt": "2026-11-09T15:05:07.235659+00:00",
   "title": "Design System: CodeXArtifacts",
   "extensions": {
     "motion": [
@@ -8,6 +8,16 @@
         "name": "ease-out",
         "value": "cubic-bezier(0.16, 1, 0.3, 1)",
         "purpose": "Existing UI state transitions"
+      },
+      {
+        "name": "website-ease",
+        "value": "cubic-bezier(.19, 1, .22, 1)",
+        "purpose": "Website button 250ms, specimen 600ms, preview arrival 350ms; reduced motion disables these."
+      },
+      {
+        "name": "website-pointer-depth",
+        "value": "6px / -8px / 4px",
+        "purpose": "Fine-pointer only, bounded per-axis; reset on pointer leave and preference changes; disabled for reduced motion."
       }
     ],
     "breakpoints": [
@@ -20,8 +30,12 @@
         "value": "899px"
       },
       {
-        "name": "website-preview-compact",
-        "value": "680px"
+        "name": "website-intermediate",
+        "value": "1100px"
+      },
+      {
+        "name": "website-compact",
+        "value": "900px"
       }
     ],
     "colorMeta": {
@@ -39,6 +53,37 @@
         "role": "primary",
         "displayName": "Dark-theme berry",
         "purpose": "Dark app actions with charcoal labels"
+      }
+    },
+    "shadows": [
+      {
+        "name": "website-document",
+        "value": "0 22px 40px #33242b18",
+        "purpose": "Authored document specimen"
+      },
+      {
+        "name": "website-slide",
+        "value": "0 24px 45px #3e182921",
+        "purpose": "Authored slide specimen"
+      },
+      {
+        "name": "website-board",
+        "value": "0 16px 30px #302b2512",
+        "purpose": "Authored board specimen"
+      }
+    ],
+    "typographyMeta": {
+      "website-brand": {
+        "displayName": "Website Brand",
+        "purpose": "Public website only; application display typography is unchanged."
+      },
+      "website-hero": {
+        "displayName": "Website Hero",
+        "purpose": "Public website only; application display typography is unchanged."
+      },
+      "website-heading": {
+        "displayName": "Website Heading",
+        "purpose": "Public website only; application display typography is unchanged."
       }
     }
   },
@@ -80,25 +125,36 @@
       "description": "Quiet bordered library container; synthetic title only.",
       "html": "<article class=\"ds-card\"><a class=\"ds-card-link\" href=\"#example\"><div class=\"ds-card-meta\"><h2>Project overview</h2><span>Edited now</span></div></a></article>",
       "css": ".ds-card{overflow:hidden;border:1px solid var(--line,oklch(0.91 0.015 80));border-radius:12px;background:var(--plate,white);transition:transform 200ms cubic-bezier(.16,1,.3,1),border-color 200ms cubic-bezier(.16,1,.3,1)}.ds-card:hover,.ds-card:focus-within{transform:translateY(-4px);border-color:var(--edge,oklch(0.62 0.019 83))}.ds-card-link{display:block;color:var(--text,oklch(0.21 0.007 78));text-decoration:none;border-radius:12px}.ds-card-meta{padding:12px;font:400 13px/1.4 var(--font-sans,\"Familjen Grotesk\",sans-serif);color:var(--muted,oklch(0.46 0.015 75))}.ds-card h2{margin:0 0 2px;color:var(--text,oklch(0.21 0.007 78));font-size:15px;line-height:1.35;font-weight:600}.ds-card-link:focus-visible{outline:2px solid var(--text,oklch(0.21 0.007 78));outline-offset:2px;}@media(prefers-reduced-motion:reduce){.ds-card:hover,.ds-card:focus-within{transform:none}}"
+    },
+    {
+      "name": "Primary website action",
+      "kind": "button",
+      "refersTo": "website-button",
+      "description": "Public website pill action; independent of app controls.",
+      "html": "<a class=\"ds-website-button\" href=\"#example\">Explore the formats</a>",
+      "css": ".ds-website-button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;box-sizing:border-box;padding:13px 24px;border-radius:999px;background:var(--ink,#211e20);color:var(--paper,#f5f3ed);font:600 14px \"Familjen Grotesk\",sans-serif;text-decoration:none;transition:transform .25s cubic-bezier(.19,1,.22,1),background-color .2s}.ds-website-button:focus-visible{outline:3px solid var(--berry,#ad4968);outline-offset:5px}.ds-website-button:active{transform:translateY(1px)}@media(hover:hover) and (pointer:fine){.ds-website-button:hover{transform:translateY(-3px)}}@media(prefers-reduced-motion:reduce){.ds-website-button{transition:none}}"
+    },
+    {
+      "name": "Secondary website action",
+      "kind": "button",
+      "refersTo": "website-button-secondary",
+      "description": "Public website pill action; independent of app controls.",
+      "html": "<a class=\"ds-website-button-secondary\" href=\"#example\">Explore the formats</a>",
+      "css": ".ds-website-button-secondary{display:inline-flex;align-items:center;justify-content:center;min-height:48px;box-sizing:border-box;padding:13px 24px;border-radius:999px;background:var(--stage,#eee7e8);color:var(--ink,#211e20);font:600 14px \"Familjen Grotesk\",sans-serif;text-decoration:none;transition:transform .25s cubic-bezier(.19,1,.22,1),background-color .2s}.ds-website-button-secondary:focus-visible{outline:3px solid var(--berry,#ad4968);outline-offset:5px}.ds-website-button-secondary:active{transform:translateY(1px)}@media(hover:hover) and (pointer:fine){.ds-website-button-secondary:hover{transform:translateY(-3px)}}@media(prefers-reduced-motion:reduce){.ds-website-button-secondary{transition:none}}"
     }
   ],
   "narrative": {
     "northStar": "The work continues",
-    "overview": "The owner-selected A website composition and offset-field mark connect a warm, editorial public face to a quiet working interface. Artifacts stay visually primary inside the app; berry marks deliberate actions. This is a Go-backed product with a bilingual interface, not a static UI proposal.",
+    "overview": "The public website expresses a berry artifact studio: oversized neutral type, warm paper and scattered authored specimens connect the offset-field mark to a spacious editorial public face. The app retains its quiet working interface. Artifacts stay visually primary inside the app; berry marks deliberate actions. This is a Go-backed product with a bilingual interface, not a static UI proposal.",
     "keyCharacteristics": [
       "Artifact-first workspace",
       "Deliberate berry actions",
-      "Light and dark app themes"
+      "Light and dark themes with independently scoped website surfaces"
     ],
     "rules": [
       {
         "name": "The Action Contrast Rule",
-        "body": "Keep the brand accent distinct from the app's text-safe action shades; use `--star`, `--on-star`, `--star-edge` and `--star-hover` together. Kit v5 shares those app tokens. Released kit v1–v4 remain immutable and do not inherit the berry update.",
-        "section": "colors"
-      },
-      {
-        "name": "Brand mark color by context",
-        "body": "Use brand berry #AD4968 for standalone website, README, sign-in, favicon and share marks with neutral wordmarks. Product navigation and the website illustrative workspace use theme-aware monochrome marks.",
+        "body": "Keep the brand accent distinct from the app's text-safe action shades; use `--star`, `--on-star`, `--star-edge` and `--star-hover` together. Kit v5 shares those app tokens. Released kit v1\u2013v4 remain immutable and do not inherit the berry update.",
         "section": "colors"
       }
     ],

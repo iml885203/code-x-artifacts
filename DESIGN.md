@@ -9,12 +9,48 @@ colors:
   paper: "#f5f3ed"
   charcoal: "#191d24"
   white: "#ffffff"
+  website-ink: "#211e20"
+  website-muted: "#625b60"
+  website-line: "#d8d1d1"
+  website-warm-white: "#fbfaf6"
+  website-berry-deep: "#8e3451"
+  website-berry-pale: "#f5e8ed"
+  website-stage: "#eee7e8"
+  website-rail: "#20252d"
+  website-panel: "#282e38"
+  website-panel-line: "#454d59"
+  website-panel-copy: "#c3c9d2"
+  website-dark-paper: "#201c20"
+  website-dark-ink: "#f5f0ed"
+  website-dark-muted: "#c0b4bc"
+  website-dark-line: "#4c4149"
+  website-dark-surface: "#2b242b"
+  website-dark-stage: "#352830"
+  website-dark-accent-text: "#e4a7bc"
 typography:
   display:
     fontFamily: "Familjen Grotesk"
     fontSize: "clamp(36px, 4.5vw, 60px)"
     fontWeight: 600
     lineHeight: 1.05
+    letterSpacing: "-0.035em"
+  website-brand:
+    fontFamily: "Familjen Grotesk, sans-serif"
+    fontSize: "clamp(68px, 7.4vw, 104px)"
+    fontWeight: 700
+    lineHeight: 0.83
+    letterSpacing: "-0.04em"
+  website-hero:
+    fontFamily: "Familjen Grotesk, sans-serif"
+    fontSize: "clamp(26px, 2.6vw, 38px)"
+    fontWeight: 450
+    lineHeight: 1.16
+    letterSpacing: "-0.025em"
+  website-heading:
+    fontFamily: "Familjen Grotesk, sans-serif"
+    fontSize: "clamp(32px, 4.3vw, 58px)"
+    fontWeight: 500
+    lineHeight: 1.02
     letterSpacing: "-0.035em"
   body:
     fontFamily: "Familjen Grotesk, Noto Sans TC, system-ui, sans-serif"
@@ -25,7 +61,12 @@ rounded:
   control: "8px"
   field: "10px"
   card: "12px"
-  website-control: "4px"
+  website-action: "999px"
+  website-tab: "7px"
+  website-workspace: "16px"
+  website-specimen: "14px"
+  website-section: "36px"
+  website-closing: "28px"
 spacing:
   small: "8px"
   medium: "16px"
@@ -39,6 +80,16 @@ components:
   button-primary-hover:
     backgroundColor: "{colors.primary-hover}"
     textColor: "{colors.white}"
+  website-button:
+    backgroundColor: "{colors.website-ink}"
+    textColor: "{colors.paper}"
+    rounded: "{rounded.website-action}"
+    padding: "13px 24px"
+  website-button-secondary:
+    backgroundColor: "{colors.website-stage}"
+    textColor: "{colors.website-ink}"
+    rounded: "{rounded.website-action}"
+    padding: "13px 24px"
   input:
     backgroundColor: "{colors.white}"
     rounded: "{rounded.field}"
@@ -54,15 +105,16 @@ components:
 
 **Creative North Star: "The work continues"**
 
-The owner-selected A website composition and offset-field
-mark connect a warm, editorial public face to a quiet working interface.
+The public website expresses a berry artifact studio: oversized neutral type,
+warm paper and scattered authored specimens connect the offset-field mark to
+a spacious editorial public face. The app retains its quiet working interface.
 Artifacts stay visually primary inside the app; berry marks deliberate actions.
 This is a Go-backed product with a bilingual interface, not a static UI proposal.
 
 **Key Characteristics:**
 - Artifact-first workspace
 - Deliberate berry actions
-- Light and dark app themes
+- Light and dark themes with independently scoped website surfaces
 
 ## Colors
 
@@ -73,6 +125,11 @@ shade preserve the kit's existing 7:1 label-contrast requirement; brand berry is
 not substituted for this text-bearing action fill. The source
 of truth for full light/dark tokens is `internal/web/static/style.css`; website
 surface tokens live in `website/styles.css`. Reading contrast is checked in tests.
+The website defaults to warm paper with charcoal text; its theme switch changes
+only the website stage. Dark website tokens are separately named in frontmatter.
+The dark illustrative workspace remains dark in both themes, and its pale demo
+interiors locally fix `--berry-dark: #8e3451` so outer-theme accent text cannot
+reduce their contrast. The closing invitation also keeps its fixed deep berry fill.
 Kind-specific colors identify formats, with a distinct icon as well as color.
 
 **The Action Contrast Rule.** Keep the brand accent distinct from the app's
@@ -83,30 +140,43 @@ remain immutable and do not inherit the berry update.
 ## Typography
 
 Familjen Grotesk is self-hosted for the wordmark, website and Latin UI. Noto Sans TC
-supports Traditional Chinese; Martian Mono is reserved for actual code. Headlines
+supports Traditional Chinese; Martian Mono is reserved for actual code. App headlines
 use a compact line height and tracking no tighter than -0.035em. UI text starts at
 14px, metadata at 12–13px; the website varies scale to distinguish its reading levels.
-The sign-in introduction uses the frontmatter display role; the website hero uses
-48–78px at desktop, 560 weight and 0.99 line height. Georgia appears only inside
+The sign-in introduction uses the frontmatter display role. The website's two-line
+CodeX / Artifacts brand composition uses the website-brand role (including its
+website-only -0.04em tracking); the actual h1 uses website-hero, with its second
+line at 650 weight. Website section headings use website-heading. At 900px and
+below the brand uses clamp(68px, 14vw, 96px), the h1 is 28px, demo heading 38px,
+and workflow/formats headings 42px. Georgia appears only inside
 labelled synthetic artifact illustrations. It is not the website's interface or
 product display face, and illustration-specific type, colors and corners are not
 shared application tokens.
 
 ## Layout
 
-The website keeps the approved centered value proposition and interactive six-format
-illustrative workspace. The app uses its existing library/sidebar and consistent
-viewer bar. Sign-in has a broad product introduction and a narrow account form;
-at 899px and below they stack. The compact website preview at 680px and below
-uses three columns of 11px labels with 44px minimum tab height. Its illustrative
-artwork occupies normal flow below its copy rather than overlapping it.
+The website uses a 1440px maximum container with clamp(22px, 5vw, 72px)
+horizontal padding. A centered two-line brand and value proposition sit among
+rotated document, slide and board specimens. A dark six-format illustrative
+workspace follows, then asymmetric two-column workflow and format sections and
+a berry closing invitation. This replaces the previous A website composition;
+it does not redefine the application layout or released kits.
+
+At 1100px and below specimens tighten, the preview becomes two columns, and its
+continuation panel moves below. At 900px and below specimens enter normal flow
+in two columns, the small board disappears, preview tabs become three columns
+with 44px minimum height, and preview/workflow/formats become single-column.
+Compact tabs use 12px labels; illustration labels remain at least 11px. The app
+retains its existing library/sidebar and viewer bar; sign-in stacks at 899px.
 Validate 320, 375, 768, 1024 and 1440px without page overflow.
 
 ## Elevation & Depth
 
 App surfaces use tonal layers and quiet borders. Menus use the existing soft
-`--float` shadow. The website's main workspace preview uses one broad soft shadow;
-content inside it remains clearly labelled as synthetic illustration.
+`--float` shadow. Website depth belongs to the authored specimens: document shadow
+`0 22px 40px #33242b18`, slide shadow `0 24px 45px #3e182921`, and board shadow
+`0 16px 30px #302b2512`. The main workspace has no shadow. Content inside it
+remains clearly labelled as synthetic illustration.
 
 ## Shapes
 
@@ -118,8 +188,11 @@ monochrome marks that follow the current theme. The website's illustrative
 workspace uses the same monochrome product treatment. Sign-in reuses the fixed
 brand token `--mark-amber` for its mark, independently of action shades.
 Icon/navigation controls use 8px corners, standard buttons and fields use 10px,
-and app cards use 12px. Website action controls use 4px corners. These roles are
-not interchangeable. Do not restore the pixel-easel mark.
+and app cards use 12px. Website actions and GitHub navigation use pill corners; the theme switch and
+scroll control are circles. Website tabs use 7px, workspace 16px (12px compact),
+slide specimen and document toolbar 14px, mini board 12px, section shells 36px
+(25px compact), and closing shell 28px (20px compact). These website surface
+roles do not replace the app's 8/10/12px geometry. These roles are not interchangeable. Do not restore the pixel-easel mark.
 
 ## Components
 
@@ -140,6 +213,17 @@ keyboard behavior.
 Theme and language remain in the account menu; sign-in exposes language in its
 footer. Keep loading, errors, empty states and recovery paths visible.
 The website's radio tabs change the labelled format example without network work.
+Specimen and format links select the radio, focus it, and scroll to the workspace.
+The website theme button updates its accessible label and pressed state, starts
+in light mode and does not persist or change the account theme. Website actions
+have a 48px minimum height and 3px berry focus outline with 5px offset.
+
+Website easing is cubic-bezier(.19, 1, .22, 1): buttons lift 3px over 250ms,
+specimen hover rotation/lift takes 600ms, and preview arrival takes 350ms.
+Fine-pointer hero movement is requestAnimationFrame-bounded to 6/-8/4px per
+specimen, resets on pointer leave or preference change, and has no ongoing loop.
+Reduced motion removes transitions, animation, smooth scrolling and specimen
+translation. Touch and coarse pointers do not trigger depth.
 
 ## Do's and Don'ts
 

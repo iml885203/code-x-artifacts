@@ -25,7 +25,9 @@ Native Cloudflare and a TypeScript backend are deferred. OAuth is not implemente
 
 ## Brand Commitments
 Exact name CodeXArtifacts. Owner-selected berry #AD4968, warm paper and charcoal,
-offset-field mark and A website composition reused from the private research project.
+offset-field mark reused from the private research project. The public website
+now uses a berry artifact studio composition inspired by the owner-pinned Astryx
+reference; this replaces the earlier A website composition only.
 English README and website; English and Traditional Chinese product UI.
 Dark and light themes, keyboard access and reduced motion remain supported.
 
