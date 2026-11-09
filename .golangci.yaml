@@ -1,0 +1,79 @@
+# The linter set stands in for code review: no human reads this code by hand,
+# so anything a reviewer would have caught has to be caught here or not at all.
+# Adapted from an independent local verification harness. Upgrading the pinned version (Makefile) is a
+# deliberate change.
+version: "2"
+run:
+  tests: true
+linters:
+  default: none
+  enable:
+    - bodyclose
+    - contextcheck
+    - copyloopvar
+    - depguard
+    - errcheck
+    - errorlint
+    - exhaustive
+    - forbidigo
+    - gochecknoinits
+    - gocritic
+    - gocyclo
+    - gosec
+    - govet
+    - ineffassign
+    - misspell
+    - nilerr
+    - noctx
+    - nolintlint
+    - paralleltest
+    - tparallel
+    - revive
+    - staticcheck
+    - unconvert
+    - unparam
+    - unused
+  settings:
+    depguard:
+      rules:
+        # Rules and storage return errors; the edges (web, mcptools, cmd) decide
+        # what to log. realtime is not listed because it owns background
+        # goroutines (compaction, idle unload, ping) with no caller to return
+        # an error to, so it logs with slog.
+        no-slog-below-the-edges:
+          files:
+            - "**/internal/service/**"
+            - "**/internal/store/**"
+            - "**/internal/kind/**"
+            - "**/internal/files/**"
+            - "**/internal/docfmt/**"
+            - "**/internal/designfmt/**"
+            - "**/internal/designroom/**"
+            - "!$test"
+          deny:
+            - pkg: log/slog
+              desc: return the error and let the caller log; background goroutines belong in internal/realtime
+    forbidigo:
+      forbid:
+        # Structured logging only (log/slog). User output goes through an
+        # io.Writer the caller hands in, so a test can capture it.
+        - pattern: ^fmt\.Print.*$
+          msg: write to the io.Writer you were given, or log with slog
+        - pattern: ^log\.(Print|Fatal|Panic).*$
+          msg: use log/slog
+    gocyclo:
+      min-complexity: 15
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+  exclusions:
+    rules:
+      # Parallel tests are required in internal/web only.
+      # The other packages' tests are small and not audited for shared state.
+      - path-except: internal/web/
+        linters:
+          - paralleltest
+          - tparallel
+formatters:
+  enable:
+    - gofumpt

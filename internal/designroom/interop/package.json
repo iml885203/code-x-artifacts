@@ -1,0 +1,16 @@
+{
+  "name": "pictor-designroom-interop",
+  "private": true,
+  "type": "module",
+  "description": "Writes, with the real yjs library, the formatted text of a design in a room, and checks the formatted text Go wrote. See docs/design-room.md.",
+  "engines": {
+    "node": "24.22.0"
+  },
+  "scripts": {
+    "generate": "node generate.mjs",
+    "check": "node check.mjs"
+  },
+  "dependencies": {
+    "yjs": "13.6.33"
+  }
+}

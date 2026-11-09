@@ -1,0 +1,17 @@
+{
+  "share.title": "Who can open this",
+  "share.button": "Share",
+  "share.dialog": "Share “{title}”",
+  "share.link": "Link",
+  "share.people": "People with access",
+  "share.owner": "Owner",
+  "share.editor": "Can edit",
+  "share.reader": "Can view",
+  "share.everyone": "Everyone in the organisation",
+  "share.anyone": "Anyone with the link",
+  "share.done": "Done",
+  "share.saving": "Saving access…",
+  "share.saved": "Access saved.",
+  "share.immediate": "Changes are saved immediately.",
+  "share.accountHint": "Use your colleague’s sign-in account name."
+}

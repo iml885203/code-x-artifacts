@@ -1,0 +1,35 @@
+{
+  "name": "two-people",
+  "body": "<p data-pid=\"e2\">Hello brave <b data-pid=\"e3\">new</b> world today</p>",
+  "pid": "e2",
+  "delta": [
+    {
+      "insert": "Hello brave "
+    },
+    {
+      "attributes": {
+        "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}"
+      },
+      "insert": "new"
+    },
+    {
+      "insert": " world today"
+    }
+  ],
+  "edits": {
+    "alice": {
+      "replace": [
+        "brave",
+        "kind"
+      ]
+    },
+    "bob": {
+      "format": [
+        "today",
+        "f:e90",
+        "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e90\"]]}"
+      ]
+    }
+  },
+  "afterEdits": "<p data-pid=\"e2\">Hello kind <b data-pid=\"e3\">new</b> world <b data-pid=\"e90\">today</b></p>"
+}

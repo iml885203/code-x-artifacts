@@ -1,0 +1,89 @@
+# Self-hosting CodeXArtifacts
+
+## Accounts
+
+`codexartifacts init [directory]` creates `users.json` and a random `admin-password`
+in a directory readable only by its owner. Both files are created exclusively:
+existing files are never overwritten. The service defaults to `.local/users.json`.
+Set `PICTOR_USERS_FILE` to use another private file. Restart after editing accounts.
+
+Each JSON entry has `username`, `displayName`, `passwordHash` and `groups`.
+Usernames use 1–64 lowercase ASCII letters, numbers, dots, hyphens or underscores.
+Use a unique username and bcrypt cost 10–14; plaintext passwords are refused.
+To hash a new password without placing it in shell history or process arguments:
+
+```sh
+read -rs PASSWORD
+printf '%s' "$PASSWORD" | ./bin/codexartifacts hash-password
+unset PASSWORD
+```
+
+Paste the resulting hash into the private JSON file. Passwords must be 12–72 bytes.
+Accounts in the file can sign in; group membership is shared with the existing
+artifact authorization model. There is no signup or email password reset.
+Removing an account blocks new sign-ins; to revoke its existing sessions and
+personal tokens, stop the service and invalidate the account's sessions/tokens
+before exposing it again. Account removal alone is not immediate session revocation.
+
+## Runtime settings
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `PICTOR_ADDR` | `127.0.0.1:8080` | Listen address |
+| `PICTOR_DB` | `.local/codexartifacts.db` | SQLite database |
+| `PICTOR_ASSETS_DIR` | `assets` beside the database | Uploaded files |
+| `PICTOR_USERS_FILE` | `.local/users.json` | Private local account hashes |
+| `PICTOR_AUTH` | `local` | `local` or explicitly configured `ldap` |
+| `PICTOR_PUBLIC_LINKS` | `false` | Allow authors to publish public links |
+| `PICTOR_USAGE_READERS` | empty | Comma-separated accounts allowed to read usage |
+
+The `PICTOR_` setting names and `window.pictor` artifact API are retained for
+compatibility. Product branding is CodeXArtifacts.
+
+LDAP is optional: set `PICTOR_AUTH=ldap` and supply `LDAP_URL`, `LDAP_DOMAIN`,
+`LDAP_BASE_DN`, plus optional comma-separated `LDAP_ALLOWED_GROUPS`.
+No company directory, internal host or organization credentials are built in.
+Simple bind is used only over LDAPS; other LDAP connections use NTLM.
+
+## Docker
+
+The Compose application runs as uid/gid 65532 and uses one named `data` volume.
+Build it, initialize accounts once, read the password, then start it:
+
+```sh
+docker compose build
+docker compose run --rm app init /data
+docker compose run --rm password cat /data/admin-password
+docker compose run --rm password rm /data/admin-password
+docker compose up -d
+```
+
+The `password` helper has no listener and uses the same non-root identity.
+Save the password before deleting its plaintext bootstrap file. The bcrypt account
+file remains. The image contains no runtime Node.js or shell.
+
+For a remote deployment, put a trusted HTTPS reverse proxy in front of the
+loopback port, configure login rate limiting and request-size/time limits there,
+and preserve WebSocket upgrades. Secure cookies remain enabled; plain HTTP is
+only practical through browsers' `localhost` exception. Do not expose the local
+password/bootstrap files through a web server or commit them.
+
+## Persistence and recovery
+
+Run one replica: live room coordination is in memory and its accepted updates
+are logged to SQLite before broadcasting. Restart recovery uses those logs.
+Stop the application, copy the full data directory/volume to a private backup,
+then restart. Retain SQLite WAL/SHM files if present and all assets, account hashes
+and session-key database state. Restore to a separate data directory first and
+verify representative artifacts, permissions, files and continued editing before
+switching users to it. Never mount the same SQLite volume into two active instances.
+
+The `/healthz` endpoint is a liveness check; it does not prove login, publishing
+or persistence. Deployment acceptance should verify those application behaviors.
+
+## Bundled font fallback
+
+The legacy Board fallback slot uses the OFL-licensed Arimo font in this distribution.
+Its metrics and appearance are not claimed identical to the legacy Liberation binary.
+Other bundled Board families retain their upstream files and copyright notices.
+The build keeps all font requests on the same origin.

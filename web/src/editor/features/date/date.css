@@ -1,0 +1,7 @@
+.ed-date { padding: 0 var(--space-1); border-radius: var(--r-tip); background: var(--raised); font-variant-numeric: tabular-nums; cursor: pointer; transition: background var(--dur) var(--ease-out); }
+.ed-date:hover { background: var(--line); }
+.ed-date-tools { flex-wrap: wrap; }
+.ed-date-tools label { display: flex; align-items: center; gap: var(--space-2); }
+.ed-date-tools input { min-height: 44px; }
+.ed-doc[contenteditable="false"] .ed-date { padding: 0; background: none; cursor: text; }
+@media print { .ed-date { padding: 0; background: none; } .ed-date-tools { display: none; } }

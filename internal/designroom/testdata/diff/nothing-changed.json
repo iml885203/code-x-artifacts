@@ -1,0 +1,19 @@
+{
+  "name": "nothing changed",
+  "before": [
+    {
+      "insert": "same"
+    }
+  ],
+  "after": [
+    {
+      "insert": "same"
+    }
+  ],
+  "want": {
+    "start": 4,
+    "end": 4,
+    "insert": [],
+    "formats": []
+  }
+}

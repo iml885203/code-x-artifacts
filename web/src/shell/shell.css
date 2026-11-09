@@ -1,0 +1,23 @@
+/* The avatar menu: the account line, then the language and theme groups. The menu itself (.menu, .menu-item) is in app.css. */
+.account-menu { min-width: 220px; }
+.account-menu .menu-label { text-transform: none; }
+/* Account identity is secondary to Share/New, with a circular 44px target. */
+.initials.account-avatar { background: var(--raised); border: 1px solid var(--edge); border-radius: 50%; color: var(--text); font: 600 13px/1 var(--font-sans); letter-spacing: 0; transition: background var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out); }
+.initials.account-avatar:hover { background: var(--plate); border-color: var(--muted); }
+.initials.account-avatar:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.account-menu .account-identity { color: var(--text); font: 600 13px/1.5 var(--font-sans); overflow-wrap: anywhere; }
+
+.account-menu { width: 248px; max-width: calc(100vw - 24px); max-height: var(--radix-dropdown-menu-content-available-height); overflow-y: auto; background: var(--raised); border-color: var(--edge-pop); }
+.account-menu .menu-item[data-highlighted] { background: var(--plate); }
+.account-handle { display: block; margin-top: 2px; color: var(--muted); font-weight: 400; }
+.library .account-trigger { display: flex; align-items: center; gap: var(--space-2); width: 100%; min-height: 48px; padding: var(--space-1) var(--space-2); border: 0; border-radius: var(--r-icon); background: none; text-align: left; transition: background var(--dur) var(--ease-out); }
+.library .account-trigger:hover, .library .account-trigger[data-state="open"] { background: var(--raised); }
+.account-trigger .account-avatar { flex: none; width: 32px; min-width: 32px; height: 32px; min-height: 32px; }
+.account-trigger .lib-account-name { flex: 1; }
+.account-trigger > .icon { flex: none; width: 14px; height: 14px; transition: rotate var(--dur) var(--ease-out); }
+.account-trigger[data-state="open"] > .icon { rotate: 180deg; }
+@media (max-width: 640px) {
+  .library .lib-nav { grid-template-columns: minmax(0, 1fr) var(--target) auto; }
+  .library .account-trigger { width: var(--target); min-height: var(--target); padding: 6px; }
+  .library .account-trigger > .icon { display: none; }
+}

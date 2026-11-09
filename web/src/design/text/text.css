@@ -1,0 +1,2 @@
+/* While a person types into a frame, the frame takes the pointer: a click in it places the caret. */
+.dframe[data-editing] iframe { pointer-events: auto; }

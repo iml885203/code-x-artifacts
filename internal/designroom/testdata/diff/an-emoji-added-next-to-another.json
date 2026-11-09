@@ -1,0 +1,23 @@
+{
+  "name": "an emoji added next to another",
+  "before": [
+    {
+      "insert": "😀"
+    }
+  ],
+  "after": [
+    {
+      "insert": "😀😀"
+    }
+  ],
+  "want": {
+    "start": 2,
+    "end": 2,
+    "insert": [
+      {
+        "insert": "😀"
+      }
+    ],
+    "formats": []
+  }
+}

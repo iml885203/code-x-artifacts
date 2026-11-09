@@ -1,0 +1,31 @@
+.board {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.board-canvas {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.board-canvas > .excalidraw {
+  position: absolute;
+  inset: 0;
+}
+
+/* Tools a board does not offer: an embed loads another site and the hub refuses it;
+   the AI frame needs a service CodeXArtifacts does not call. */
+.board [data-testid="toolbar-embeddable"],
+.board [data-testid="toolbar-magicframe"] {
+  display: none;
+}
+
+/* On a board 1 and 0 are zoom keys, as on a design (keys.ts), not the editor's
+   selection and eraser keys, so their hints are not shown. */
+.board [data-testid="toolbar-selection"] .ToolIcon__keybinding,
+.board [data-testid="toolbar-eraser"] .ToolIcon__keybinding {
+  display: none;
+}

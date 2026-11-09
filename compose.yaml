@@ -1,0 +1,20 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      PICTOR_ADDR: "0.0.0.0:8080"
+      PICTOR_DB: /data/codexartifacts.db
+      PICTOR_USERS_FILE: /data/users.json
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - data:/data
+  password:
+    image: busybox:1.37.0
+    profiles: [tools]
+    user: "65532:65532"
+    volumes:
+      - data:/data
+volumes:
+  data:

@@ -1,0 +1,164 @@
+/* The library: the left rail, the top row, the scope tabs and the wall of cards
+   (DESIGN.md "作品庫"). Colours, radii and sizes are the site's tokens. Every
+   rule is scoped under .library so the older overview rules in app.css never
+   reach it. */
+
+.library { display: grid; grid-template-columns: var(--nav-w) minmax(0, 1fr); min-height: 100vh; background: var(--night); }
+
+/* ---- The rail ---- */
+.lib-nav { position: sticky; top: 0; display: flex; flex-direction: column; gap: var(--space-4); height: 100vh; padding: var(--space-4) var(--space-3); border-right: 1px solid var(--line); background: var(--plate); }
+.lib-nav .brand { padding: 0 var(--space-2); }
+.lib-nav-list { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.lib-nav-item { display: flex; align-items: center; gap: var(--space-3); min-height: 40px; padding: 0 var(--space-3); border-radius: var(--r-icon); color: var(--text-2); transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out); }
+.lib-nav-item:hover { background: var(--raised); color: var(--text); }
+.lib-nav-item[aria-current="page"] { background: var(--raised); color: var(--text); font-weight: 600; }
+.lib-nav-item .icon { flex: none; width: 16px; height: 16px; }
+.lib-nav-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lib-nav-item .count { margin-left: auto; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.library .lib-nav-toggle { display: none; }
+.lib-nav-me { display: flex; align-items: center; gap: var(--space-2); margin-top: auto; }
+.library .lib-account-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-size: 13px; }
+
+/* ---- The page ---- */
+.library .lib-main { min-width: 0; padding: var(--space-5) var(--space-7) var(--space-8); }
+.lib-top { display: flex; align-items: center; gap: var(--space-3); }
+.lib-top .spacer { flex: 1; }
+.library .lib-search { flex: 0 1 360px; width: auto; min-height: var(--target); }
+.lib-tabs { display: flex; gap: var(--space-5); margin: var(--space-4) 0 var(--space-5); border-bottom: 1px solid var(--line); overflow-x: auto; }
+.library .lib-tab { min-height: var(--target); margin-bottom: -1px; padding: 0 var(--space-1); border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; color: var(--text-2); white-space: nowrap; transition: color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out); }
+.library .lib-tab:focus-visible { outline-offset: -3px; }
+.library .lib-tab:hover { background: none; color: var(--text); }
+.library .lib-tab[data-state="on"] { border-bottom-color: var(--star); color: var(--text); font-weight: 600; }
+.library .lib-tab .count { margin-left: var(--space-2); color: var(--muted); font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
+
+/* ---- The wall ---- */
+.card { position: relative; }
+/* The preview is a screen inset in a wash of the kind's colour: the page inside is clipped, never the whole document. */
+.thumb { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; background: color-mix(in oklch, var(--wash, var(--plate)), var(--plate) 55%); }
+.thumb-screen { position: absolute; inset: var(--space-4) var(--space-4) 0; overflow: hidden; border: 1px solid var(--line); border-bottom: 0; border-radius: var(--r-card) var(--r-card) 0 0; background: var(--plate); }
+/* The half-size glimpse fades throughout the screen, keeping dense content quiet without an empty lower band. */
+.thumb-screen { -webkit-mask-image: linear-gradient(to bottom, #000 20%, transparent 100%); mask-image: linear-gradient(to bottom, #000 20%, transparent 100%); }
+.thumb iframe { position: absolute; top: 0; left: 0; width: 200%; height: 200%; border: 0; background: #fff; opacity: 0; transform: scale(0.5); transform-origin: 0 0; pointer-events: none; transition: opacity var(--dur) var(--ease-out); }
+.thumb-screen.loaded iframe { opacity: 1; }
+/* A page without a background of its own is white; on the dark theme the slab is dimmed so it does not outshine the title below it. */
+:root[data-theme="dark"] .thumb-screen.loaded iframe { opacity: 0.86; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .thumb-screen.loaded iframe { opacity: 0.86; } }
+.card.plate .thumb { animation: breathe 1.6s ease-in-out infinite alternate; }
+@keyframes breathe { from { opacity: 0.6; } to { opacity: 1; } }
+.lib-grid { position: relative; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--space-5); margin: 0; padding: 0; list-style: none; }
+.lib-grid .card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--plate); transition: transform var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out); }
+.lib-grid .card:not(.plate):hover, .lib-grid .card:not(.plate):focus-within { transform: translateY(-4px); border-color: var(--edge); }
+.lib-grid .card-link { display: flex; flex: 1; align-items: stretch; flex-direction: column; padding: 0; border-radius: var(--r-card); color: inherit; }
+.lib-grid .card .card-link:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.lib-grid .card .card-title { display: -webkit-box; min-height: 2.7em; margin: 0; padding: 0; color: var(--text); overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 15px; line-height: 1.35; font-weight: 600; letter-spacing: 0; overflow-wrap: anywhere; }
+.title-field { width: calc(100% - var(--space-2)); margin: var(--space-2) var(--space-1); font: 600 15px/1.35 var(--font-sans); }
+
+/* The footer is the link's last block and the link takes the spare height, so it sits at the bottom of every card in a row: kind, title with its time and author, then the open state. */
+.card-meta { display: flex; flex: 1; align-items: center; gap: var(--space-3); min-width: 0; margin: 0; padding: var(--space-3); color: var(--muted); font-size: 13px; line-height: 1.4; }
+.card-text { display: grid; grid-template-columns: minmax(0, 1fr); flex: 1; gap: 2px; min-width: 0; }
+/* The author takes the next line when the time leaves no room for the whole name, so a long time never cuts the name to a letter. */
+.card-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 2px var(--space-2); min-width: 0; }
+.card-meta time { flex: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.card-meta .audience { flex: none; }
+.library .audience.open { color: var(--text-2); }
+.card-meta .comments-new { flex: none; white-space: nowrap; }
+.card-author { display: inline-flex; flex: 0 1 auto; align-items: center; gap: var(--space-1); min-width: 0; }
+.card-author-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-meta .card-face { width: 20px; height: 20px; border: 0; font-size: 11px; }
+
+/* Pin and "⋯" are one group at the preview's upper right, outside the link. They show with the pointer, the keyboard or an open menu (a pinned pin stays) and always on a screen without hover. Each is 32px with a 44px area to hit, centred on it whatever its border; the 12px gap keeps the two areas apart. */
+.library .card-actions { position: absolute; top: var(--space-2); right: var(--space-2); display: flex; align-items: center; gap: 12px; }
+.library .item-pin, .library .item-more { position: relative; display: inline-grid; place-items: center; flex: none; width: 32px; min-width: 32px; height: 32px; min-height: 32px; padding: 0; border-color: var(--edge); background: color-mix(in oklch, var(--plate), transparent 8%); color: var(--text); opacity: 0; transition: opacity var(--dur) var(--ease-out), background var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out); }
+.library .item-pin::before, .library .item-more::before { content: ""; position: absolute; top: 50%; left: 50%; width: var(--target); height: var(--target); transform: translate(-50%, -50%); }
+.library .lib-row .item-pin { background: none; color: var(--text-2); }
+.library .lib-row .item-more { background: none; }
+.library .item-pin:hover, .library .item-more:hover { background: var(--raised); }
+.library .card:hover .item-pin, .library .card:focus-within .item-pin, .library .card:hover .item-more, .library .card:focus-within .item-more,
+.library .lib-row:hover .item-pin, .library .lib-row:focus-within .item-pin, .library .lib-row:hover .item-more, .library .lib-row:focus-within .item-more,
+.library .card-actions:has(.item-more[data-state="open"]) > button,
+.library .item-more[data-state="open"], .library .item-pin.pinned { opacity: 1; }
+.library .item-pin.pinned { border-color: transparent; }
+.library .item-pin .icon.filled { fill: var(--star); stroke: var(--star-edge); }
+@media (hover: none) { .library .item-pin, .library .item-more { opacity: 1; } }
+
+
+/* ---- Group by and the view ---- */
+.library .lib-group-button { display: inline-flex; white-space: nowrap; align-items: center; gap: var(--space-2); min-height: var(--target); padding: 0 var(--space-3); border-radius: var(--r-field); }
+.lib-group-current { color: var(--muted); font-weight: 400; }
+.lib-group-button .icon { width: 14px; height: 14px; }
+.lib-views { display: inline-flex; border: 1px solid var(--edge); border-radius: var(--r-field); }
+.library .lib-view { position: relative; display: inline-grid; place-items: center; width: var(--target); min-width: var(--target); height: var(--target); padding: 0; border: 0; border-radius: var(--r-field); background: none; color: var(--text-2); }
+.library .lib-view[aria-pressed="true"] { background: var(--text); color: var(--night); }
+.lib-group + .lib-group { margin-top: var(--space-6); }
+.lib-group-head { display: flex; align-items: baseline; gap: var(--space-2); margin: 0 0 var(--space-3); color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; }
+.lib-group-head .count { font-weight: 400; font-variant-numeric: tabular-nums; }
+.lib-group-head[data-kind] { color: var(--kh); }
+
+/* ---- The list: borderless rows ---- */
+.lib-list { margin: 0; padding: 0; list-style: none; }
+.library .lib-row { position: relative; display: flex; align-items: center; gap: var(--space-3); min-height: var(--row-h); padding: 0 var(--space-2); border-radius: var(--r-field); transition: background var(--dur) var(--ease-out); }
+.library .lib-row:hover, .library .lib-row:focus-within { background: var(--raised); }
+.row-link { display: flex; flex: 1; align-items: center; gap: var(--space-3); min-width: 0; min-height: var(--row-h); color: inherit; border-radius: var(--r-field); }
+.library .lib-row .row-link:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.lib-row .row-title { min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 500; letter-spacing: 0; }
+.row-unread { display: inline-grid; flex: none; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--text); color: var(--night); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.row-side { display: flex; flex: none; align-items: center; gap: var(--space-3); color: var(--muted); font-size: 13px; }
+.row-side time { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lib-row .title-field { flex: 1; width: auto; margin: 0; }
+
+/* The card's menu. */
+.card-menu { width: 260px; }
+.menu-key { margin-left: auto; padding: 0; border: 0; background: none; color: var(--muted); font: 12px/1 var(--font-mono); }
+
+/* ---- A phone: one column and the rail a bar ---- */
+@media (max-width: 640px) {
+  .library { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: start; }
+  .library .lib-nav { position: static; display: grid; grid-template-columns: minmax(0, 1fr) var(--target) var(--target); align-items: center; gap: var(--space-2); height: auto; padding: var(--space-2) var(--space-4); border-right: 0; border-bottom: 1px solid var(--line); }
+  .library .lib-nav .brand { min-width: 0; padding: 0; }
+  .library .lib-nav-toggle { display: inline-grid; }
+  .library .lib-nav-list { display: none; grid-column: 1 / -1; grid-row: 2; }
+  .library .lib-nav-list.open { display: grid; }
+  .library .lib-nav-me { grid-column: 3; grid-row: 1; margin: 0; }
+  .library .lib-account-name { display: none; }
+  .library .lib-main { padding: var(--space-4); }
+  .library .lib-top { flex-wrap: wrap; gap: var(--space-2); }
+  .library .lib-search { flex: 1 1 100%; min-width: 0; }
+  .library .lib-tabs { margin: var(--space-3) 0 var(--space-4); }
+  .lib-top .spacer { display: none; }
+
+  .lib-grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
+  .row-side time, .row-side .audience { display: none; }
+  .library .lib-group-button .lib-group-current { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lib-grid .card:not(.plate):hover, .lib-grid .card:not(.plate):focus-within { transform: none; }
+}
+
+/* One stable sticky region keeps the same controls mounted and focused while scrolling. */
+.lib-controls { position: sticky; top: 0; z-index: 10; padding: var(--space-3) 0 0; margin-top: calc(-1 * var(--space-3)); margin-bottom: var(--space-5); background: var(--night); border-bottom: 1px solid var(--line); }
+.lib-controls .lib-tabs { margin: var(--space-2) 0 0; border-bottom: 0; padding: 2px; }
+.library .lib-search { min-width: 0; transition: border-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out); }
+.library .lib-search:focus-visible { outline: none; border-color: var(--text); box-shadow: inset 0 0 0 1px var(--text); }
+.library .lib-wall { scroll-margin-top: 120px; }
+.library .lib-row, .library .card, .library .row-link, .library .card-link { scroll-margin-top: 120px; }
+@media (max-width: 980px) and (min-width: 641px) {
+  .lib-top { flex-wrap: wrap; gap: var(--space-2); }
+  .library .lib-search { flex: 1 1 180px; }
+  .lib-top .spacer { display: none; }
+  .lib-group-current { display: none; }
+}
+@media (max-width: 640px) {
+  .library .lib-top { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; }
+  .library .lib-search { grid-column: 1 / 3; grid-row: 1; width: 100%; }
+  .library .new-button { grid-column: 3; grid-row: 1; }
+  .library .lib-group-button { grid-column: 1; grid-row: 2; }
+  .library .lib-views { grid-column: 2 / 4; grid-row: 2; justify-self: end; }
+  .lib-controls { padding-top: var(--space-2); margin-top: calc(-1 * var(--space-2)); margin-bottom: var(--space-4); }
+  .lib-controls .lib-tabs { margin-top: var(--space-1); gap: var(--space-4); }
+  .library .lib-row, .library .card, .library .row-link, .library .card-link { scroll-margin-top: 172px; }
+}
+
+.library .lib-view { border-radius: 0; }
+.library .lib-view:first-child { border-radius: calc(var(--r-field) - 1px) 0 0 calc(var(--r-field) - 1px); }
+.library .lib-view:last-child { border-radius: 0 calc(var(--r-field) - 1px) calc(var(--r-field) - 1px) 0; }

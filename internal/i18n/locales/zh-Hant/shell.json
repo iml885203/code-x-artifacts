@@ -1,0 +1,10 @@
+{
+  "shell.language": "語言",
+  "shell.language.en": "English",
+  "shell.language.zh-Hant": "中文",
+  "shell.theme": "主題",
+  "shell.theme.system": "跟隨系統",
+  "shell.theme.light": "淺色",
+  "shell.theme.dark": "深色",
+  "shell.languageFailed": "無法切換語言，請再試一次"
+}

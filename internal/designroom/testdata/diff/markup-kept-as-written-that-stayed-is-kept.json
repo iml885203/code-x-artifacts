@@ -1,0 +1,36 @@
+{
+  "name": "markup kept as written that stayed is kept",
+  "before": [
+    {
+      "insert": "a"
+    },
+    {
+      "insert": {
+        "raw": "<mark>m</mark>"
+      }
+    }
+  ],
+  "after": [
+    {
+      "insert": "a"
+    },
+    {
+      "insert": {
+        "raw": "<mark>m</mark>"
+      }
+    },
+    {
+      "insert": "b"
+    }
+  ],
+  "want": {
+    "start": 2,
+    "end": 2,
+    "insert": [
+      {
+        "insert": "b"
+      }
+    ],
+    "formats": []
+  }
+}

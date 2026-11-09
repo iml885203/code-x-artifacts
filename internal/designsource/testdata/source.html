@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html><head><style>.card { color: var(--ink); }</style></head><body data-pid="root">
+<script type="application/x-pictor-props+json">{"schema":{"title":{"type":"string","default":"Cards","maxLength":80}},"values":{}}</script>
+<script type="text/x-pictor">class Frame extends PictorLogic { render() { return {items: []}; } choose(event) {} }</script>
+<h1 data-pid="heading">{{props.title}}</h1>
+<p-for data-pid="cards" list="{{items}}" as="item" key="{{item.id}}" hint-count="3"><p-if data-pid="visible" value="{{item.visible}}"><button data-pid="choose" p-on:click="{{choose}}"><strong data-pid="label">{{item.name}}</strong></button></p-if></p-for>
+<svg data-pid="drawing" viewBox="0 0 10 10"><defs data-pid="defs"><linearGradient data-pid="gradient" id="ink" gradientUnits="userSpaceOnUse"><stop data-pid="stop" offset="0" stop-color="red"></stop></linearGradient></defs><path data-pid="pen" d="M0 0 L10 10" stroke="url(#ink)" fill="none"></path></svg>
+</body></html>

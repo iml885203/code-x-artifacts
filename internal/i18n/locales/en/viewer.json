@@ -1,0 +1,21 @@
+{
+  "viewer.copyLink": "Copy link",
+  "viewer.copy": "Make a copy",
+  "viewer.copied": "Copied. This is your own private copy.",
+  "viewer.copyFailed": "Couldn't make a copy. Try again.",
+  "viewer.copiedFrom": "Copied from {title}",
+  "viewer.openRaw": "Open in new tab",
+  "viewer.delete": "Delete…",
+  "viewer.confirmDelete": "Delete this artifact?",
+  "viewer.confirmDeleteHint": "The page and its shared data are removed for everyone. This can't be undone.",
+  "viewer.cancel": "Cancel",
+  "viewer.more": "More actions",
+  "viewer.undo": "Undo",
+  "viewer.changedTo": "Changed to {visibility}",
+  "viewer.changeFailed": "Couldn't change who can open this. Try again.",
+  "viewer.deleteFailed": "Couldn't delete this artifact. Try again.",
+  "viewer.deleteConfirm": "Delete",
+  "viewer.versions": "Versions",
+  "viewer.downloadFailed": "Couldn't download this artifact. Try again.",
+  "viewer.files": "Files"
+}

@@ -1,0 +1,6 @@
+.pen-draw { position: absolute; inset: 0; z-index: 2; cursor: crosshair; touch-action: none; }
+.pen-preview { position: absolute; pointer-events: none; overflow: visible; }
+.pen-fields { display: grid; gap: var(--space-3); padding: var(--space-3); }
+.pen-fields label { display: grid; gap: var(--space-1); font-size: 13px; color: var(--muted); }
+.pen-fields input { min-width: 0; width: 100%; min-height: var(--target); padding: 0 var(--space-3); color: var(--text); background: var(--field); border: 1px solid var(--edge); border-radius: var(--r-field); font: inherit; }
+.pen-error { margin: 0; color: var(--danger); font-size: 13px; }

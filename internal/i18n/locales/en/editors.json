@@ -1,0 +1,8 @@
+{
+  "editors.account": "Account name",
+  "editors.add": "Add",
+  "editors.remove": "Remove",
+  "editors.organisation": "Everyone in the organisation can edit",
+  "editors.hint": "Editors can publish new versions, restore versions and manage files. They can't change who sees it, who edits it, or delete it.",
+  "editors.failed": "Couldn't change the editors. Try again."
+}

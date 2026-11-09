@@ -1,0 +1,9 @@
+{
+  "pen.draw": "Draw a pencil stroke",
+  "pen.stroke": "Pencil stroke",
+  "pen.tool": "Pen",
+  "pen.color": "Stroke color",
+  "pen.width": "Stroke width",
+  "pen.invalid": "Use a hex color or var(--token), and a width from 0.5 to 64.",
+  "pen.settings": "Pen settings"
+}

@@ -1,0 +1,23 @@
+{
+  "name": "one word replaced",
+  "before": [
+    {
+      "insert": "Hello world"
+    }
+  ],
+  "after": [
+    {
+      "insert": "Hello there"
+    }
+  ],
+  "want": {
+    "start": 6,
+    "end": 11,
+    "insert": [
+      {
+        "insert": "there"
+      }
+    ],
+    "formats": []
+  }
+}

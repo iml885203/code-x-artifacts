@@ -1,0 +1,29 @@
+/* Editing a slide in place: the shell's fields over the deck's frame, the insert tool, the stage's notes. Tokens only (internal/web/static/style.css). */
+.deck-paper { position: relative; }
+.slide-fields { position: absolute; inset: 0; pointer-events: none; }
+.slide-field { position: absolute; box-sizing: border-box; min-width: 12px; min-height: 12px; margin: 0; padding: 0; border: 0; border-radius: 3px; background: none; pointer-events: auto; cursor: text; outline: 2px dashed transparent; outline-offset: 2px; transition: outline-color var(--dur) var(--ease-out); }
+.slide-field:hover:not(:disabled) { outline-color: var(--star-edge); }
+.slide-field:focus-visible { outline: 2px solid var(--text); }
+.slide-field:disabled { cursor: progress; }
+.slide-input { position: absolute; box-sizing: border-box; min-width: 48px; margin: 0; padding: 0; border: 0; border-radius: 2px; background: var(--night); color: var(--text); caret-color: var(--star-text); font-family: var(--font-sans); letter-spacing: inherit; resize: none; overflow: hidden; field-sizing: content; pointer-events: auto; outline: 2px solid var(--star-edge); outline-offset: 2px; box-shadow: var(--float); }
+
+.deck-bar.deck-insert { right: auto; left: var(--space-4); }
+.deck-bar-sep { flex: none; align-self: stretch; width: 1px; margin: 8px 2px; background: var(--line); }
+
+.slide-notes { position: absolute; left: var(--space-4); right: var(--space-4); bottom: var(--space-4); z-index: 3; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); pointer-events: none; }
+.slide-note { box-sizing: border-box; max-width: min(560px, 100%); margin: 0; padding: var(--space-3) var(--space-4); background: var(--plate); color: var(--text); border: 1px solid var(--edge-pop); border-radius: var(--r-pop); box-shadow: var(--float); pointer-events: auto; }
+p.slide-note { color: var(--star-text); }
+.slide-conflict p { margin: 0; }
+.slide-conflict .slide-kept { margin-top: var(--space-2); padding: var(--space-2) var(--space-3); max-height: 8em; overflow: auto; background: var(--raised); border-radius: 6px; white-space: pre-wrap; overflow-wrap: anywhere; user-select: text; }
+.slide-note-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+
+@media (max-width: 640px) {
+  .deck-bar.deck-insert { top: auto; bottom: var(--space-4); }
+  .slide-notes { bottom: calc(var(--space-4) * 2 + var(--target) + 8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide-field { transition-duration: var(--dur-fast); }
+}
+@media print {
+  .deck-insert, .slide-fields, .slide-notes { display: none; }
+}

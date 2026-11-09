@@ -1,0 +1,259 @@
+import { expect, publish, signIn, test } from "./support";
+
+test("a card's time moves from now to a minute ago without a reload", async ({ page }) => {
+  await signIn(page, "alice");
+  await publish(page, { title: "Clock card", content: "<!doctype html><p>x</p>" });
+  // The page's clock is faked from here on, so the minute is run, not waited for.
+  await page.clock.install({ time: new Date() });
+  await page.goto("/");
+  const card = page.locator("li.card", { hasText: "Clock card" });
+  await expect(card.locator("time")).toHaveText("Edited now");
+  await page.clock.runFor(61_000);
+  await expect(card.locator("time")).toHaveText("Edited 1 minute ago");
+  // The exact time stays available to a pointer and to assistive technology.
+  const time = card.locator("time");
+  await time.hover();
+  await page.clock.runFor(400);
+  await expect(page.getByRole("tooltip")).toHaveText(/^\d{4}-\d\d-\d\d \d\d:\d\d$/);
+  await expect(time).toHaveAttribute("aria-describedby", await page.getByRole("tooltip").getAttribute("id") ?? "");
+  await expect(time).not.toHaveAttribute("title");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("tooltip")).toHaveCount(0);
+  await time.focus();
+  await expect(page.getByRole("tooltip")).toBeVisible();
+});
+
+test("a card says who can open it with an icon and wears a badge for its type, and its corner actions show on hover, focus and touch", async ({ page, browser }) => {
+  await signIn(page, "alice");
+  const { id } = await publish(page, { title: "Badge card", content: "<!doctype html><p>x</p>", visibility: "organisation" });
+  await page.goto("/");
+  const card = page.locator(`li.card[data-artifact-id="${id}"]`);
+  await expect(card.getByRole("img", { name: "Organisation" })).toBeVisible();
+  await expect(card.getByRole("img", { name: "Web page" })).toBeVisible();
+  const menuButton = card.getByRole("button", { name: "Actions for Badge card" });
+  const pinButton = card.getByRole("button", { name: "Pin Badge card" });
+  await expect(menuButton).toHaveCSS("opacity", "0");
+  // The keyboard reaches the group without a pointer: focus on the card's link shows it.
+  await card.getByRole("link").first().focus();
+  await expect(menuButton).toHaveCSS("opacity", "1");
+  await expect(pinButton).toHaveCSS("opacity", "1");
+  await page.evaluate(() => { if (document.activeElement instanceof HTMLElement) document.activeElement.blur(); });
+  await page.mouse.move(0, 0);
+  await expect(menuButton).toHaveCSS("opacity", "0");
+  await card.hover();
+  await expect(menuButton).toHaveCSS("opacity", "1");
+  // The group sits at the card's upper right, over the preview.
+  const cardBox = await card.boundingBox(); // page-level
+  const groupBox = await card.locator(".card-actions").boundingBox(); // page-level
+  expect(groupBox && cardBox && groupBox.x + groupBox.width > cardBox.x + cardBox.width - 24 && groupBox.y < cardBox.y + 24).toBe(true);
+  // Pin and More are one group in the preview's corner, beside the open link, and More opens its menu without opening the artifact.
+  const group = card.locator(".card-actions");
+  await expect(group.getByRole("button")).toHaveCount(2);
+  await expect(card.locator("a.card-link .card-actions")).toHaveCount(0);
+  const url = page.url();
+  await menuButton.click();
+  await expect(page.getByRole("menuitem", { name: "Delete…" })).toBeVisible();
+  expect(page.url()).toBe(url);
+  await page.keyboard.press("Escape");
+  await expect(menuButton).toBeFocused();
+  await pinButton.click();
+  await page.evaluate(() => { if (document.activeElement instanceof HTMLElement) document.activeElement.blur(); });
+  await page.mouse.move(0, 0);
+  const pinnedButton = card.getByRole("button", { name: "Unpin Badge card" });
+  await expect(pinnedButton).toHaveCSS("opacity", "1");
+  await expect(menuButton).toHaveCSS("opacity", "0");
+  const pinnedBox = await pinnedButton.boundingBox(); // page-level
+  const settledCard = await card.boundingBox(); // page-level
+  expect(pinnedBox && settledCard && settledCard.x + settledCard.width - pinnedBox.x - pinnedBox.width <= 10).toBe(true);
+  await card.hover();
+  await pinnedButton.click();
+
+  // On a phone with no hover the same corner actions stay visible and never open the artifact.
+  const phone = await browser.newContext({ baseURL: page.url().split("/").slice(0, 3).join("/"), viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  const touch = await phone.newPage();
+  // Half an hour on, the card says "Edited 30 minutes ago": the longest time line a card carries.
+  await touch.clock.install({ time: new Date(Date.now() + 30 * 60_000) });
+  await signIn(touch, "alice");
+  const phoneCard = touch.locator(`li.card[data-artifact-id="${id}"]`);
+  const phonePreview = await phoneCard.locator(".thumb").boundingBox(); // page-level
+  const phoneCardBox = await phoneCard.boundingBox(); // page-level
+  expect(phonePreview && phoneCardBox && phonePreview.width >= phoneCardBox.width - 2 && phonePreview.height > 100).toBe(true);
+  const phoneMenu = phoneCard.getByRole("button", { name: "Actions for Badge card" });
+  await expect(phoneMenu).toHaveCSS("opacity", "1");
+  await expect(phoneCard.getByRole("button", { name: "Pin Badge card" })).toHaveCSS("opacity", "1");
+  // Each control is drawn at 32px and takes a touch anywhere in the 44px square around it.
+  for (const target of [phoneMenu, phoneCard.getByRole("button", { name: "Pin Badge card" })]) {
+    const box = await target.boundingBox(); // page-level
+    expect(box && box.width >= 32 && box.height >= 32).toBe(true);
+    await target.scrollIntoViewIfNeeded();
+    // Polled: while the page's entrance view transition runs, every point hits the transition, not the page.
+    await expect.poll(() => target.evaluate((b) => {
+      const r = b.getBoundingClientRect();
+      const [cx, cy] = [r.x + r.width / 2, r.y + r.height / 2];
+      return [[0, 0], [-21, 0], [21, 0], [0, -21], [0, 21]].filter(([dx = 0, dy = 0]) => !b.contains(document.elementFromPoint(cx + dx, cy + dy)));
+    })).toEqual([]);
+  }
+  // The author's name is whole beside the time, not cut to a letter.
+  await expect(phoneCard.locator("time")).toHaveText("Edited 30 minutes ago");
+  const author = await phoneCard.locator(".card-author-name").evaluate((n) => ({ text: n.textContent, shown: n.clientWidth, needs: n.scrollWidth }));
+  expect(author.text).toBe("alice");
+  expect(author.shown).toBeGreaterThan(0);
+  expect(author.shown).toBeGreaterThanOrEqual(author.needs);
+  const phoneBox = await phoneCard.boundingBox(); // page-level
+  const phoneGroup = await phoneCard.locator(".card-actions").boundingBox(); // page-level
+  expect(phoneBox && phoneGroup && phoneGroup.y < phoneBox.y + 24 && phoneGroup.x + phoneGroup.width > phoneBox.x + phoneBox.width - 24).toBe(true);
+  const phoneUrl = touch.url();
+  await phoneMenu.tap();
+  await expect(touch.getByRole("menuitem", { name: "Delete…" })).toBeVisible();
+  expect(touch.url()).toBe(phoneUrl);
+  await touch.keyboard.press("Escape");
+  await phoneCard.getByRole("button", { name: "Pin Badge card" }).tap();
+  await expect(phoneCard.getByRole("button", { name: "Unpin Badge card" })).toBeVisible();
+  const pinned = await phoneCard.getByRole("button", { name: "Unpin Badge card" }).boundingBox(); // page-level
+  const pinnedCard = await phoneCard.boundingBox(); // page-level
+  expect(pinned && pinnedCard && pinnedCard.x + pinnedCard.width - pinned.x - pinned.width <= 10).toBe(true);
+  expect(touch.url()).toBe(phoneUrl);
+  await phoneCard.getByRole("button", { name: "Unpin Badge card" }).tap();
+  await expect(phoneCard.getByRole("button", { name: "Pin Badge card" })).toBeVisible();
+  await phone.close();
+});
+
+test("carol finds a card by search, pins it with P and renames it with R from its menu, they show under Pinned and survive a reload; she unpins it from the viewer", async ({ page }) => {
+  await signIn(page, "carol");
+  const ids: Record<string, string> = {};
+  for (const title of ["Pin one", "Pin two"]) ids[title] = (await publish(page, { title, content: "<!doctype html><p>x</p>" })).id;
+  await page.goto("/");
+  const headings = page.locator("li.card h2");
+  // Both were made in the same second, so which is listed first is the server's call: use the one listed second.
+  await expect(headings.filter({ hasText: /^Pin (one|two)$/ })).toHaveCount(2);
+  const [upper, lower] = await headings.filter({ hasText: /^Pin (one|two)$/ }).allTextContents();
+  const target = lower ?? "";
+  expect(upper).not.toBe(target);
+  await expect(headings.first()).not.toHaveText(target);
+
+  // Search narrows the wall to the card; its menu pins it and then renames it, each with its letter.
+  await page.getByRole("searchbox", { name: "Search" }).fill(target);
+  await expect(headings).toHaveText([target]);
+  const card = page.locator("li.card", { hasText: target });
+  await card.hover();
+  await card.getByRole("button", { name: `Actions for ${target}` }).click();
+  await page.keyboard.press("p");
+  await expect(card.getByRole("button", { name: `Unpin ${target}` })).toBeVisible();
+  await card.hover();
+  await card.getByRole("button", { name: `Actions for ${target}` }).click();
+  await page.keyboard.press("r");
+  const renamed = `${target} renamed`;
+  await page.getByRole("textbox", { name: "Title" }).fill(renamed);
+  await page.keyboard.press("Enter");
+  await expect(headings).toHaveText([renamed]);
+
+  await page.getByRole("searchbox", { name: "Search" }).clear();
+  await expect(headings.first()).toHaveText(renamed);
+  await page.getByRole("radio", { name: /^Pinned/ }).click();
+  await expect(headings).toHaveText([renamed]);
+
+  // The pin and the name are carol's and the server's: both survive a reload.
+  await page.reload();
+  await page.getByRole("radio", { name: /^Pinned/ }).click();
+  await expect(headings).toHaveText([renamed]);
+
+  await page.goto(`/a/${ids[target] ?? ""}`);
+  await page.getByRole("button", { name: "More actions" }).click();
+  await page.getByRole("menuitem", { name: "Unpin" }).click();
+  await page.goto("/");
+  await expect(page.getByRole("radio", { name: /^Pinned/ })).toHaveText("Pinned0");
+  await expect(page.locator("li.card", { hasText: renamed }).getByRole("button", { name: `Pin ${renamed}` })).toBeVisible();
+});
+
+test("carol does not see bob's pin, groups the library by owner as a list, and finds bob's page first under Recently opened once she opened it", async ({ page, browser }) => {
+  await signIn(page, "bob");
+  const a = await publish(page, { title: "Bob pins this", content: "<!doctype html><p>x</p>", visibility: "organisation" });
+  const earlier = await publish(page, { title: "Bob's earlier page", content: "<!doctype html><p>x</p>", visibility: "organisation" });
+  await page.goto("/");
+  const mine = page.locator(`li.card[data-artifact-id="${a.id}"]`);
+  await mine.getByRole("button", { name: "Pin Bob pins this" }).click();
+  await expect(mine.getByRole("button", { name: "Unpin Bob pins this" })).toBeVisible();
+  const other = await browser.newContext({ baseURL: page.url().split("/").slice(0, 3).join("/") });
+  const carol = await other.newPage();
+  await signIn(carol, "carol");
+  const recorded = carol.waitForResponse((r) => r.url().endsWith(`/api/artifacts/${earlier.id}/open`) && r.ok());
+  await carol.goto(`/a/${earlier.id}`);
+  await recorded;
+  await carol.goto("/");
+  await expect(carol.locator(`li.card[data-artifact-id="${a.id}"]`).getByRole("button", { name: "Pin Bob pins this" })).toBeVisible();
+
+  // Grouped by owner and shown as a list, bob's item sits under his name; both choices are carol's and outlive a reload.
+  await carol.getByRole("button", { name: /^Group by/ }).click();
+  await carol.getByRole("menuitemradio", { name: "Owner" }).click();
+  await carol.getByRole("button", { name: "List" }).click();
+  const underBob = () => carol.getByRole("region", { name: "bob" }).locator(`li.lib-row[data-artifact-id="${a.id}"]`);
+  await expect(underBob()).toBeVisible();
+  await carol.reload();
+  await expect(carol.getByRole("button", { name: "List" })).toHaveAttribute("aria-pressed", "true");
+  await expect(underBob()).toBeVisible();
+
+  // Carol opens bob's page, goes back to the library and finds it first under Recently opened, in the same list rows.
+  // Other tests sign in as carol at the same time and open pages of their own, so "first" is among the pages this test opened.
+  await underBob().getByRole("link").first().click();
+  await expect(carol).toHaveURL(new RegExp(`/a/${a.id}$`));
+  await carol.getByRole("link", { name: "Back to artifacts" }).click();
+  await carol.getByRole("navigation", { name: "Library" }).getByRole("link", { name: "Recently opened" }).click();
+  await expect(carol).toHaveURL(/\/recent$/);
+  const ours = [a.id, earlier.id];
+  const opened = () => carol.locator("li.lib-row").evaluateAll((rows, ids) => rows.map((r) => r.getAttribute("data-artifact-id")).filter((id) => id !== null && ids.includes(id)), ours);
+  await expect.poll(opened).toEqual([a.id, earlier.id]);
+  await carol.reload();
+  await expect.poll(opened).toEqual([a.id, earlier.id]);
+  await other.close();
+});
+
+test("every card of the overview shows its page, a script-drawn one too, and logs no console error", async ({ page }) => {
+  await signIn(page, "alice");
+  const ids: string[] = [];
+  const own: string[] = [];
+  page.on("console", (m) => {
+    if (m.type() === "error" && ids.some((id) => m.location().url.includes(id))) own.push(m.text());
+  });
+  const made = async (body: Parameters<typeof publish>[1]) => ids.push((await publish(page, body)).id);
+  await made({ title: "Plain html", content: "<!doctype html><h1>Html on a card</h1>" });
+  // A page that asks for its data on load: in a preview nothing answers, and it must not throw.
+  await made({
+    title: "Asks for data",
+    content: "<!doctype html><h1 id=t>Waiting</h1><script>pictor.db.list('rows').then(() => { document.getElementById('t').textContent = 'Answered'; }); document.body.append('Drawn by script');</script>",
+  });
+  await made({ title: "A doc", kind: "doc", content: "# Doc on a card\n\nBody.\n" });
+  await made({ title: "A chart", kind: "react", content: "export default function App() { return <h1>React on a card</h1>; }\n" });
+  // A design of eight frames: its card loads the first frame only.
+  const frames = Array.from({ length: 8 }, (_, i) => ({ id: `f${i + 1}`, name: `Frame ${i + 1}`, file: `frames/f${i + 1}.html`, w: 400, h: 300 }));
+  await made({
+    title: "Eight frames",
+    kind: "design",
+    content: JSON.stringify({ version: 1, pages: [{ id: "p", name: "Page", rows: [frames] }] }),
+    files: Object.fromEntries(frames.map((f) => [f.file, `<!doctype html><body><h1>Text of ${f.name}</h1></body>`])),
+  });
+  const frameRequests: string[] = [];
+  page.on("request", (r) => {
+    if (/\/frames\/f\d\.html$/.test(new URL(r.url()).pathname)) frameRequests.push(new URL(r.url()).pathname.split("/").pop() ?? "");
+  });
+  await page.goto("/");
+  const card = (index: number) => page.locator("li.card").filter({ has: page.locator(`a[href="/a/${ids[index] ?? ""}"]`) });
+  const previews = [
+    ["Plain html", "Html on a card"],
+    ["Asks for data", "Drawn by script"],
+    ["A doc", "Doc on a card"],
+    ["A chart", "React on a card"],
+  ] as const;
+  for (const [index, [title, text]] of previews.entries()) {
+    await expect(card(index).getByRole("heading", { name: title, exact: true })).toBeVisible();
+    await expect(card(index).frameLocator("iframe").getByText(text)).toBeVisible();
+  }
+  // The page that asked is still waiting: the preview has no bridge behind it.
+  await expect(card(1).frameLocator("iframe").locator("#t")).toHaveText("Waiting");
+  expect(own, "console errors of the cards' own frames").toEqual([]);
+  await expect(card(4).frameLocator("iframe").frameLocator("iframe").getByText("Text of Frame 1")).toBeVisible();
+  expect(frameRequests, "frame documents the wall asked for").toEqual(["f1.html"]);
+  // The same design opens normally, with every frame.
+  await card(4).getByRole("link", { name: "Eight frames" }).first().click();
+  await expect(page).toHaveURL(new RegExp(`/a/${ids[4]}$`));
+  await expect.poll(() => frameRequests.filter((f) => f === "f8.html").length).toBeGreaterThan(0);
+});

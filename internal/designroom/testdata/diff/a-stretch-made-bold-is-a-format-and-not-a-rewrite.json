@@ -1,0 +1,56 @@
+{
+  "name": "a stretch made bold is a format and not a rewrite",
+  "before": [
+    {
+      "insert": "Hello world"
+    }
+  ],
+  "after": [
+    {
+      "insert": "Hello "
+    },
+    {
+      "insert": "world",
+      "attributes": {
+        "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}"
+      }
+    }
+  ],
+  "want": {
+    "start": 11,
+    "end": 11,
+    "insert": [],
+    "formats": [
+      {
+        "index": 6,
+        "attrs": {
+          "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}"
+        }
+      },
+      {
+        "index": 7,
+        "attrs": {
+          "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}"
+        }
+      },
+      {
+        "index": 8,
+        "attrs": {
+          "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}"
+        }
+      },
+      {
+        "index": 9,
+        "attrs": {
+          "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}"
+        }
+      },
+      {
+        "index": 10,
+        "attrs": {
+          "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}"
+        }
+      }
+    ]
+  }
+}

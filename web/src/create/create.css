@@ -1,0 +1,20 @@
+/* Starting something new and renaming it (web/src/create). Colours come from the site's tokens. */
+.new-button { display: inline-flex; align-items: center; gap: var(--space-2); }
+.new-item { display: flex; align-items: center; gap: var(--space-2); }
+.rename { margin: 0; font: inherit; min-width: 0; }
+.rename-button { all: unset; box-sizing: border-box; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: text; border-radius: var(--r-pop); padding: 0 var(--space-1); margin: 0 calc(-1 * var(--space-1)); }
+.rename-button:hover { background: var(--raised); }
+.rename-button:focus-visible { outline: 2px solid var(--star-edge); outline-offset: 1px; }
+.rename-field { font: inherit; width: min(32rem, 100%); }
+
+.new-menu { width: 200px; background: var(--raised); border-color: var(--edge-pop); }
+.new-menu .new-item { gap: var(--space-3); min-height: 56px; padding: var(--space-2) var(--space-3); }
+.new-menu .new-item[data-highlighted] { background: var(--plate); }
+.new-kind { display: inline-grid; flex: none; place-items: center; width: 32px; height: 32px; border-radius: var(--r-icon); }
+.new-kind .icon { width: 20px; height: 20px; }
+.new-kind-doc { background: var(--kind-doc-bg); color: var(--kind-doc-fg); }
+.new-kind-design { background: var(--kind-design-bg); color: var(--kind-design-fg); }
+.new-kind-board { background: var(--kind-board-bg); color: var(--kind-board-fg); }
+.new-words { display: grid; gap: 2px; }
+.new-purpose { font-size: 12px; color: var(--muted); }
+.new-button > .icon:last-child { width: 14px; height: 14px; }

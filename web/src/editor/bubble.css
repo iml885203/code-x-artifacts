@@ -1,0 +1,15 @@
+/* The bubble over a selection (FormatBubble.tsx) and the hint of an empty doc. */
+.ed-scroll { position: relative; }
+.ed-bubble { position: absolute; z-index: 4; display: flex; align-items: center; gap: 2px; padding: 2px var(--space-1); border: 1px solid var(--edge-pop); border-radius: var(--r-pop); background: var(--field); color: var(--text); box-shadow: var(--float); animation: fade var(--dur) var(--ease-out); }
+.ed-bubble .icon-button { min-width: 32px; height: 32px; position: relative; }
+/* A 44px hit area behind the 32px button. */
+.ed-bubble .icon-button::after { content: ""; position: absolute; inset: -6px; }
+.ed-bubble .icon-button[aria-pressed="true"] { background: var(--raised); border-color: var(--edge-pop); }
+.ed-bubble .icon-button code { font-size: 12px; }
+.ed-bubble select { min-height: 32px; font-size: 13px; }
+.ed-bubble-sep { align-self: stretch; width: 1px; margin: 4px var(--space-1); background: var(--line); }
+.ed-bubble-comment { min-height: 32px; padding: 0 var(--space-3); font-size: 13px; white-space: nowrap; }
+.ed-bubble-comment:disabled { opacity: 0.5; }
+.ed-doc .ed-empty::before { content: attr(data-hint); float: left; height: 0; color: var(--muted); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .ed-bubble { animation: none; } }
+@media print { .ed-bubble { display: none; } .ed-doc .ed-empty::before { color: #6b6b7a; } }

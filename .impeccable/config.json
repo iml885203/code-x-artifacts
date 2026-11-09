@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "web/src/app.css"
+        ],
+        "createdAt": "2026-10-22T17:29:41.847Z",
+        "reason": "Agent triage: parent static diff confirms unchanged .comment-quote is a semantic quotation of selected words above a comment thread, not a card accent. Only new CSS is the Kit pre overflow rule; no user-confirmed design waiver claimed."
+      }
+    ]
+  }
+}

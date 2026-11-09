@@ -1,0 +1,21 @@
+{
+  "viewer.copyLink": "複製連結",
+  "viewer.copy": "建立副本",
+  "viewer.copied": "已建立副本，只有你看得到。",
+  "viewer.copyFailed": "無法建立副本，請再試一次。",
+  "viewer.copiedFrom": "複製自 {title}",
+  "viewer.openRaw": "開新分頁",
+  "viewer.delete": "刪除…",
+  "viewer.confirmDelete": "刪除這個 artifact？",
+  "viewer.confirmDeleteHint": "頁面和它的共享資料會對所有人移除，無法復原。",
+  "viewer.cancel": "取消",
+  "viewer.more": "更多操作",
+  "viewer.undo": "復原",
+  "viewer.changedTo": "已改為{visibility}",
+  "viewer.changeFailed": "無法變更誰可以開啟，請再試一次。",
+  "viewer.deleteFailed": "無法刪除這個 artifact，請再試一次。",
+  "viewer.deleteConfirm": "刪除",
+  "viewer.versions": "版本紀錄",
+  "viewer.downloadFailed": "無法下載這個 artifact，請再試一次。",
+  "viewer.files": "檔案"
+}

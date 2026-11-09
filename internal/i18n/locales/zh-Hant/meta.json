@@ -1,0 +1,8 @@
+{
+  "meta.description.login": "用公司帳號登入 CodeXArtifacts。",
+  "meta.description.gallery": "你做的和別人分享給你的 artifact，都在 CodeXArtifacts。",
+  "meta.description.viewer": "CodeXArtifacts 上的 artifact，由作者分享。",
+  "meta.description.connect": "把你的 agent 接上 CodeXArtifacts，讓它替你發佈 artifact。",
+  "meta.description.kit": "發佈到 CodeXArtifacts 的頁面用的樣式表和元件。",
+  "meta.description.error": "這個頁面不存在，或沒有開放給你。"
+}

@@ -1,0 +1,3 @@
+/* Icon spacing travels with the shared action renderer, including menus outside the Library. */
+.menu-item.menu-action { gap: var(--space-3); padding-left: var(--space-3); }
+.menu-item.menu-action > .icon { flex: none; width: 16px; height: 16px; }

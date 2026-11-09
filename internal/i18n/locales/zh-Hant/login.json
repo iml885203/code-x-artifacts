@@ -1,0 +1,13 @@
+{
+  "login.title": "登入",
+  "login.help": "使用工作空間管理者提供的帳號登入。",
+  "login.username": "帳號",
+  "login.password": "密碼",
+  "login.submit": "登入",
+  "login.error.invalid": "帳號或密碼錯誤",
+  "login.error.notAllowed": "這個帳號沒有使用權限",
+  "login.error.unavailable": "目前無法登入，請稍後再試。",
+  "login.headline": "把想法做成作品，讓作品持續發揮價值。",
+  "login.description": "讓你與慣用的 AI 一起創作、分享與編輯，持續推進每一份作品。",
+  "login.formats": "作品類型"
+}

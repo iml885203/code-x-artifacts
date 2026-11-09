@@ -1,0 +1,8 @@
+# Properties controls
+
+- Wrap edits change only `flex-wrap`; unsupported authored values remain visible until an explicit choice. Tests: `changes wrapping once, preserves children and other declarations, and Undo restores the authored reverse wrap`.
+- No fill explicitly suppresses background color and images; Reset removes current owned inline background declarations to reveal the current cascade, without claiming restoration of previous inline values. Other declarations and own Undo remain intact. Tests: `distinguishes transparent color, no fill and reset with authored images and token bindings in one-step history`.
+- Border controls represent mixed sides honestly and write only the selected sides and property; governing inline priority is preserved without duplicating `!important`. Tests: `shows mixed borders and edits only the chosen side without duplicating important or escalating normal styles`, `preserves shorthand priority only when it applies to the edited side`.
+- Panel and contextual hosts share the same Theme/Custom picker; token selection retains the binding, color gestures commit once, and Escape restores the swatch trigger's focus. Tests: `searches tokens, preserves a selected binding and dismisses back to its actual swatch`, `provides keyboard solid color controls and distinct no fill and reset intents`, `commits one alpha gesture once and does not repeat it on blur`.
+
+- Controls read the shared inline cascade projection for covered authored slots; edits retain authored source entries and use the shared override transaction. Tests: `shows the winning authored cascade rather than a covered original slot`, `writes explicit priority once to a covered override and reset reveals the retained cascade in one-step Undo`.

@@ -1,0 +1,15 @@
+{
+  "files.title": "Files",
+  "files.close": "Close",
+  "files.drop": "Drop files here, or choose files",
+  "files.uploading": "Uploading {name}…",
+  "files.empty": "No files yet. Put the URL of a file in the page to show it.",
+  "files.copyUrl": "Copy URL",
+  "files.delete": "Delete",
+  "files.loadFailed": "Couldn't load the files. Try again.",
+  "files.uploadFailed": "Couldn't upload {name}: {reason}",
+  "files.uploadFailedNoReason": "Couldn't upload {name}. Try again.",
+  "files.confirmDelete": "Delete {name}?",
+  "files.confirmDeleteHint": "A page that shows it will lose it. This can't be undone.",
+  "files.deleteFailed": "Couldn't delete this file. Try again."
+}

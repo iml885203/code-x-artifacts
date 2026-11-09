@@ -1,0 +1,7 @@
+{
+  "mention.list": "人員",
+  "mention.none": "找不到人",
+  "mention.cannotOpen": "{name} 無法開啟這份文件。",
+  "mention.dismiss": "關閉",
+  "mention.incomplete": "人員清單可能不完整。重新登入可更新清單。"
+}

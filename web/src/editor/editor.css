@@ -1,0 +1,117 @@
+/* The Docs editor (loaded with it). Colours come from the site's tokens; a
+   person's colour is one of eight classes because the CSP allows no style
+   attribute (colors.ts). Print styles keep a separate white-paper palette. */
+.ed { display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; }
+.ed-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--gutter); border-bottom: 1px solid var(--line); background: var(--night); }
+.ed-toolbar select { min-height: var(--target); }
+.ed-group { display: flex; align-items: center; gap: 2px; padding-left: var(--space-2); border-left: 1px solid var(--line); }
+.ed-toolbar .icon-button[aria-pressed="true"] { background: var(--plate); border-color: var(--line); }
+.ed-toolbar .icon-button code { font-size: 12px; }
+.ed-toolbar .icon-button mark { background: #ffe58a; color: #1a1a22; padding: 0 2px; }
+.ed-banner { margin: 0; padding: var(--space-2) var(--gutter); background: var(--plate); color: var(--muted); font-size: 13px; }
+.ed-scroll { flex: 1; min-height: 0; overflow: auto; background: var(--night); padding: 48px 24px 80px; }
+.ed-paper { max-width: 720px; min-height: 100%; margin: 0 auto; padding: 0; background: transparent; color: var(--text); font: 16px/1.85 var(--font-sans); }
+.ed-doc { outline: none; white-space: pre-wrap; word-wrap: break-word; min-height: 50vh; }
+.ed-doc p { margin: 0 0 20px; }
+.ed-doc h1, .ed-doc h2, .ed-doc h3, .ed-doc h4, .ed-doc h5, .ed-doc h6 { margin: 32px 0 10px; line-height: 1.35; }
+.ed-doc h1 { font-size: 34px; } .ed-doc h2 { font-size: 22px; } .ed-doc h3 { font-size: 1.3em; }
+.ed-doc > .ed-tab > :first-child { margin-top: 0; }
+.ed-doc > .ed-tab > h1:first-child { margin-bottom: 52px; }
+.ed-doc h4 { font-size: 1.1em; } .ed-doc h5, .ed-doc h6 { font-size: 1em; }
+.ed-doc blockquote { margin: 0 0 20px; padding-left: var(--space-4); border-left: 3px solid var(--edge); color: var(--text-2); }
+.ed-doc pre { margin: 0 0 20px; padding: var(--space-3); background: var(--raised); overflow: auto; }
+.ed-doc code { font-family: var(--font-mono); font-size: 0.9em; }
+.ed-doc :not(pre) > code { padding: 0 0.25em; background: var(--raised); border-radius: 3px; }
+.ed-doc mark { background: #ffe58a; color: #1a1a22; }
+.ed-doc hr { border: 0; border-top: 1px solid var(--line); margin: 1.2em 0; }
+.ed-doc ul, .ed-doc ol { margin: 0 0 20px; padding-left: 1.6em; }
+.ed-doc li p { margin: 0 0 0.25em; }
+.ed-doc ul.ed-tasks { padding-left: 0; list-style: none; }
+.ed-doc ul.ed-tasks ul.ed-tasks { padding-left: 1.6em; }
+.ed-doc li.ed-task { display: flex; gap: var(--space-2); align-items: flex-start; }
+.ed-doc li.ed-task > div { flex: 1; min-width: 0; }
+.ed-check { flex: none; width: 1.1em; height: 1.1em; margin: 0.35em 0 0; accent-color: #6a5acd; cursor: pointer; }
+.ed-done > div > p:first-child { color: var(--muted); text-decoration: line-through; }
+.ed-doc table { width: 100%; font-size: 15px; border-collapse: collapse; margin: 0 0 20px; }
+.ed-doc td { border: 1px solid var(--line); padding: var(--space-1) var(--space-2); min-width: 4em; vertical-align: top; }
+.ed-doc td p { margin: 0; }
+.ed-doc td.ed-left { text-align: left; } .ed-doc td.ed-center { text-align: center; } .ed-doc td.ed-right { text-align: right; }
+.ed-doc table.ed-headed tr:first-child td { background: var(--raised); font-weight: 600; }
+.ed-doc img { max-width: 100%; }
+.ed-pending { padding: var(--space-2) var(--space-3); margin: 0 0 20px; border: 1px dashed var(--edge); color: var(--muted); user-select: none; }
+.ed-missing { color: var(--muted); }
+.ed-link { text-decoration: underline; }
+
+/* Other people's carets and selections: the name sits above the caret. */
+.ed-caret { display: inline-block; position: relative; width: 0; height: 1.25em; margin: 0 -1px; vertical-align: text-bottom; border-left: 2px solid var(--ed-color); pointer-events: none; user-select: none; }
+.ed-caret::after { content: attr(data-name); position: absolute; bottom: 100%; left: -2px; padding: 0 var(--space-1); border-radius: 3px 3px 3px 0; background: var(--ed-color); color: #fff; font: 600 11px/1.45 var(--font-sans); white-space: nowrap; }
+/* An agent the server shows: an icon in the roster, and the block it changed marked with its name until it fades. */
+.ed-agent-block { position: relative; outline: 2px solid #6a5acd; outline-offset: 2px; border-radius: 2px; animation: ed-agent-fade 4s ease-out forwards; }
+.ed-agent-block::before { content: attr(data-agent); position: absolute; right: 0; bottom: 100%; padding: 0 var(--space-1); border-radius: 3px; background: #6a5acd; color: #fff; font: 600 11px/1.45 var(--font-sans); white-space: nowrap; pointer-events: none; user-select: none; }
+@keyframes ed-agent-fade { 0%, 60% { outline-color: #6a5acd; } 100% { outline-color: transparent; } }
+@media (prefers-reduced-motion: reduce) { .ed-agent-block { animation: none; } }
+.ed-selection { background: color-mix(in oklch, var(--ed-color) 28%, transparent); }
+
+
+@media (max-width: 640px) {
+  .ed-scroll { padding: var(--space-6) var(--space-4) var(--space-7); }
+  .ed-toolbar, .ed-banner { padding-left: var(--space-4); padding-right: var(--space-4); }
+}
+
+.ed-link-form, .ed-link-bar { display: flex; flex-wrap: wrap; align-items: end; gap: var(--space-2); padding: var(--space-2) var(--gutter); border-bottom: 1px solid var(--line); background: var(--plate); }
+.ed-link-form label { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--muted); }
+.ed-link-form input { min-width: 14em; }
+.ed-link-reason { flex-basis: 100%; margin: 0; color: var(--danger); font-size: 13px; }
+.ed-link-bar { align-items: center; font-size: 13px; }
+.ed-link-href { max-width: 28em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+
+.ed-table-tools { background: var(--plate); }
+.ed-table-tools button { min-height: var(--target); font-size: 13px; }
+.ed-table-tools button[aria-pressed="true"] { background: var(--field); border-color: var(--line); }
+
+.ed-image { margin: 0 0 20px; }
+.ed-image img { display: block; max-width: 100%; height: auto; border-radius: 4px; }
+.ed-image.ed-selected { outline: 2px solid #6a5acd; outline-offset: 2px; }
+.ed-missing { display: block; padding: var(--space-3); border: 1px dashed var(--edge); border-radius: 4px; background: var(--raised); color: var(--muted); font-size: 14px; }
+.ed-image-tools { background: var(--plate); }
+.ed-image-tools button { min-height: var(--target); font-size: 13px; }
+.ed-image-tools button[aria-pressed="true"] { background: var(--field); border-color: var(--line); }
+.ed-alt { display: flex; align-items: center; gap: var(--space-2); font-size: 13px; color: var(--muted); }
+.ed-alt input { min-width: 16em; }
+.ed-refused { color: var(--danger); }
+
+/* Tabs: the list beside the page; the editor shows the one chosen (DocEditor.tsx). */
+.ed-body { display: flex; flex: 1; min-height: 0; }
+.ed-tabs { flex: none; display: flex; flex-direction: column; gap: var(--space-2); width: 200px; padding: var(--space-3) var(--space-2); overflow: auto; border-right: 1px solid var(--line); background: var(--field); }
+.ed-tab-list { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.ed-tab-item { display: flex; align-items: center; gap: var(--space-1); flex-wrap: wrap; border-radius: var(--r-pop); animation: fade var(--dur) var(--ease-out); }
+.ed-tab-current { background: var(--raised); }
+.ed-tab-name { all: unset; box-sizing: border-box; flex: 1; min-width: 0; padding: var(--space-2) var(--space-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; border-radius: var(--r-pop); }
+.ed-tab-name:hover { background: var(--raised); }
+.ed-tab-name:focus-visible { outline: 2px solid var(--star-edge); outline-offset: -2px; }
+.ed-tab-name[aria-current="true"] { font-weight: 600; }
+.ed-tab-field { flex: 1; min-width: 0; font: inherit; }
+.ed-tab-tools { display: flex; gap: 2px; padding: 0 var(--space-1) var(--space-1); }
+.ed-tab-tool { min-width: 28px; height: 28px; }
+.ed-tab-add { display: inline-flex; align-items: center; gap: var(--space-2); justify-content: flex-start; }
+@media (prefers-reduced-motion: reduce) { .ed-tab-item { animation: none; } }
+@media (max-width: 640px) {
+  .ed-body { flex-direction: column; }
+  .ed-tabs { width: auto; flex-direction: row; align-items: center; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: var(--space-2) var(--gutter); }
+  .ed-tab-list { flex-direction: row; }
+  .ed-tab-item { flex-wrap: nowrap; }
+  .ed-tab-name { flex: none; max-width: 12rem; }
+}
+
+/* A person named in the text: the name after an @, as a chip on the paper. */
+.ed-mention { padding: 0 0.25em; border-radius: 4px; background: var(--kind-doc-bg); color: var(--kind-doc-fg); white-space: nowrap; }
+.ed-mention.ProseMirror-selectednode { outline: 2px solid var(--kind-doc-fg); }
+
+/* Direct printing uses paper ink even when the app follows a dark theme. */
+@media print {
+  .ed-paper { font: 16px/1.65 var(--font-sans); background: #fff; color: #1a1a22; --text: #1a1a22; --text-2: #4a4a58; --raised: #f1f1f5; --line: #c9c9d3; --edge: #b5b5c2; --muted: #6b6b7a; --kind-doc-bg: #e7ecfa; --kind-doc-fg: #1f3f80; }
+  .ed-doc p, .ed-doc pre, .ed-doc blockquote, .ed-doc ul, .ed-doc ol, .ed-doc table, .ed-image, .ed-pending { margin-bottom: 0.9em; }
+  .ed-doc h1, .ed-doc h2, .ed-doc h3, .ed-doc h4, .ed-doc h5, .ed-doc h6, .ed-doc > .ed-tab > h1:first-child { margin: 1.2em 0 0.5em; line-height: 1.25; }
+  .ed-doc h1 { font-size: 2em; } .ed-doc h2 { font-size: 1.6em; }
+  .ed-doc table { width: auto; font-size: inherit; }
+}

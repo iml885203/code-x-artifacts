@@ -1,0 +1,23 @@
+{
+  "name": "an emoji replaced by another that shares its first unit",
+  "before": [
+    {
+      "insert": "a😀b"
+    }
+  ],
+  "after": [
+    {
+      "insert": "a😁b"
+    }
+  ],
+  "want": {
+    "start": 1,
+    "end": 3,
+    "insert": [
+      {
+        "insert": "😁"
+      }
+    ],
+    "formats": []
+  }
+}

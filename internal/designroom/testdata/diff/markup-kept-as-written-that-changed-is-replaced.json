@@ -1,0 +1,35 @@
+{
+  "name": "markup kept as written that changed is replaced",
+  "before": [
+    {
+      "insert": "a"
+    },
+    {
+      "insert": {
+        "raw": "<mark>m</mark>"
+      }
+    }
+  ],
+  "after": [
+    {
+      "insert": "a"
+    },
+    {
+      "insert": {
+        "raw": "<mark>n</mark>"
+      }
+    }
+  ],
+  "want": {
+    "start": 1,
+    "end": 2,
+    "insert": [
+      {
+        "insert": {
+          "raw": "<mark>n</mark>"
+        }
+      }
+    ],
+    "formats": []
+  }
+}

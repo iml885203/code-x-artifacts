@@ -1,0 +1,64 @@
+/* A deck in the viewer: the stage over the filmstrip, the notes panel beside them. Tokens only (internal/web/static/style.css). */
+.deck-view { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.deck-stage { position: relative; flex: 1; min-height: 0; background: var(--raised); }
+/* margin: auto centres the slide while it fits and lets it scroll from its edge once zoomed past the stage. */
+.deck-scroll { position: absolute; inset: 0; overflow: auto; display: flex; }
+.deck-paper { flex: none; margin: auto; box-shadow: var(--float); }
+.stage .deck-paper iframe { display: block; width: 100%; height: 100%; border: 0; background: var(--night); }
+
+/* The floating bar, the same shape as the design canvas's. */
+.deck-bar { position: absolute; top: var(--space-4); right: var(--space-4); z-index: 3; display: flex; flex-wrap: wrap; align-items: center; gap: 2px; max-width: calc(100% - 2 * var(--space-4)); box-sizing: border-box; padding: 4px; background: var(--plate); border: 1px solid var(--edge-pop); border-radius: var(--r-pop); box-shadow: var(--float); animation: deck-bar-enter var(--dur) var(--ease-out); }
+@keyframes deck-bar-enter { from { opacity: 0; transform: translateY(-6px) scale(0.98); } }
+/* Transparent borders give the 44px target around a 32px visible control. */
+.deck-tool { flex: none; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-width: var(--target); min-height: var(--target); padding: 0; border: 6px solid transparent; border-radius: 14px; background: none; background-clip: padding-box; color: var(--text); font-size: 14px; cursor: pointer; transition: background-color var(--dur) var(--ease-out); }
+.deck-tool-wide { gap: 6px; padding: 0 10px; }
+.deck-tool:hover:not(:disabled), .deck-tool[data-state="open"], .deck-tool[aria-pressed="true"] { background-color: var(--raised); background-clip: padding-box; }
+.deck-footer .deck-tool[aria-pressed="true"] { background-color: var(--line); }
+.deck-tool:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.deck-tool:disabled { opacity: 0.5; cursor: not-allowed; }
+.deck-zoom { min-width: 4ch; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* The filmstrip along the bottom. */
+.deck-footer { flex: none; display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); background: var(--night); border-top: 1px solid var(--line); }
+.deck-strip { flex: 1; min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; }
+.deck-views { display: flex; gap: 2px; }
+.deck-failed { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0; padding: 0 var(--space-2); color: var(--danger); }
+.deck-thumbs { display: flex; gap: var(--space-3); margin: 0; padding: 6px; list-style: none; }
+.deck-thumbs li { position: relative; flex: none; margin: 0; }
+.deck-thumb { position: relative; display: block; width: 128px; aspect-ratio: 16 / 9; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 6px; background: var(--plate); cursor: pointer; }
+.deck-thumb iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; background: transparent; }
+.deck-thumb[aria-current="true"] { outline: 3px solid var(--star-edge); outline-offset: 2px; }
+.deck-thumb:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.deck-thumb[aria-current="true"]:focus-visible { outline: 3px solid var(--text); }
+.deck-thumb-number { position: absolute; left: 4px; bottom: 4px; padding: 0 5px; border-radius: 4px; background: color-mix(in oklch, var(--text) 78%, transparent); color: var(--plate); font: 500 11px/16px var(--font-sans); font-variant-numeric: tabular-nums; }
+/* Where a dragged slide would land. */
+.deck-thumbs li.drop-before::before, .deck-thumbs li.drop-after::after { content: ""; position: absolute; top: 0; bottom: 0; width: 3px; border-radius: 2px; background: var(--star-edge); }
+.deck-thumbs li.drop-before::before { left: calc(-1 * var(--space-3) / 2 - 1px); }
+.deck-thumbs li.drop-after::after { right: calc(-1 * var(--space-3) / 2 - 1px); }
+
+/* The grid covers the stage; the stage's frame stays loaded under it, so printing still has a page. */
+.deck-grid { position: absolute; inset: 0; z-index: 2; overflow: auto; padding: calc(var(--space-4) * 2 + var(--target)) var(--space-6) var(--space-6); background: var(--raised); }
+.deck-thumbs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-5); padding: 0; }
+.deck-thumbs-grid .deck-thumb { width: 100%; }
+.deck-thumbs-grid .deck-thumb-number { font-size: 13px; line-height: 20px; padding: 0 7px; }
+
+/* Speaker notes beside the stage, laid out like the other side panels. */
+.deck-notes-body { flex: 1; min-height: 0; overflow: auto; padding: var(--space-4); white-space: pre-wrap; overflow-wrap: anywhere; }
+.deck-notes-body p { margin: 0; }
+.deck-notes-none { color: var(--muted); }
+
+@media (max-width: 640px) {
+  .deck-footer { padding: var(--space-2); gap: 0; }
+  .deck-thumb { width: 96px; }
+  .deck-thumbs { gap: var(--space-2); }
+  .deck-grid { padding: calc(var(--space-4) * 2 + var(--target)) var(--space-4) var(--space-4); }
+  .deck-thumbs-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-3); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .deck-bar { animation: fade var(--dur-fast) var(--ease-out); }
+  .deck-tool { transition-duration: var(--dur-fast); }
+}
+@media print {
+  .deck-bar, .deck-footer, .deck-grid, .deck-notes { display: none; }
+  .deck-view, .deck-stage, .deck-scroll { display: block; position: static; }
+}

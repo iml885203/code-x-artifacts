@@ -1,0 +1,11 @@
+/* The list under an @ (suggest.ts): on the page, not on the paper, so it follows the app's tokens. */
+.ed-mention-list { position: fixed; z-index: 30; min-width: 220px; max-width: min(360px, calc(100vw - 16px)); max-height: 260px; overflow-y: auto; margin: 0; padding: var(--space-1); list-style: none; border: 1px solid var(--edge-pop); border-radius: var(--r-pop); background: var(--field); color: var(--text); box-shadow: var(--float); animation: fade var(--dur) var(--ease-out); font-size: 14px; }
+.ed-mention-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) var(--space-3); border-radius: var(--r-tip); cursor: pointer; }
+.ed-mention-row:hover, .ed-mention-on { background: var(--raised); }
+.ed-mention-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ed-mention-account { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.ed-mention-none { padding: var(--space-2) var(--space-3); color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .ed-mention-list { animation: none; } }
+@media print { .ed-mention-list { display: none; } }
+/* Read-only paper keeps the stored name as plain muted text, including names no longer in the roster. */
+.ed-doc[contenteditable="false"] .ed-mention { padding: 0; border-radius: 0; background: none; color: #666; white-space: normal; }

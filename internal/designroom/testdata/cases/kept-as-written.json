@@ -1,0 +1,23 @@
+{
+  "name": "kept-as-written",
+  "body": "<p data-pid=\"e2\">a <mark data-pid=\"e3\" class=\"m\">hi <sub data-pid=\"e4\">2</sub></mark> b<!-- kept --></p>",
+  "pid": "e2",
+  "delta": [
+    {
+      "insert": "a "
+    },
+    {
+      "insert": {
+        "raw": "<mark data-pid=\"e3\" class=\"m\">hi <sub data-pid=\"e4\">2</sub></mark>"
+      }
+    },
+    {
+      "insert": " b"
+    },
+    {
+      "insert": {
+        "raw": "<!-- kept -->"
+      }
+    }
+  ]
+}

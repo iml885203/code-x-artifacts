@@ -1,0 +1,98 @@
+@import url("/static/fonts/noto-sans-tc.css");
+@font-face {
+  font-family: "Familjen Grotesk";
+  src: url("/static/fonts/FamiljenGrotesk.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Martian Mono";
+  src: url("/static/fonts/MartianMono.woff2") format("woff2");
+  font-weight: 100 800;
+  font-display: swap;
+}
+:root {
+  --night: oklch(0.17 0.03 262);
+  --plate: oklch(0.23 0.03 262);
+  --line: oklch(0.30 0.03 262);
+  --text: oklch(0.94 0.01 262);
+  --muted: oklch(0.74 0.02 262);
+  --link: oklch(0.84 0.12 80);
+  --font-sans: "Familjen Grotesk", "Noto Sans TC", ui-sans-serif, system-ui, "PingFang TC", "Microsoft JhengHei", "Helvetica Neue", sans-serif;
+  --font-mono: "Martian Mono", "Noto Sans TC", "PingFang TC", ui-monospace, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --night: oklch(0.97 0.006 262);
+    --plate: oklch(0.93 0.008 262);
+    --line: oklch(0.86 0.01 262);
+    --text: oklch(0.20 0.03 262);
+    --muted: oklch(0.42 0.02 262);
+    --link: oklch(0.48 0.12 65);
+    color-scheme: light;
+  }
+}
+* { box-sizing: border-box; }
+html { background: var(--night); }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--text);
+  font: 400 17px/1.75 var(--font-sans);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+.doc { max-width: 42rem; margin: 0 auto; padding: 56px 20px 96px; overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  .doc { padding: 28px 16px 64px; }
+}
+.doc > :first-child { margin-top: 0; }
+p, ul, ol, pre, blockquote, table { margin: 0 0 1.1em; }
+h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.25; letter-spacing: -0.015em; margin: 2em 0 0.55em; }
+h1 { font-size: 2.1rem; letter-spacing: -0.03em; margin-bottom: 0.7em; }
+h2 { font-size: 1.5rem; padding-bottom: 0.3em; border-bottom: 1px solid var(--line); }
+h3 { font-size: 1.2rem; }
+h4, h5, h6 { font-size: 1rem; }
+h6 { color: var(--muted); }
+a { color: var(--link); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; border-radius: 2px; }
+strong { font-weight: 600; }
+ul, ol { padding-left: 1.5em; }
+li { margin: 0.25em 0; }
+li > ul, li > ol { margin: 0.25em 0 0; }
+li:has(> input[type="checkbox"]) { list-style: none; margin-left: -1.5em; }
+input[type="checkbox"] { margin: 0 0.5em 0 0; accent-color: var(--link); }
+blockquote { margin-left: 0; padding: 0 0 0 1.1em; border-left: 3px solid var(--line); color: var(--muted); }
+blockquote > :last-child { margin-bottom: 0; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2.4em 0; }
+code, pre { font-family: var(--font-mono); font-size: 0.86em; }
+:not(pre) > code { padding: 0.12em 0.4em; background: var(--plate); border-radius: 4px; }
+pre { padding: 14px 16px; background: var(--plate); border: 1px solid var(--line); border-radius: 6px; overflow-x: auto; line-height: 1.55; }
+pre code { font-size: inherit; background: none; padding: 0; }
+img { max-width: 100%; height: auto; border-radius: 4px; }
+table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; font-size: 0.94em; line-height: 1.5; }
+th, td { padding: 8px 12px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { background: var(--plate); font-weight: 600; }
+del { color: var(--muted); }
+/* Print (the PDF export: the viewer asks this page to print). The page leaves no
+   margin to the browser, which is what fills margins with the address and the
+   date: a PDF must not carry the private address of the page. The space around
+   the text is made by the page itself, on every sheet. */
+@page { size: A4; margin: 0; }
+@media print {
+  :root { --night: #fff; --plate: #f3f3f3; --line: #d0d0d0; --text: #111; --muted: #555; --link: #111; color-scheme: light; }
+  html, body { background: #fff; }
+  body { font-size: 11pt; line-height: 1.6; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .doc { max-width: none; padding: 16mm 18mm; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  a { text-decoration: underline; }
+  h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+  p, li, blockquote, pre, img, tr, .pending { break-inside: avoid; }
+  table { display: table; width: 100%; overflow: visible; font-size: 0.94em; }
+  thead { display: table-header-group; }
+  td, th { overflow-wrap: anywhere; }
+  pre { white-space: pre-wrap; overflow: visible; }
+  img { max-height: 240mm; }
+}

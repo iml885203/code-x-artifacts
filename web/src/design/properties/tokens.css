@@ -1,0 +1,3 @@
+.design-tokens .prop-field { flex-direction: column; align-items: stretch; }
+.design-tokens .prop-field > span { overflow-wrap: anywhere; }
+.design-tokens .prop-field input { width: 100%; }

@@ -1,0 +1,14 @@
+.git
+*.db*
+kubernetes-manifest
+.cache
+.tools
+web/node_modules
+internal/web/dist
+runtime/node_modules
+e2e
+
+.local
+.work
+website
+.impeccable

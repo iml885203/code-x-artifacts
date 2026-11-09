@@ -1,0 +1,8 @@
+/* A kind's mark: the icon on the kind's colour pair (--kind-<token>-bg and -fg in style.css), which is
+   both themes' already. */
+.kind-mark { display: inline-grid; place-items: center; flex: none; box-sizing: border-box; background: var(--kt); color: var(--ki); }
+.kind-mark .icon { width: 60%; height: 60%; }
+.kind-mark.kind-chip { width: 24px; height: 24px; border-radius: var(--r-icon); }
+.kind-mark.kind-bar { width: 28px; height: 28px; border-radius: var(--r-icon); }
+.kind-mark.kind-square { width: var(--kind-box); height: var(--kind-box); border-radius: var(--r-field); }
+.kind-mark.reserved { background: transparent; border: 1px dashed var(--ki); }

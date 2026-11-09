@@ -1,0 +1,18 @@
+{
+  "owned": [
+    "left", "top", "width", "height",
+    "position", "flex-direction", "flex-wrap", "align-items", "justify-content", "gap", "flex-grow",
+    "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
+    "margin", "margin-top", "margin-right", "margin-bottom", "margin-left",
+    "border-radius", "border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius",
+    "border-width", "border-style", "border-color",
+    "border-top-width", "border-top-style", "border-top-color",
+    "border-right-width", "border-right-style", "border-right-color",
+    "border-bottom-width", "border-bottom-style", "border-bottom-color",
+    "border-left-width", "border-left-style", "border-left-color",
+    "background-color", "opacity", "box-shadow",
+    "font-family", "font-size", "font-weight", "font-style", "text-align", "line-height", "letter-spacing", "color",
+    "background-image", "background-size", "background-position", "background-repeat", "object-fit"
+  ],
+  "shown": ["display"]
+}

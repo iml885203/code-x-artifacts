@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T14:15:12.714513+00:00",
+  "title": "Design System: CodeXArtifacts",
+  "extensions": {
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Existing UI state transitions"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact",
+        "value": "640px"
+      },
+      {
+        "name": "signin-stack",
+        "value": "899px"
+      },
+      {
+        "name": "website-preview-compact",
+        "value": "680px"
+      }
+    ],
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Brand berry",
+        "purpose": "Website brand expression; not the light app primary-button fill"
+      },
+      "primary-deep": {
+        "role": "primary",
+        "displayName": "Text-safe deep berry",
+        "purpose": "Light app action fill and accent text"
+      },
+      "primary-light": {
+        "role": "primary",
+        "displayName": "Dark-theme berry",
+        "purpose": "Dark app actions with charcoal labels"
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "Primary app button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Text-safe action fill, distinct from brand berry; inherits the current theme tokens.",
+      "html": "<button class=\"ds-primary\">Create document</button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid var(--edge,oklch(0.62 0.019 83));border-radius:10px;font:500 14px/1.55 var(--font-sans,\"Familjen Grotesk\",sans-serif);cursor:pointer;transition:background-color 200ms cubic-bezier(.16,1,.3,1),border-color 200ms cubic-bezier(.16,1,.3,1),color 200ms cubic-bezier(.16,1,.3,1),transform 120ms cubic-bezier(.16,1,.3,1);background:var(--star,oklch(0.46097675 0.12476191 3.36827942));border-color:var(--star-edge,oklch(0.46097675 0.12476191 3.36827942));color:var(--on-star,white);}.ds-primary:hover{background:var(--star-hover,oklch(0.39979732 0.11091987 5.45027163));}.ds-primary:focus-visible{outline:2px solid var(--text,oklch(0.21 0.007 78));outline-offset:2px;}.ds-primary:active{transform:translateY(1px)}.ds-primary:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Secondary app button",
+      "kind": "button",
+      "description": "Quiet outlined action using the common control geometry.",
+      "html": "<button class=\"ds-secondary\">Cancel</button>",
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid var(--edge,oklch(0.62 0.019 83));border-radius:10px;font:500 14px/1.55 var(--font-sans,\"Familjen Grotesk\",sans-serif);cursor:pointer;transition:background-color 200ms cubic-bezier(.16,1,.3,1),border-color 200ms cubic-bezier(.16,1,.3,1),color 200ms cubic-bezier(.16,1,.3,1),transform 120ms cubic-bezier(.16,1,.3,1);background:transparent;color:var(--text,oklch(0.21 0.007 78))}.ds-secondary:hover{background:var(--raised,oklch(0.94 0.014 84))}.ds-secondary:focus-visible{outline:2px solid var(--text,oklch(0.21 0.007 78));outline-offset:2px;}.ds-secondary:active{transform:translateY(1px)}.ds-secondary:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Account field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "The actual account-form field dimensions and visible edge.",
+      "html": "<label class=\"ds-label\" for=\"ds-name\">Username</label><input class=\"ds-input\" id=\"ds-name\" autocomplete=\"username\">",
+      "css": ".ds-label{display:block;margin-bottom:6px;font:600 13px/18px var(--font-sans,\"Familjen Grotesk\",sans-serif);color:var(--text-2,oklch(0.35 0.014 76))}.ds-input{width:100%;box-sizing:border-box;min-height:44px;padding:0 12px;border:1px solid var(--edge,oklch(0.62 0.019 83));border-radius:10px;background:var(--field,white);color:var(--text,oklch(0.21 0.007 78));font:400 14px/1.55 var(--font-sans,\"Familjen Grotesk\",sans-serif);transition:border-color 200ms cubic-bezier(.16,1,.3,1)}.ds-input:hover{border-color:var(--muted,oklch(0.46 0.015 75))}.ds-input:focus-visible{outline:2px solid var(--text,oklch(0.21 0.007 78));outline-offset:2px;}"
+    },
+    {
+      "name": "Library navigation",
+      "kind": "nav",
+      "description": "Raised current-page state in the library rail.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item\" href=\"#artifacts\" aria-current=\"page\">Artifacts</a><a class=\"ds-nav-item\" href=\"#recent\">Recently opened</a></nav>",
+      "css": ".ds-nav{display:grid;gap:2px}.ds-nav-item{display:flex;align-items:center;gap:12px;min-height:40px;padding:0 12px;border-radius:8px;text-decoration:none;color:var(--text-2,oklch(0.35 0.014 76));font:400 14px/1.55 var(--font-sans,\"Familjen Grotesk\",sans-serif);transition:background 200ms cubic-bezier(.16,1,.3,1),color 200ms cubic-bezier(.16,1,.3,1)}.ds-nav-item:hover,.ds-nav-item[aria-current=page]{background:var(--raised,oklch(0.94 0.014 84));color:var(--text,oklch(0.21 0.007 78))}.ds-nav-item[aria-current=page]{font-weight:600}.ds-nav-item:focus-visible{outline:2px solid var(--text,oklch(0.21 0.007 78));outline-offset:2px;}"
+    },
+    {
+      "name": "Artifact card",
+      "kind": "card",
+      "refersTo": "artifact-card",
+      "description": "Quiet bordered library container; synthetic title only.",
+      "html": "<article class=\"ds-card\"><a class=\"ds-card-link\" href=\"#example\"><div class=\"ds-card-meta\"><h2>Project overview</h2><span>Edited now</span></div></a></article>",
+      "css": ".ds-card{overflow:hidden;border:1px solid var(--line,oklch(0.91 0.015 80));border-radius:12px;background:var(--plate,white);transition:transform 200ms cubic-bezier(.16,1,.3,1),border-color 200ms cubic-bezier(.16,1,.3,1)}.ds-card:hover,.ds-card:focus-within{transform:translateY(-4px);border-color:var(--edge,oklch(0.62 0.019 83))}.ds-card-link{display:block;color:var(--text,oklch(0.21 0.007 78));text-decoration:none;border-radius:12px}.ds-card-meta{padding:12px;font:400 13px/1.4 var(--font-sans,\"Familjen Grotesk\",sans-serif);color:var(--muted,oklch(0.46 0.015 75))}.ds-card h2{margin:0 0 2px;color:var(--text,oklch(0.21 0.007 78));font-size:15px;line-height:1.35;font-weight:600}.ds-card-link:focus-visible{outline:2px solid var(--text,oklch(0.21 0.007 78));outline-offset:2px;}@media(prefers-reduced-motion:reduce){.ds-card:hover,.ds-card:focus-within{transform:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The work continues",
+    "overview": "The owner-selected A website composition and offset-field mark connect a warm, editorial public face to a quiet working interface. Artifacts stay visually primary inside the app; berry marks deliberate actions. This is a Go-backed product with a bilingual interface, not a static UI proposal.",
+    "keyCharacteristics": [
+      "Artifact-first workspace",
+      "Deliberate berry actions",
+      "Light and dark app themes"
+    ],
+    "rules": [
+      {
+        "name": "The Action Contrast Rule",
+        "body": "Keep the brand accent distinct from the app's text-safe action shades; use `--star`, `--on-star`, `--star-edge` and `--star-hover` together. Kit v5 shares those app tokens. Released kit v1–v4 remain immutable and do not inherit the berry update.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "Do keep product prose and headings named CodeXArtifacts.",
+      "Do keep lowercase `pictor` API/settings identifiers compatible where documented.",
+      "Do respect reduced motion and both light/dark themes.",
+      "Do preserve sandbox, sharing and browser focus behavior during visual work.",
+      "Do label illustration as illustration; do not invent usage or acceptance claims."
+    ],
+    "donts": [
+      "Don't introduce the paused TS/Cloudflare architecture into this release."
+    ]
+  }
+}

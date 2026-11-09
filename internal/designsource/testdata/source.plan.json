@@ -1,0 +1,859 @@
+{
+  "File": "frames/source.html",
+  "Source": "\u003c!DOCTYPE html\u003e\n\u003chtml\u003e\u003chead\u003e\u003cstyle\u003e.card { color: var(--ink); }\u003c/style\u003e\u003c/head\u003e\u003cbody data-pid=\"root\"\u003e\n\u003cscript type=\"application/x-pictor-props+json\"\u003e{\"schema\":{\"title\":{\"type\":\"string\",\"default\":\"Cards\",\"maxLength\":80}},\"values\":{}}\u003c/script\u003e\n\u003cscript type=\"text/x-pictor\"\u003eclass Frame extends PictorLogic { render() { return {items: []}; } choose(event) {} }\u003c/script\u003e\n\u003ch1 data-pid=\"heading\"\u003e{{props.title}}\u003c/h1\u003e\n\u003cp-for data-pid=\"cards\" list=\"{{items}}\" as=\"item\" key=\"{{item.id}}\" hint-count=\"3\"\u003e\u003cp-if data-pid=\"visible\" value=\"{{item.visible}}\"\u003e\u003cbutton data-pid=\"choose\" p-on:click=\"{{choose}}\"\u003e\u003cstrong data-pid=\"label\"\u003e{{item.name}}\u003c/strong\u003e\u003c/button\u003e\u003c/p-if\u003e\u003c/p-for\u003e\n\u003csvg data-pid=\"drawing\" viewBox=\"0 0 10 10\"\u003e\u003cdefs data-pid=\"defs\"\u003e\u003clinearGradient data-pid=\"gradient\" id=\"ink\" gradientUnits=\"userSpaceOnUse\"\u003e\u003cstop data-pid=\"stop\" offset=\"0\" stop-color=\"red\"\u003e\u003c/stop\u003e\u003c/linearGradient\u003e\u003c/defs\u003e\u003cpath data-pid=\"pen\" d=\"M0 0 L10 10\" stroke=\"url(#ink)\" fill=\"none\"\u003e\u003c/path\u003e\u003c/svg\u003e\n\u003c/body\u003e\u003c/html\u003e\n",
+  "Rewritten": "\u003c!DOCTYPE html\u003e\n\u003chtml\u003e\u003chead\u003e\u003cstyle\u003e.card { color: var(--ink); }\u003c/style\u003e\u003c/head\u003e\u003cbody data-pid=\"root\"\u003e\n\u003cscript type=\"application/x-pictor-props+json\"\u003e{\"schema\":{\"title\":{\"type\":\"string\",\"default\":\"Cards\",\"maxLength\":80}},\"values\":{}}\u003c/script\u003e\n\u003cscript type=\"text/x-pictor\"\u003eclass Frame extends PictorLogic { render() { return {items: []}; } choose(event) {} }\u003c/script\u003e\n\u003ch1 data-pid=\"heading\"\u003e{{props.title}}\u003c/h1\u003e\n\u003cp-for data-pid=\"cards\" list=\"{{items}}\" as=\"item\" key=\"{{item.id}}\" hint-count=\"3\"\u003e\u003cp-if data-pid=\"visible\" value=\"{{item.visible}}\"\u003e\u003cbutton data-pid=\"choose\" p-on:click=\"{{choose}}\"\u003e\u003cstrong data-pid=\"label\"\u003e{{item.name}}\u003c/strong\u003e\u003c/button\u003e\u003c/p-if\u003e\u003c/p-for\u003e\n\u003csvg data-pid=\"drawing\" viewBox=\"0 0 10 10\"\u003e\u003cdefs data-pid=\"defs\"\u003e\u003clinearGradient data-pid=\"gradient\" id=\"ink\" gradientUnits=\"userSpaceOnUse\"\u003e\u003cstop data-pid=\"stop\" offset=\"0\" stop-color=\"red\"\u003e\u003c/stop\u003e\u003c/linearGradient\u003e\u003c/defs\u003e\u003cpath data-pid=\"pen\" d=\"M0 0 L10 10\" stroke=\"url(#ink)\" fill=\"none\"\u003e\u003c/path\u003e\u003c/svg\u003e\n\u003c/body\u003e\u003c/html\u003e\n",
+  "Nodes": [
+    {
+      "Kind": "element",
+      "Tag": "html",
+      "PID": "",
+      "Namespace": "",
+      "Span": {
+        "File": "frames/source.html",
+        "StartByte": 16,
+        "EndByte": 984
+      },
+      "Attributes": null,
+      "Segments": null,
+      "Children": [
+        {
+          "Kind": "element",
+          "Tag": "head",
+          "PID": "",
+          "Namespace": "",
+          "Span": {
+            "File": "frames/source.html",
+            "StartByte": 22,
+            "EndByte": 78
+          },
+          "Attributes": null,
+          "Segments": null,
+          "Children": [
+            {
+              "Kind": "element",
+              "Tag": "style",
+              "PID": "",
+              "Namespace": "",
+              "Span": {
+                "File": "frames/source.html",
+                "StartByte": 28,
+                "EndByte": 71
+              },
+              "Attributes": null,
+              "Segments": null,
+              "Children": [
+                {
+                  "Kind": "text",
+                  "Tag": "",
+                  "PID": "",
+                  "Namespace": "",
+                  "Span": {
+                    "File": "frames/source.html",
+                    "StartByte": 35,
+                    "EndByte": 63
+                  },
+                  "Attributes": null,
+                  "Segments": [
+                    {
+                      "Literal": ".card { color: var(--ink); }",
+                      "Path": "",
+                      "ValueType": "",
+                      "Span": {
+                        "File": "frames/source.html",
+                        "StartByte": 35,
+                        "EndByte": 63
+                      }
+                    }
+                  ],
+                  "Children": null,
+                  "Repeat": null,
+                  "Condition": "",
+                  "Import": "",
+                  "ImportProps": "",
+                  "Navigation": "",
+                  "Events": null,
+                  "Hints": null
+                }
+              ],
+              "Repeat": null,
+              "Condition": "",
+              "Import": "",
+              "ImportProps": "",
+              "Navigation": "",
+              "Events": {},
+              "Hints": {}
+            }
+          ],
+          "Repeat": null,
+          "Condition": "",
+          "Import": "",
+          "ImportProps": "",
+          "Navigation": "",
+          "Events": {},
+          "Hints": {}
+        },
+        {
+          "Kind": "element",
+          "Tag": "body",
+          "PID": "root",
+          "Namespace": "",
+          "Span": {
+            "File": "frames/source.html",
+            "StartByte": 78,
+            "EndByte": 977
+          },
+          "Attributes": null,
+          "Segments": null,
+          "Children": [
+            {
+              "Kind": "text",
+              "Tag": "",
+              "PID": "",
+              "Namespace": "",
+              "Span": {
+                "File": "frames/source.html",
+                "StartByte": 100,
+                "EndByte": 101
+              },
+              "Attributes": null,
+              "Segments": [
+                {
+                  "Literal": "\n",
+                  "Path": "",
+                  "ValueType": "",
+                  "Span": {
+                    "File": "frames/source.html",
+                    "StartByte": 100,
+                    "EndByte": 101
+                  }
+                }
+              ],
+              "Children": null,
+              "Repeat": null,
+              "Condition": "",
+              "Import": "",
+              "ImportProps": "",
+              "Navigation": "",
+              "Events": null,
+              "Hints": null
+            },
+            {
+              "Kind": "text",
+              "Tag": "",
+              "PID": "",
+              "Namespace": "",
+              "Span": {
+                "File": "frames/source.html",
+                "StartByte": 240,
+                "EndByte": 241
+              },
+              "Attributes": null,
+              "Segments": [
+                {
+                  "Literal": "\n",
+                  "Path": "",
+                  "ValueType": "",
+                  "Span": {
+                    "File": "frames/source.html",
+                    "StartByte": 240,
+                    "EndByte": 241
+                  }
+                }
+              ],
+              "Children": null,
+              "Repeat": null,
+              "Condition": "",
+              "Import": "",
+              "ImportProps": "",
+              "Navigation": "",
+              "Events": null,
+              "Hints": null
+            },
+            {
+              "Kind": "text",
+              "Tag": "",
+              "PID": "",
+              "Namespace": "",
+              "Span": {
+                "File": "frames/source.html",
+                "StartByte": 364,
+                "EndByte": 365
+              },
+              "Attributes": null,
+              "Segments": [
+                {
+                  "Literal": "\n",
+                  "Path": "",
+                  "ValueType": "",
+                  "Span": {
+                    "File": "frames/source.html",
+                    "StartByte": 364,
+                    "EndByte": 365
+                  }
+                }
+              ],
+              "Children": null,
+              "Repeat": null,
+              "Condition": "",
+              "Import": "",
+              "ImportProps": "",
+              "Navigation": "",
+              "Events": null,
+              "Hints": null
+            },
+            {
+              "Kind": "element",
+              "Tag": "h1",
+              "PID": "heading",
+              "Namespace": "",
+              "Span": {
+                "File": "frames/source.html",
+                "StartByte": 365,
+                "EndByte": 408
+              },
+              "Attributes": null,
+              "Segments": null,
+              "Children": [
+                {
+                  "Kind": "text",
+                  "Tag": "",
+                  "PID": "",
+                  "Namespace": "",
+                  "Span": {
+                    "File": "frames/source.html",
+                    "StartByte": 388,
+                    "EndByte": 403
+                  },
+                  "Attributes": null,
+                  "Segments": [
+                    {
+                      "Literal": "",
+                      "Path": "props.title",
+                      "ValueType": "",
+                      "Span": {
+                        "File": "frames/source.html",
+                        "StartByte": 388,
+                        "EndByte": 403
+                      }
+                    }
+                  ],
+                  "Children": null,
+                  "Repeat": null,
+                  "Condition": "",
+                  "Import": "",
+                  "ImportProps": "",
+                  "Navigation": "",
+                  "Events": null,
+                  "Hints": null
+                }
+              ],
+              "Repeat": null,
+              "Condition": "",
+              "Import": "",
+              "ImportProps": "",
+              "Navigation": "",
+              "Events": {},
+              "Hints": {}
+            },
+            {
+              "Kind": "text",
+              "Tag": "",
+              "PID": "",
+              "Namespace": "",
+              "Span": {
+                "File": "frames/source.html",
+                "StartByte": 408,
+                "EndByte": 409
+              },
+              "Attributes": null,
+              "Segments": [
+                {
+                  "Literal": "\n",
+                  "Path": "",
+                  "ValueType": "",
+                  "Span": {
+                    "File": "frames/source.html",
+                    "StartByte": 408,
+                    "EndByte": 409
+                  }
+                }
+              ],
+              "Children": null,
+              "Repeat": null,
+              "Condition": "",
+              "Import": "",
+              "ImportProps": "",
+              "Navigation": "",
+              "Events": null,
+              "Hints": null
+            },
+            {
+              "Kind": "repeat",
+              "Tag": "p-for",
+              "PID": "cards",
+              "Namespace": "",
+              "Span": {
+                "File": "frames/source.html",
+                "StartByte": 409,
+                "EndByte": 664
+              },
+              "Attributes": null,
+              "Segments": null,
+              "Children": [
+                {
+                  "Kind": "condition",
+                  "Tag": "p-if",
+                  "PID": "visible",
+                  "Namespace": "",
+                  "Span": {
+                    "File": "frames/source.html",
+                    "StartByte": 493,
+                    "EndByte": 656
+                  },
+                  "Attributes": null,
+                  "Segments": null,
+                  "Children": [
+                    {
+                      "Kind": "element",
+                      "Tag": "button",
+                      "PID": "choose",
+                      "Namespace": "",
+                      "Span": {
+                        "File": "frames/source.html",
+                        "StartByte": 543,
+                        "EndByte": 649
+                      },
+                      "Attributes": null,
+                      "Segments": null,
+                      "Children": [
+                        {
+                          "Kind": "element",
+                          "Tag": "strong",
+                          "PID": "label",
+                          "Namespace": "",
+                          "Span": {
+                            "File": "frames/source.html",
+                            "StartByte": 593,
+                            "EndByte": 640
+                          },
+                          "Attributes": null,
+                          "Segments": null,
+                          "Children": [
+                            {
+                              "Kind": "text",
+                              "Tag": "",
+                              "PID": "",
+                              "Namespace": "",
+                              "Span": {
+                                "File": "frames/source.html",
+                                "StartByte": 618,
+                                "EndByte": 631
+                              },
+                              "Attributes": null,
+                              "Segments": [
+                                {
+                                  "Literal": "",
+                                  "Path": "item.name",
+                                  "ValueType": "",
+                                  "Span": {
+                                    "File": "frames/source.html",
+                                    "StartByte": 618,
+                                    "EndByte": 631
+                                  }
+                                }
+                              ],
+                              "Children": null,
+                              "Repeat": null,
+                              "Condition": "",
+                              "Import": "",
+                              "ImportProps": "",
+                              "Navigation": "",
+                              "Events": null,
+                              "Hints": null
+                            }
+                          ],
+                          "Repeat": null,
+                          "Condition": "",
+                          "Import": "",
+                          "ImportProps": "",
+                          "Navigation": "",
+                          "Events": {},
+                          "Hints": {}
+                        }
+                      ],
+                      "Repeat": null,
+                      "Condition": "",
+                      "Import": "",
+                      "ImportProps": "",
+                      "Navigation": "",
+                      "Events": {
+                        "click": "choose"
+                      },
+                      "Hints": {}
+                    }
+                  ],
+                  "Repeat": null,
+                  "Condition": "item.visible",
+                  "Import": "",
+                  "ImportProps": "",
+                  "Navigation": "",
+                  "Events": {},
+                  "Hints": {}
+                }
+              ],
+              "Repeat": {
+                "List": "items",
+                "As": "item",
+                "Key": "item.id",
+                "Positional": false
+              },
+              "Condition": "",
+              "Import": "",
+              "ImportProps": "",
+              "Navigation": "",
+              "Events": {},
+              "Hints": {
+                "hint-count": "3"
+              }
+            },
+            {
+              "Kind": "text",
+              "Tag": "",
+              "PID": "",
+              "Namespace": "",
+              "Span": {
+                "File": "frames/source.html",
+                "StartByte": 664,
+                "EndByte": 665
+              },
+              "Attributes": null,
+              "Segments": [
+                {
+                  "Literal": "\n",
+                  "Path": "",
+                  "ValueType": "",
+                  "Span": {
+                    "File": "frames/source.html",
+                    "StartByte": 664,
+                    "EndByte": 665
+                  }
+                }
+              ],
+              "Children": null,
+              "Repeat": null,
+              "Condition": "",
+              "Import": "",
+              "ImportProps": "",
+              "Navigation": "",
+              "Events": null,
+              "Hints": null
+            },
+            {
+              "Kind": "element",
+              "Tag": "svg",
+              "PID": "drawing",
+              "Namespace": "svg",
+              "Span": {
+                "File": "frames/source.html",
+                "StartByte": 665,
+                "EndByte": 969
+              },
+              "Attributes": [
+                {
+                  "Name": "viewBox",
+                  "Namespace": "",
+                  "Segments": [
+                    {
+                      "Literal": "0 0 10 10",
+                      "Path": "",
+                      "ValueType": "",
+                      "Span": {
+                        "File": "",
+                        "StartByte": 0,
+                        "EndByte": 9
+                      }
+                    }
+                  ],
+                  "Kind": "scalar",
+                  "Style": null
+                }
+              ],
+              "Segments": null,
+              "Children": [
+                {
+                  "Kind": "element",
+                  "Tag": "defs",
+                  "PID": "defs",
+                  "Namespace": "svg",
+                  "Span": {
+                    "File": "frames/source.html",
+                    "StartByte": 709,
+                    "EndByte": 888
+                  },
+                  "Attributes": null,
+                  "Segments": null,
+                  "Children": [
+                    {
+                      "Kind": "element",
+                      "Tag": "linearGradient",
+                      "PID": "gradient",
+                      "Namespace": "svg",
+                      "Span": {
+                        "File": "frames/source.html",
+                        "StartByte": 731,
+                        "EndByte": 881
+                      },
+                      "Attributes": [
+                        {
+                          "Name": "gradientUnits",
+                          "Namespace": "",
+                          "Segments": [
+                            {
+                              "Literal": "userSpaceOnUse",
+                              "Path": "",
+                              "ValueType": "",
+                              "Span": {
+                                "File": "",
+                                "StartByte": 0,
+                                "EndByte": 14
+                              }
+                            }
+                          ],
+                          "Kind": "scalar",
+                          "Style": null
+                        },
+                        {
+                          "Name": "id",
+                          "Namespace": "",
+                          "Segments": [
+                            {
+                              "Literal": "ink",
+                              "Path": "",
+                              "ValueType": "",
+                              "Span": {
+                                "File": "",
+                                "StartByte": 0,
+                                "EndByte": 3
+                              }
+                            }
+                          ],
+                          "Kind": "scalar",
+                          "Style": null
+                        }
+                      ],
+                      "Segments": null,
+                      "Children": [
+                        {
+                          "Kind": "element",
+                          "Tag": "stop",
+                          "PID": "stop",
+                          "Namespace": "svg",
+                          "Span": {
+                            "File": "frames/source.html",
+                            "StartByte": 807,
+                            "EndByte": 864
+                          },
+                          "Attributes": [
+                            {
+                              "Name": "offset",
+                              "Namespace": "",
+                              "Segments": [
+                                {
+                                  "Literal": "0",
+                                  "Path": "",
+                                  "ValueType": "",
+                                  "Span": {
+                                    "File": "",
+                                    "StartByte": 0,
+                                    "EndByte": 1
+                                  }
+                                }
+                              ],
+                              "Kind": "scalar",
+                              "Style": null
+                            },
+                            {
+                              "Name": "stop-color",
+                              "Namespace": "",
+                              "Segments": [
+                                {
+                                  "Literal": "red",
+                                  "Path": "",
+                                  "ValueType": "",
+                                  "Span": {
+                                    "File": "",
+                                    "StartByte": 0,
+                                    "EndByte": 3
+                                  }
+                                }
+                              ],
+                              "Kind": "scalar",
+                              "Style": null
+                            }
+                          ],
+                          "Segments": null,
+                          "Children": null,
+                          "Repeat": null,
+                          "Condition": "",
+                          "Import": "",
+                          "ImportProps": "",
+                          "Navigation": "",
+                          "Events": {},
+                          "Hints": {}
+                        }
+                      ],
+                      "Repeat": null,
+                      "Condition": "",
+                      "Import": "",
+                      "ImportProps": "",
+                      "Navigation": "",
+                      "Events": {},
+                      "Hints": {}
+                    }
+                  ],
+                  "Repeat": null,
+                  "Condition": "",
+                  "Import": "",
+                  "ImportProps": "",
+                  "Navigation": "",
+                  "Events": {},
+                  "Hints": {}
+                },
+                {
+                  "Kind": "element",
+                  "Tag": "path",
+                  "PID": "pen",
+                  "Namespace": "svg",
+                  "Span": {
+                    "File": "frames/source.html",
+                    "StartByte": 888,
+                    "EndByte": 963
+                  },
+                  "Attributes": [
+                    {
+                      "Name": "d",
+                      "Namespace": "",
+                      "Segments": [
+                        {
+                          "Literal": "M0 0 L10 10",
+                          "Path": "",
+                          "ValueType": "",
+                          "Span": {
+                            "File": "",
+                            "StartByte": 0,
+                            "EndByte": 11
+                          }
+                        }
+                      ],
+                      "Kind": "scalar",
+                      "Style": null
+                    },
+                    {
+                      "Name": "fill",
+                      "Namespace": "",
+                      "Segments": [
+                        {
+                          "Literal": "none",
+                          "Path": "",
+                          "ValueType": "",
+                          "Span": {
+                            "File": "",
+                            "StartByte": 0,
+                            "EndByte": 4
+                          }
+                        }
+                      ],
+                      "Kind": "scalar",
+                      "Style": null
+                    },
+                    {
+                      "Name": "stroke",
+                      "Namespace": "",
+                      "Segments": [
+                        {
+                          "Literal": "url(#ink)",
+                          "Path": "",
+                          "ValueType": "",
+                          "Span": {
+                            "File": "",
+                            "StartByte": 0,
+                            "EndByte": 9
+                          }
+                        }
+                      ],
+                      "Kind": "scalar",
+                      "Style": null
+                    }
+                  ],
+                  "Segments": null,
+                  "Children": null,
+                  "Repeat": null,
+                  "Condition": "",
+                  "Import": "",
+                  "ImportProps": "",
+                  "Navigation": "",
+                  "Events": {},
+                  "Hints": {}
+                }
+              ],
+              "Repeat": null,
+              "Condition": "",
+              "Import": "",
+              "ImportProps": "",
+              "Navigation": "",
+              "Events": {},
+              "Hints": {}
+            },
+            {
+              "Kind": "text",
+              "Tag": "",
+              "PID": "",
+              "Namespace": "",
+              "Span": {
+                "File": "frames/source.html",
+                "StartByte": 969,
+                "EndByte": 970
+              },
+              "Attributes": null,
+              "Segments": [
+                {
+                  "Literal": "\n",
+                  "Path": "",
+                  "ValueType": "",
+                  "Span": {
+                    "File": "frames/source.html",
+                    "StartByte": 969,
+                    "EndByte": 970
+                  }
+                }
+              ],
+              "Children": null,
+              "Repeat": null,
+              "Condition": "",
+              "Import": "",
+              "ImportProps": "",
+              "Navigation": "",
+              "Events": null,
+              "Hints": null
+            }
+          ],
+          "Repeat": null,
+          "Condition": "",
+          "Import": "",
+          "ImportProps": "",
+          "Navigation": "",
+          "Events": {},
+          "Hints": {}
+        }
+      ],
+      "Repeat": null,
+      "Condition": "",
+      "Import": "",
+      "ImportProps": "",
+      "Navigation": "",
+      "Events": {},
+      "Hints": {}
+    },
+    {
+      "Kind": "text",
+      "Tag": "",
+      "PID": "",
+      "Namespace": "",
+      "Span": {
+        "File": "frames/source.html",
+        "StartByte": 984,
+        "EndByte": 985
+      },
+      "Attributes": null,
+      "Segments": [
+        {
+          "Literal": "\n",
+          "Path": "",
+          "ValueType": "",
+          "Span": {
+            "File": "frames/source.html",
+            "StartByte": 984,
+            "EndByte": 985
+          }
+        }
+      ],
+      "Children": null,
+      "Repeat": null,
+      "Condition": "",
+      "Import": "",
+      "ImportProps": "",
+      "Navigation": "",
+      "Events": null,
+      "Hints": null
+    }
+  ],
+  "Logic": {
+    "Source": "class Frame extends PictorLogic { render() { return {items: []}; } choose(event) {} }",
+    "SHA256": "af52171e96f6ea06b0741cca30e4f4466b7c180000264cc51f041ee6fc6b0aab",
+    "Span": {
+      "File": "frames/source.html",
+      "StartByte": 241,
+      "EndByte": 364
+    },
+    "SyntaxChecked": true,
+    "Methods": [
+      "choose",
+      "render"
+    ],
+    "CompiledSHA256": "",
+    "CapabilityProfile": "",
+    "WorkerProgram": null
+  },
+  "Declarations": [
+    {
+      "Kind": "props",
+      "Span": {
+        "File": "frames/source.html",
+        "StartByte": 101,
+        "EndByte": 240
+      },
+      "ContentSpan": {
+        "File": "frames/source.html",
+        "StartByte": 148,
+        "EndByte": 231
+      },
+      "ParentSpan": {
+        "File": "frames/source.html",
+        "StartByte": 78,
+        "EndByte": 977
+      },
+      "ParentPID": "root"
+    },
+    {
+      "Kind": "logic",
+      "Span": {
+        "File": "frames/source.html",
+        "StartByte": 241,
+        "EndByte": 364
+      },
+      "ContentSpan": {
+        "File": "frames/source.html",
+        "StartByte": 270,
+        "EndByte": 355
+      },
+      "ParentSpan": {
+        "File": "frames/source.html",
+        "StartByte": 78,
+        "EndByte": 977
+      },
+      "ParentPID": "root"
+    }
+  ],
+  "Opaque": null,
+  "Props": {
+    "schema": {
+      "title": {
+        "type": "string",
+        "default": "Cards",
+        "maxLength": 80
+      }
+    },
+    "values": {}
+  },
+  "Diagnostics": null
+}

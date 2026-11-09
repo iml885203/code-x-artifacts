@@ -1,0 +1,38 @@
+{
+  "name": "a format taken away from the units that lost it",
+  "before": [
+    {
+      "insert": "ab",
+      "attributes": {
+        "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}"
+      }
+    },
+    {
+      "insert": "c"
+    }
+  ],
+  "after": [
+    {
+      "insert": "abc"
+    }
+  ],
+  "want": {
+    "start": 3,
+    "end": 3,
+    "insert": [],
+    "formats": [
+      {
+        "index": 0,
+        "attrs": {
+          "f:e3": null
+        }
+      },
+      {
+        "index": 1,
+        "attrs": {
+          "f:e3": null
+        }
+      }
+    ]
+  }
+}

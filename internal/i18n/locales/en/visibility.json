@@ -1,0 +1,10 @@
+{
+  "visibility.private": "Only me",
+  "visibility.private.hint": "Only you and the people you add can open it.",
+  "visibility.organisation": "Organisation",
+  "visibility.organisation.hint": "Anyone in the company who signs in can open it and comment.",
+  "visibility.public": "Public link",
+  "visibility.public.hint": "Anyone with the link can open it, without signing in.",
+  "visibility.public.hintOff": "Anyone with the link can open it. This server turned public links off, so for now it works like Organisation.",
+  "visibility.public.unavailable": "This server has no public links."
+}

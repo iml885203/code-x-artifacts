@@ -1,0 +1,14 @@
+{
+  "tabs.label": "Tabs",
+  "tabs.untitled": "Untitled tab",
+  "tabs.add": "Add tab",
+  "tabs.rename": "Rename tab",
+  "tabs.renameField": "Tab name",
+  "tabs.moveUp": "Move tab up",
+  "tabs.moveDown": "Move tab down",
+  "tabs.delete": "Delete tab",
+  "tabs.confirmDelete": "Delete this tab?",
+  "tabs.confirmDeleteHint": "The tab \"{name}\" and everything in it is deleted for everyone.",
+  "tabs.deleteConfirm": "Delete tab",
+  "tabs.deleteFailed": "Couldn't delete the tab. Try again."
+}

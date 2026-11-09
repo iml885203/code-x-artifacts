@@ -1,0 +1,44 @@
+{
+  "name": "inserted text carries its own formats",
+  "before": [
+    {
+      "insert": "one "
+    },
+    {
+      "insert": "two",
+      "attributes": {
+        "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}"
+      }
+    }
+  ],
+  "after": [
+    {
+      "insert": "one "
+    },
+    {
+      "insert": "2",
+      "attributes": {
+        "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}"
+      }
+    },
+    {
+      "insert": " plain"
+    }
+  ],
+  "want": {
+    "start": 4,
+    "end": 7,
+    "insert": [
+      {
+        "insert": "2",
+        "attributes": {
+          "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}"
+        }
+      },
+      {
+        "insert": " plain"
+      }
+    ],
+    "formats": []
+  }
+}

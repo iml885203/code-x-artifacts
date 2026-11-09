@@ -1,0 +1,10 @@
+{
+  "visibility.private": "只有我",
+  "visibility.private.hint": "只有你和你加入的人可以開啟。",
+  "visibility.organisation": "組織內",
+  "visibility.organisation.hint": "公司裡用帳號登入的人都可以開啟與留言。",
+  "visibility.public": "公開連結",
+  "visibility.public.hint": "知道連結的人都可以開啟，不需要登入。",
+  "visibility.public.hintOff": "知道連結的人都可以開啟。此伺服器已停用公開連結，目前等同組織內所有人。",
+  "visibility.public.unavailable": "此伺服器沒有開放公開連結。"
+}

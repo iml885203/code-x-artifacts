@@ -1,0 +1,18 @@
+{
+  "versions.copy": "建立副本",
+  "versions.title": "版本紀錄",
+  "versions.close": "關閉",
+  "versions.current": "目前",
+  "versions.restoredFrom": "還原自 v{from}",
+  "versions.viewing": "正在檢視 v{number}（唯讀）",
+  "versions.backToNewest": "回到最新版",
+  "versions.restore": "還原",
+  "versions.confirmRestore": "還原 v{number}？",
+  "versions.confirmRestoreHint": "它會存成最上面的新版本，歷史紀錄不會被移除。",
+  "versions.restored": "已把 v{from} 還原為 v{to}",
+  "versions.restoreFailed": "無法還原這個版本，請再試一次。",
+  "versions.restoreConflict": "已經有更新的版本。重新開啟這個頁面就會看到。",
+  "versions.loadFailed": "無法載入版本紀錄，請再試一次。",
+  "versions.earlier": "較早的 {count} 個",
+  "versions.agent": "{name} 的 {client}"
+}

@@ -1,0 +1,311 @@
+/* pictor kit v2: the look of pages agents make for pictor. See DESIGN.md.
+   Link it from the page's <head>: <link rel="stylesheet" href="/kit/v2/pictor.css">
+   The path is immutable: a change to this file is a new version under /kit/v3/.
+   Since v1: light mode has the site's bright amber (--star), with --star-edge
+   for the border of a button that carries it and --star-hover for its hover. */
+
+@font-face {
+  font-family: "Familjen Grotesk";
+  src: url("/static/fonts/FamiljenGrotesk.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Martian Mono";
+  src: url("/static/fonts/MartianMono.woff2") format("woff2");
+  font-weight: 100 800;
+  font-display: swap;
+}
+
+/* Tokens. Dark is the default; light follows the system. data-theme="light" or
+   "dark" on <html> (or on any element, for a part of a page) forces one. */
+:root,
+[data-theme="dark"] {
+  --night: oklch(0.15 0.025 265);
+  --field: oklch(0.19 0.025 265);
+  --plate: oklch(0.22 0.025 265);
+  --raised: oklch(0.27 0.025 265);
+  --line: oklch(0.29 0.025 265);
+  --text: oklch(0.95 0.008 265);
+  --muted: oklch(0.72 0.02 265);
+  --star: oklch(0.84 0.13 78);
+  --star-edge: var(--star);
+  --star-hover: color-mix(in oklch, var(--star), var(--text) 12%);
+  --star-text: oklch(0.86 0.13 78);
+  --on-star: oklch(0.20 0.04 78);
+  --danger: oklch(0.78 0.14 25);
+  --ok: oklch(0.80 0.12 160);
+  --info: oklch(0.78 0.11 245);
+  --shadow: 0 20px 48px oklch(0.05 0.02 265 / 0.55), 0 2px 8px oklch(0.05 0.02 265 / 0.4);
+
+  /* Chart palette: six categorical colours with the same lightness, so no series shouts. */
+  --chart-1: oklch(0.78 0.11 245);
+  --chart-2: oklch(0.84 0.13 78);
+  --chart-3: oklch(0.80 0.12 160);
+  --chart-4: oklch(0.76 0.13 25);
+  --chart-5: oklch(0.78 0.10 320);
+  --chart-6: oklch(0.80 0.09 205);
+  --chart-grid: oklch(0.95 0 0 / 0.12);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --night: oklch(0.97 0.006 265);
+    --field: oklch(1 0 0);
+    --plate: oklch(1 0 0);
+    --raised: oklch(0.93 0.008 265);
+    --line: oklch(0.86 0.01 265);
+    --text: oklch(0.20 0.03 265);
+    --muted: oklch(0.42 0.02 265);
+    --star: oklch(0.80 0.15 78);
+    --star-edge: oklch(0.62 0.13 72);
+    --star-hover: oklch(0.76 0.15 76);
+    --star-text: oklch(0.48 0.12 65);
+    --on-star: oklch(0.20 0.04 78);
+    --danger: oklch(0.50 0.17 25);
+    --ok: oklch(0.45 0.11 160);
+    --info: oklch(0.47 0.12 245);
+    --shadow: 0 20px 48px oklch(0.30 0.03 265 / 0.22), 0 2px 8px oklch(0.30 0.03 265 / 0.14);
+    --chart-1: oklch(0.55 0.13 245);
+    --chart-2: oklch(0.62 0.14 70);
+    --chart-3: oklch(0.55 0.11 160);
+    --chart-4: oklch(0.56 0.16 25);
+    --chart-5: oklch(0.55 0.13 320);
+    --chart-6: oklch(0.55 0.09 205);
+    --chart-grid: oklch(0.20 0.03 265 / 0.12);
+    color-scheme: light;
+  }
+}
+[data-theme="light"] {
+  --night: oklch(0.97 0.006 265);
+  --field: oklch(1 0 0);
+  --plate: oklch(1 0 0);
+  --raised: oklch(0.93 0.008 265);
+  --line: oklch(0.86 0.01 265);
+  --text: oklch(0.20 0.03 265);
+  --muted: oklch(0.42 0.02 265);
+  --star: oklch(0.80 0.15 78);
+  --star-edge: oklch(0.62 0.13 72);
+  --star-hover: oklch(0.76 0.15 76);
+  --star-text: oklch(0.48 0.12 65);
+  --on-star: oklch(0.20 0.04 78);
+  --danger: oklch(0.50 0.17 25);
+  --ok: oklch(0.45 0.11 160);
+  --info: oklch(0.47 0.12 245);
+  --shadow: 0 20px 48px oklch(0.30 0.03 265 / 0.22), 0 2px 8px oklch(0.30 0.03 265 / 0.14);
+  --chart-1: oklch(0.55 0.13 245);
+  --chart-2: oklch(0.62 0.14 70);
+  --chart-3: oklch(0.55 0.11 160);
+  --chart-4: oklch(0.56 0.16 25);
+  --chart-5: oklch(0.55 0.13 320);
+  --chart-6: oklch(0.55 0.09 205);
+  --chart-grid: oklch(0.20 0.03 265 / 0.12);
+  color-scheme: light;
+}
+
+/* Type, space and shape. These do not change with the theme. */
+:root {
+  --font-sans: "Familjen Grotesk", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Helvetica Neue", sans-serif;
+  --font-mono: "Martian Mono", "PingFang TC", "Noto Sans TC", ui-monospace, monospace;
+
+  --fs-meta: 0.8125rem;
+  --fs-body: 0.9375rem;
+  --fs-lead: 1.0625rem;
+  --fs-h3: 1.1875rem;
+  --fs-h2: 1.5rem;
+  --fs-h1: clamp(1.75rem, 1.2rem + 2vw, 2.25rem);
+  --fs-display: clamp(2.5rem, 1.6rem + 3.5vw, 3.5rem);
+
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 28px;
+  --s-7: 40px;
+  --s-8: 56px;
+  --gutter: 40px;
+  --measure: 68ch;
+  --page: 72rem;
+
+  --r-control: 4px;
+  --r-card: 6px;
+  --target: 40px;
+  --dur: 200ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (max-width: 640px) {
+  :root { --gutter: 16px; }
+}
+@media (pointer: coarse) {
+  :root { --target: 44px; }
+}
+
+/* Base: plain HTML looks right without any class. */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scrollbar-color: var(--line) var(--night); }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--text);
+  font: 400 var(--fs-body) / 1.65 var(--font-sans);
+  caret-color: var(--star-text);
+  overflow-wrap: break-word;
+}
+::selection { background: var(--star); color: var(--on-star); }
+:focus-visible { outline: 2px solid var(--star-text); outline-offset: 2px; }
+[hidden] { display: none !important; }
+img, svg, video, canvas { max-width: 100%; height: auto; }
+
+/* Layout. .pk-page is the page column; .pk-prose is a readable measure inside it. */
+.pk-page { max-width: var(--page); margin-inline: auto; padding: var(--s-7) var(--gutter); }
+.pk-prose { max-width: var(--measure); }
+.pk-stack > * + * { margin-block-start: var(--s-4); }
+.pk-row { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center;  margin-block-end: var(--s-4); }
+.pk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); gap: var(--s-5); }
+
+/* Headings and text */
+h1, h2, h3, h4 { margin: var(--s-6) 0 var(--s-3); font-weight: 600; line-height: 1.2; text-wrap: balance; }
+h1 { font-size: var(--fs-h1); letter-spacing: -0.03em; margin-top: 0; }
+h2 { font-size: var(--fs-h2); letter-spacing: -0.02em; }
+h3 { font-size: var(--fs-h3); letter-spacing: -0.01em; }
+h4 { font-size: var(--fs-body); letter-spacing: 0; }
+.pk-display { font-size: var(--fs-display); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05; }
+p, ul, ol, dl, pre, table, blockquote, figure, details { margin: 0 0 var(--s-4); }
+.pk-lead { font-size: var(--fs-lead); }
+.pk-meta { font: 400 var(--fs-meta) / 1.4 var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+small, .pk-muted { color: var(--muted); }
+small { font-size: var(--fs-meta); }
+strong, b { font-weight: 600; }
+a { color: var(--star-text); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+ul, ol { padding-inline-start: 1.4em; }
+li + li { margin-block-start: var(--s-1); }
+dt { font-weight: 600; }
+dd { margin: 0 0 var(--s-2); color: var(--muted); }
+hr { border: 0; border-top: 1px solid var(--line); margin: var(--s-6) 0; }
+blockquote { padding-inline-start: var(--s-4); color: var(--muted); font-size: var(--fs-lead); }
+code, kbd, samp, pre { font-family: var(--font-mono); font-size: 0.875em; }
+code, kbd { padding: 0.1em 0.4em; border: 1px solid var(--line); border-radius: var(--r-control); background: var(--plate); }
+kbd { border-bottom-width: 2px; }
+pre { padding: var(--s-4); overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--plate); line-height: 1.5; }
+pre code { padding: 0; border: 0; background: none; }
+mark { background: color-mix(in oklab, var(--star) 35%, transparent); color: inherit; padding: 0 0.2em; }
+figcaption { color: var(--muted); font-size: var(--fs-meta); margin-block-start: var(--s-2); }
+details { border: 1px solid var(--line); border-radius: var(--r-card); background: var(--plate); padding: var(--s-3) var(--s-4); }
+summary { cursor: pointer; font-weight: 500; }
+details[open] > summary { margin-block-end: var(--s-2); }
+
+/* Tables: numbers line up. Wrap a wide table in .pk-table-wrap so it scrolls on a phone. */
+.pk-table-wrap { overflow-x: auto; margin: 0 0 var(--s-4); border: 1px solid var(--line); border-radius: var(--r-card); }
+.pk-table-wrap > table { margin: 0; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: var(--s-3) var(--s-4); text-align: start; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: var(--fs-meta); font-weight: 500; color: var(--muted); white-space: nowrap; }
+tbody tr:last-child > * { border-bottom: 0; }
+tbody tr:hover { background: var(--plate); }
+td.num, th.num { text-align: end; font-family: var(--font-mono); font-size: 0.875em; }
+caption { padding-inline: var(--s-4); padding-block-start: var(--s-3); caption-side: top; text-align: start; padding-block-end: var(--s-2); color: var(--muted); font-size: var(--fs-meta); }
+
+/* Callouts: a full border and a tint, no side stripe. Start with a <strong> that names it. */
+.pk-callout {
+  --tone: var(--info);
+  margin: 0 0 var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid color-mix(in oklab, var(--tone) 45%, var(--line));
+  border-radius: var(--r-card);
+  background: color-mix(in oklab, var(--tone) 12%, var(--plate));
+}
+.pk-callout > :last-child { margin-bottom: 0; }
+.pk-callout > strong:first-child { display: block; color: var(--tone); }
+.pk-callout--ok { --tone: var(--ok); }
+.pk-callout--warn { --tone: var(--star-text); }
+.pk-callout--danger { --tone: var(--danger); }
+
+/* Cards and tags */
+.pk-card { padding: var(--s-5); border: 1px solid var(--line); border-radius: var(--r-card); background: var(--plate); }
+.pk-card > :first-child { margin-top: 0; }
+.pk-card > :last-child { margin-bottom: 0; }
+a.pk-card { display: block; color: inherit; text-decoration: none; transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out); }
+a.pk-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--star-edge); }
+.pk-tag {
+  display: inline-block;
+  padding: 0 var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-control);
+  font: 400 var(--fs-meta) / 1.6 var(--font-mono);
+  color: var(--muted);
+}
+.pk-tag--star { color: var(--star-text); border-color: color-mix(in oklab, var(--star) 50%, var(--line)); }
+
+/* Buttons: one primary per view. */
+button, .pk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: var(--target);
+  padding: 0 var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--text);
+  font: 500 var(--fs-body) / 1 var(--font-sans);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
+}
+button:hover, .pk-btn:hover { background: var(--raised); }
+button:disabled, .pk-btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+.pk-btn--primary { background: var(--star); border-color: var(--star-edge); color: var(--on-star); }
+.pk-btn--primary:hover { background: var(--star-hover); }
+.pk-btn--danger { color: var(--danger); }
+.pk-btn--quiet { border-color: transparent; }
+
+/* Form controls */
+label { display: block; font-weight: 500; margin-block-end: var(--s-1); }
+input, select, textarea {
+  width: 100%;
+  min-height: var(--target);
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-control);
+  background: var(--field);
+  color: var(--text);
+  font: inherit;
+}
+textarea { min-height: 7rem; resize: vertical; }
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.8; }
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offset: 0; border-color: var(--star-text); }
+input:disabled, select:disabled, textarea:disabled { opacity: 0.5; cursor: not-allowed; }
+input[type="checkbox"], input[type="radio"], input[type="range"] { width: auto; min-height: 0; accent-color: var(--star-edge); }
+input[type="checkbox"], input[type="radio"] { width: 1.1em; height: 1.1em; vertical-align: -0.15em; margin-inline-end: var(--s-2); }
+label:has(> input[type="checkbox"]), label:has(> input[type="radio"]) { font-weight: 400; }
+fieldset { margin: 0 0 var(--s-4); padding: var(--s-3) var(--s-4); border: 1px solid var(--line); border-radius: var(--r-card); }
+legend { padding: 0 var(--s-2); font-weight: 500; }
+.pk-field { margin-block-end: var(--s-4); }
+.pk-help { margin: var(--s-1) 0 0; color: var(--muted); font-size: var(--fs-meta); }
+.pk-error { margin: var(--s-1) 0 0; color: var(--danger); font-size: var(--fs-meta); }
+input[aria-invalid="true"] { border-color: var(--danger); }
+progress, meter { width: 100%; height: 0.5rem; accent-color: var(--star-edge); }
+
+/* Charts: colours only. Draw with SVG or canvas and take the series colour from the palette:
+   stroke="var(--chart-1)". .pk-series-1 to -6 set --series for CSS-drawn bars and legend dots. */
+.pk-series-1 { --series: var(--chart-1); }
+.pk-series-2 { --series: var(--chart-2); }
+.pk-series-3 { --series: var(--chart-3); }
+.pk-series-4 { --series: var(--chart-4); }
+.pk-series-5 { --series: var(--chart-5); }
+.pk-series-6 { --series: var(--chart-6); }
+.pk-legend { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); margin: 0 0 var(--s-4); padding: 0; list-style: none; color: var(--muted); font-size: var(--fs-meta); }
+.pk-legend li { margin: 0; }
+.pk-legend li::before { content: ""; display: inline-block; width: 0.7em; height: 0.7em; margin-inline-end: var(--s-2); border-radius: 1px; background: var(--series); }
+.pk-bars { display: grid; gap: var(--s-2); margin: 0 0 var(--s-4); padding: 0; list-style: none; }
+.pk-bars li { display: grid; grid-template-columns: minmax(5rem, 9rem) 1fr auto; gap: var(--s-3); align-items: center; margin: 0; }
+.pk-bars li::after { content: ""; grid-column: 2; grid-row: 1; height: 0.75rem; width: var(--v, 0%); border-radius: 1px; background: var(--series, var(--chart-1)); }
+.pk-bars li > span:last-child { grid-column: 3; grid-row: 1; font: 400 var(--fs-meta) / 1 var(--font-mono); font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  a.pk-card:hover { transform: none; }
+}

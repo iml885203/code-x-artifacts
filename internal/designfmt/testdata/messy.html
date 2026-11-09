@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang=en>
+<head>
+<meta charset=utf-8>
+<title>Messy frame</title>
+<style>
+:root { --accent: #0f766e; --pad: 12px; --x: {a:b;c}; }
+* { box-sizing: border-box }
+body { margin:0; background:#f5f3ee; font: 16px/1.4 Georgia, "Noto Serif TC", serif; color: #222 }
+.card { display:grid; grid-template-columns: 1fr 2fr; gap: var(--pad); padding: var(--pad); background: linear-gradient(135deg, #fff 0%, #e8e4da 100%); border-radius: 12px; box-shadow: 0 2px 8px rgb(0 0 0 / 20%) }
+.card:hover { outline: 2px solid var(--accent) }
+.card::before { content: "\201C"; color: var(--accent); font-size: 40px }
+.name { font-weight: 700; text-shadow: 0 1px 0 #fff; -webkit-foo: 1 }
+.badge { width: 220px !important; transform: rotate(-3deg); animation: pulse 2s infinite }
+@media (max-width: 600px) { .card { grid-template-columns: 1fr } }
+@supports (display: grid) { .grid { display: grid } }
+@keyframes pulse { from { opacity: .6 } 50% { opacity: 1 } to { opacity: .6 } }
+</style>
+</head>
+<body>
+<!-- a comment the author left -->
+<div class=card data-owner=design-team data-x-unknown="1">
+  <span class=name style="display:-webkit-box;display:flex;--local: 7px">名前 テスト 😀</span>
+  <p class=badge style="position:absolute;left:48px;top:300px;width:220px;background:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/>') no-repeat">Badge &nbsp;&amp; more
+</div>
+<svg width="120" height="60" viewBox="0 0 120 60"><defs><linearGradient id="g"><stop offset="0" stop-color="#0f766e"/><stop offset="1" stop-color="#134e4a"/></linearGradient></defs><rect width="120" height="60" rx="8" fill="url(#g)"/><text x="10" y="35" fill="#fff" font-size="16">SVG</text></svg>
+<table><tr><td>one<td>two
+<tr><td>three<td>four</table>
+<ul><li>first<li>second</ul>
+<pre>
+ kept
+</pre>
+</body>
+</html>

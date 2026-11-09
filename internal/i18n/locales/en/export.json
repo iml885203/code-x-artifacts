@@ -1,0 +1,11 @@
+{
+  "export.title": "Export",
+  "export.md": "Markdown (.md)",
+  "export.docx": "Word (.docx)",
+  "export.pptx": "PowerPoint (.pptx)",
+  "export.html": "HTML (.html)",
+  "export.pdf": "PDF",
+  "export.zip": "Zip (.zip)",
+  "export.svg": "SVG (.svg)",
+  "export.png": "PNG (.png)"
+}

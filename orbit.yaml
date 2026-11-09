@@ -1,0 +1,20 @@
+version: "3"
+tracing:
+  enabled: false
+services:
+  app:
+    kind: frontend
+    command: env PICTOR_ADDR=127.0.0.1:$PORT ./bin/codexartifacts
+    ports:
+      http: 18081
+    health_check:
+      type: http
+      path: /healthz
+  website:
+    kind: frontend
+    command: python3 -m http.server "$PORT" --bind 127.0.0.1 --directory website
+    ports:
+      http: 4176
+    health_check:
+      type: http
+      path: /

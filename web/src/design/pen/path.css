@@ -1,0 +1,6 @@
+@import "./pen.css";
+.path-preview { overflow: visible; }
+.path-anchor, .path-control { fill: var(--night); stroke: var(--star-edge); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.path-start { fill: var(--star-edge); }
+.path-handle { stroke: var(--star-edge); stroke-width: 1px; }
+.path-next { opacity: 0.65; stroke-dasharray: 4 4; }

@@ -1,0 +1,9 @@
+{
+  "pen.draw": "繪製鉛筆筆畫",
+  "pen.stroke": "鉛筆筆畫",
+  "pen.tool": "畫筆",
+  "pen.color": "筆畫顏色",
+  "pen.width": "筆畫寬度",
+  "pen.invalid": "請輸入十六進位顏色或 var(--token)，寬度為 0.5 到 64。",
+  "pen.settings": "畫筆設定"
+}

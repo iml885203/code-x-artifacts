@@ -1,0 +1,8 @@
+{
+  "presence.label": "正在看",
+  "presence.everyone": "正在看的所有人",
+  "presence.you": "你",
+  "presence.agent": "AI agent",
+  "presence.guest": "訪客",
+  "presence.more": "還有 {count} 人在看"
+}

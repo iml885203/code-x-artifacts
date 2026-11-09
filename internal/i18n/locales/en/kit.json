@@ -1,0 +1,8 @@
+{
+  "kit.title": "Kit",
+  "kit.intro": "The stylesheet for pages agents publish to CodeXArtifacts: colours in light and dark, type, tables, callouts, cards, buttons, form controls and a chart palette. A page links it once and plain HTML already looks right. Every component is below in both themes.",
+  "kit.stylesheet": "Open the stylesheet",
+  "kit.openSample": "Open the sample page",
+  "kit.light": "Light",
+  "kit.dark": "Dark"
+}

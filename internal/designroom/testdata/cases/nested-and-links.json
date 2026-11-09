@@ -1,0 +1,33 @@
+{
+  "name": "nested-and-links",
+  "body": "<p data-pid=\"e2\"><b data-pid=\"e3\"><i data-pid=\"e4\">x</i></b> and <a data-pid=\"e5\" href=\"#top\" target=\"_blank\">go <code data-pid=\"e6\">now</code></a> 😀 世界</p>",
+  "pid": "e2",
+  "delta": [
+    {
+      "attributes": {
+        "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}",
+        "f:e4": "{\"t\":\"i\",\"d\":1,\"a\":[[\"\",\"data-pid\",\"e4\"]]}"
+      },
+      "insert": "x"
+    },
+    {
+      "insert": " and "
+    },
+    {
+      "attributes": {
+        "f:e5": "{\"t\":\"a\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e5\"],[\"\",\"href\",\"#top\"],[\"\",\"target\",\"_blank\"]]}"
+      },
+      "insert": "go "
+    },
+    {
+      "attributes": {
+        "f:e5": "{\"t\":\"a\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e5\"],[\"\",\"href\",\"#top\"],[\"\",\"target\",\"_blank\"]]}",
+        "f:e6": "{\"t\":\"code\",\"d\":1,\"a\":[[\"\",\"data-pid\",\"e6\"]]}"
+      },
+      "insert": "now"
+    },
+    {
+      "insert": " 😀 世界"
+    }
+  ]
+}

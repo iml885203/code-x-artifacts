@@ -1,0 +1,23 @@
+{
+  "toolbar.page": "頁面：{name}",
+  "toolbar.renamePage": "重新命名頁面",
+  "toolbar.deletePage": "刪除頁面",
+  "toolbar.frame": "畫板",
+  "toolbar.drawing": "繪製畫板",
+  "toolbar.shape": "形狀",
+  "toolbar.present": "簡報模式",
+  "toolbar.panel": "屬性",
+  "toolbar.view": "檢視",
+  "toolbar.zoom": "縮放 {percent}%",
+  "toolbar.drawingTools": "繪圖",
+  "toolbar.pencil": "鉛筆",
+  "toolbar.pathDraw": "繪製連續路徑",
+  "toolbar.path": "路徑",
+  "toolbar.line": "直線",
+  "toolbar.arrow": "箭頭",
+  "toolbar.copyPageLink": "複製頁面連結",
+  "toolbar.pageMore": "{name} 的更多操作",
+  "toolbar.expandArtboard": "展開 {name}",
+  "toolbar.selection": "選取項目操作",
+  "toolbar.delete": "刪除"
+}

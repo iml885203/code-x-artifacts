@@ -1,0 +1,13 @@
+{
+  "login.title": "Sign in",
+  "login.help": "Sign in with the account provided by your workspace administrator.",
+  "login.username": "Username",
+  "login.password": "Password",
+  "login.submit": "Sign in",
+  "login.error.invalid": "Wrong username or password",
+  "login.error.notAllowed": "This account is not allowed to use CodeXArtifacts",
+  "login.error.unavailable": "Sign-in is unavailable. Try again in a moment.",
+  "login.headline": "Turn ideas into artifacts. Keep creating value.",
+  "login.description": "A home for work you and your agents can keep building on. Create, share and continue together.",
+  "login.formats": "Artifact formats"
+}

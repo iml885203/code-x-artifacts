@@ -1,0 +1,44 @@
+/* The insert row under the top bar and the panels it opens (InsertRow.tsx). */
+.ed-insert { position: relative; z-index: 10; gap: var(--space-1); padding-top: var(--space-1); padding-bottom: var(--space-1); }
+.ed-insert .icon-button[aria-pressed="true"] { background: var(--raised); border-color: var(--edge-pop); }
+.ed-pop { position: relative; }
+.ed-pop-button { display: inline-flex; align-items: center; gap: var(--space-1); min-height: var(--target); padding: 0 var(--space-2); }
+.ed-pop-button[aria-expanded="true"] { background: var(--raised); border-color: var(--edge-pop); }
+.ed-pop-button .icon { flex: none; }
+.ed-pop-panel { position: absolute; z-index: 20; top: 100%; left: 0; margin-top: var(--space-1); min-width: 220px; max-width: min(92vw, 420px); padding: var(--space-2); border: 1px solid var(--edge-pop); border-radius: var(--r-pop); background: var(--field); box-shadow: var(--float); animation: grow var(--dur) var(--ease-out); }
+.ed-pop-panel .ed-tabs { width: auto; padding: 0; border: 0; background: transparent; max-height: min(60vh, 420px); }
+.ed-more { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); }
+.ed-more .ed-group { padding-left: 0; border-left: 0; }
+.ed-more .icon-button[aria-pressed="true"] { background: var(--raised); border-color: var(--edge-pop); }
+.ed-more select { min-height: var(--target); }
+@media (max-width: 640px) {
+  .ed-insert { flex-wrap: nowrap; overflow-x: auto; }
+  .ed-pop-panel { position: fixed; left: var(--space-3); right: var(--space-3); top: auto; max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) { .ed-pop-panel { animation: none; } }
+.ed-wide .ed-paper { max-width: 1100px; transition: max-width var(--dur) var(--ease-out); }
+@media (prefers-reduced-motion: reduce) { .ed-wide .ed-paper { transition: none; } }
+
+/* Printing the editor itself (Ctrl+P) gives the page and none of the tools around it. */
+@media print {
+  .ed-insert, .ed-tabs, .ed-status, .ed-banner, .ed-table-tools, .ed-image-tools, .ed-link-form, .ed-link-bar { display: none; }
+  .ed, .ed-body { display: block; }
+  .ed-scroll { overflow: visible; background: #fff; padding: 0; }
+  .ed-paper { max-width: none; padding: 0; border-radius: 0; }
+}
+
+.ed-insertion-menu { position: absolute; z-index: 30; top: 100%; right: 0; width: min(280px, calc(100vw - 2 * var(--space-4))); padding: var(--space-2); border: 1px solid var(--edge-pop); border-radius: var(--r-pop); background: var(--field); box-shadow: var(--float); animation: grow var(--dur) var(--ease-out); }
+.ed-insertion-menu input { width: 100%; min-height: var(--target); margin-bottom: var(--space-1); }
+.ed-insertion-menu [role="listbox"] { max-height: min(55vh, 440px); overflow-y: auto; }
+.ed-insertion-option { display: flex; justify-content: flex-start; align-items: center; gap: var(--space-2); width: 100%; min-height: var(--target); text-align: left; }
+.ed-insertion-option[aria-selected="true"] { background: var(--raised); }
+.ed-insertion-face { display: inline-flex; align-items: center; justify-content: center; width: var(--space-6); flex: none; font-size: 13px; font-weight: 600; }
+.ed-insertion-hint, .ed-insertion-empty { margin: 0; padding: var(--space-2); color: var(--muted); font-size: 12px; }
+.ed-insertion-hint { border-top: 1px solid var(--line); }
+.ed-insertion-menu.ed-slash-palette { position: fixed; right: auto; }
+@media (max-width: 640px) {
+  .ed-insert { flex-wrap: wrap; overflow: visible; }
+  .ed-insert .ed-insertion-menu { position: fixed; top: auto; left: var(--space-4); right: var(--space-4); width: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .ed-insertion-menu { animation: none; } }
+@media print { .ed-insertion-menu { display: none; } }

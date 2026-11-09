@@ -1,0 +1,39 @@
+{
+  "name": "a break that stayed is the same break",
+  "before": [
+    {
+      "insert": "a"
+    },
+    {
+      "insert": {
+        "br": "[[\"\",\"data-pid\",\"e4\"]]"
+      }
+    },
+    {
+      "insert": "b"
+    }
+  ],
+  "after": [
+    {
+      "insert": "a"
+    },
+    {
+      "insert": {
+        "br": "[[\"\",\"data-pid\",\"e4\"]]"
+      }
+    },
+    {
+      "insert": "bc"
+    }
+  ],
+  "want": {
+    "start": 3,
+    "end": 3,
+    "insert": [
+      {
+        "insert": "c"
+      }
+    ],
+    "formats": []
+  }
+}

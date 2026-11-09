@@ -1,0 +1,16 @@
+{
+  "create.new": "新增",
+  "create.document": "文件",
+  "create.design": "設計",
+  "create.board": "白板",
+  "create.documentFor": "寫筆記、報告和計畫",
+  "create.designFor": "設計頁面的樣子",
+  "create.boardFor": "畫流程、架構和想法",
+  "create.untitledDocument": "未命名文件",
+  "create.untitledDesign": "未命名設計",
+  "create.untitledBoard": "未命名白板",
+  "create.failed": "無法建立，請再試一次。",
+  "create.rename": "重新命名",
+  "create.titleField": "標題",
+  "create.renameFailed": "無法重新命名，請再試一次。"
+}

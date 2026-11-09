@@ -1,0 +1,18 @@
+{
+  "versions.copy": "Make a copy",
+  "versions.title": "Versions",
+  "versions.close": "Close",
+  "versions.current": "Current",
+  "versions.restoredFrom": "Restored from v{from}",
+  "versions.viewing": "Viewing v{number}, read only",
+  "versions.backToNewest": "Back to the newest",
+  "versions.restore": "Restore",
+  "versions.confirmRestore": "Restore v{number}?",
+  "versions.confirmRestoreHint": "It is saved as a new version on top. Nothing in the history is removed.",
+  "versions.restored": "Restored v{from} as v{to}",
+  "versions.restoreFailed": "Couldn't restore this version. Try again.",
+  "versions.restoreConflict": "A newer version was saved. Reopen this page to see it.",
+  "versions.loadFailed": "Couldn't load the versions. Try again.",
+  "versions.earlier": "{count} earlier",
+  "versions.agent": "{name}'s {client}"
+}

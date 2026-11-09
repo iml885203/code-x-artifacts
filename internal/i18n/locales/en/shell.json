@@ -1,0 +1,10 @@
+{
+  "shell.language": "Language",
+  "shell.language.en": "English",
+  "shell.language.zh-Hant": "中文",
+  "shell.theme": "Theme",
+  "shell.theme.system": "Match system",
+  "shell.theme.light": "Light",
+  "shell.theme.dark": "Dark",
+  "shell.languageFailed": "Couldn't change the language. Try again."
+}

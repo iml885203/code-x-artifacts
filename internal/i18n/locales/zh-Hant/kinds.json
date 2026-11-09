@@ -1,0 +1,10 @@
+{
+  "kinds.web": "網頁",
+  "kinds.doc": "文件",
+  "kinds.slides": "簡報",
+  "kinds.design": "設計",
+  "kinds.board": "白板",
+  "kinds.dashboard": "儀表板",
+  "kinds.motion": "動畫",
+  "kinds.designSystem": "設計系統"
+}

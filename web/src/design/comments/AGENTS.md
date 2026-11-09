@@ -1,0 +1,9 @@
+# Design comments
+
+Source anchors name a frame, optional template `data-pid`, and an intentional frame point in unscaled frame pixels. Element pins require current geometry; missing geometry is unavailable, while only a populated room missing the source identity confirms removal. Intentional frame-position comments remain pins; Undo reconnects the same PID, and late geometry cannot revive a removed target. Geometry is presentation only; deleting an element never rewrites its anchor or deletes its conversation. Comment drafts start from the selected source through the canvas's current selection action: `CommentsLayer` offers “Comment on selection” to readers, and `toolbar/SelectionBar` offers the editor's Comment action while Properties is closed. Both keep the frame/PID identity and place the anchor at the selected report's right edge. Artboard labels and `toolbar/ArtboardStrip` offer Expand, without a frame-comment button or dimensions. Threads, replies, permissions and unread state use the viewer's existing comments dataset and transport.
+
+Tests: `keeps source identity without a floating pin when its element disappears and reconnects the restored identity`, `removes a deleted element's pin without losing its thread and reconnects the same restored element`, web/src/design/comments/CommentsLayer.test.tsx (pin/list thread identity and draft focus for selected headings and frame bodies), `lets a reader comment on a frame and reveals an existing thread on another page without editing the design`; server: `TestDesignCommentsKeepTheirSourceAnchorForReadersAndAgentsAfterAnElementIsRemoved`.
+
+An eventual runnable-frame instance key is an optional extension to this source anchor, not a replacement for frame/pid. Do not persist generated DOM indexes or add runtime behavior here.
+
+Tests: `distinguishes unavailable geometry from a removed room identity and ignores a stale report until Undo restores that identity`.

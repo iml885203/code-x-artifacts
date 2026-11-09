@@ -1,0 +1,5 @@
+{
+  "pin.add": "Pin",
+  "pin.remove": "Unpin",
+  "pin.failed": "Couldn't change the pin. Try again."
+}

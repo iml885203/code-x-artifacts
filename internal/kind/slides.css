@@ -1,0 +1,138 @@
+/* The look of a slides deck, format 1. Sizes are canvas pixels on a 1920 x 1080
+   canvas: "40u" is 40 canvas pixels, "40k" is 40 canvas pixels scaled by the
+   slide's own type scale (--s). Go turns both into calc() on the container's
+   width (expandUnits), so the deck scales by CSS alone, with no script, and a
+   thumbnail shows the same slide a viewer does. The estimates in
+   slides_elements.go describe these sizes; change them together. */
+
+/* The kit is imported into a layer below this sheet, so its plain-element rules
+   (margins, the pre box, nowrap headers) never outrank a rule here; only its
+   tokens and fonts are wanted. */
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; background: var(--night); color: var(--text); overflow: hidden; }
+body { font: 400 16px/1.4 var(--font-sans); -webkit-text-size-adjust: none; }
+
+.deck { --bar-h: 0px; --notes-h: 0px; --stage-h: calc(100vh - var(--bar-h) - var(--notes-h)); height: 100vh; display: flex; flex-direction: column; }
+.deck.js { --bar-h: 52px; }
+.deck.full { --bar-h: 0px; }
+.deck.with-notes { --notes-h: 220px; }
+.stage { flex: none; height: var(--stage-h); display: grid; place-items: center; }
+.frame { width: min(100vw, calc(var(--stage-h) * 16 / 9)); aspect-ratio: 16 / 9; container-type: inline-size; position: relative; }
+.canvas { --u: calc(100cqw / 1920); position: absolute; inset: 0; overflow: hidden; background: var(--night); }
+
+.slide { --k: calc(var(--u) * var(--s, 1)); position: absolute; inset: 0; display: none; flex-direction: column; padding: 72u 120u; }
+.slide.on { display: flex; }
+.slide::before { content: ""; position: absolute; left: 120u; top: 0; width: 96u; height: 8u; background: var(--star); }
+.title { flex: none; text-wrap: wrap; font-size: 76u; line-height: 85u; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 44u; }
+.body { min-height: 0; display: flex; flex-direction: column; gap: 36k; }
+.layout-content .body { flex: 1; justify-content: center; }
+.notes { display: none; }
+
+.layout-title { justify-content: center; text-align: center; }
+.layout-title .title { font-size: 120u; line-height: 128u; margin-bottom: 44u; }
+.no-body .title { margin-bottom: 0; }
+.layout-title .body { flex: none; }
+.layout-title .list { align-self: center; text-align: left; }
+.layout-title .quote { text-align: left; }
+
+.slide code { font-family: var(--font-mono); font-size: 0.86em; color: var(--text); background: color-mix(in oklch, var(--text) 13%, transparent); border: 0; padding: 0.04em 0.3em; border-radius: 5u; }
+.slide strong { font-weight: 700; }
+
+.text { font-size: 40k; line-height: 58k; white-space: pre-line; }
+
+.list { list-style: none; padding: 0; font-size: 40k; line-height: 56k; display: flex; flex-direction: column; gap: 14k; counter-reset: n; }
+.list li { position: relative; padding-left: 56k; margin: 0; }
+.list li::before { content: ""; position: absolute; left: 10k; top: 21k; width: 14k; height: 14k; background: var(--star); }
+.list.numbered li { counter-increment: n; }
+.list.numbered li::before { content: counter(n); top: 0; left: 0; width: auto; height: auto; background: none; font: 600 32k/56k var(--font-mono); color: var(--star-text); }
+
+.code { position: relative; background: var(--plate); border: 2u solid var(--line); border-radius: 6u; padding: 28k 32k; }
+.code pre { font: 400 28k/42k var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; padding: 0; border: 0; background: none; overflow: visible; }
+.code pre code { font: inherit; background: none; padding: 0; }
+.code figcaption { margin: 0; position: absolute; top: 8k; right: 16k; font: 400 20k/28k var(--font-mono); color: var(--muted); }
+
+.table { width: 100%; border-collapse: collapse; table-layout: fixed; font-variant-numeric: normal; }
+.table tbody tr:hover { background: none; }
+.table tbody tr:last-child > * { border-bottom: 2u solid var(--line); }
+.table th { white-space: normal; font-size: 30k; line-height: 40k; font-weight: 600; text-align: left; color: var(--muted); padding: 15k 24k; border-bottom: 3u solid var(--line); }
+.table td { font-size: 32k; line-height: 44k; padding: 14k 24k; border-bottom: 2u solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+.table .tone-success { color: var(--ok); background: color-mix(in oklch, var(--ok) 16%, transparent); font-weight: 600; }
+.table .tone-warning { color: var(--star-text); background: color-mix(in oklch, var(--star) 16%, transparent); font-weight: 600; }
+.table .tone-danger { color: var(--danger); background: color-mix(in oklch, var(--danger) 16%, transparent); font-weight: 600; }
+
+.n1 { --n: 1; } .n2 { --n: 2; } .n3 { --n: 3; } .n4 { --n: 4; } .n5 { --n: 5; } .n6 { --n: 6; }
+.stats { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 32k; }
+.stat { background: var(--plate); border: 2u solid var(--line); border-radius: 8u; padding: 40k; }
+.stat .value { font-size: 112k; line-height: 112k; font-weight: 600; letter-spacing: -0.03em; overflow-wrap: anywhere; }
+.stat .label { font-size: 32k; line-height: 44k; color: var(--muted); margin-top: 12k; }
+
+.quote { border-left: 8u solid var(--star); padding-left: 56k; color: var(--text); font-size: inherit; }
+.quote p { font-size: 56k; line-height: 74k; font-weight: 500; letter-spacing: -0.01em; }
+.quote footer { margin-top: 20k; font-size: 34k; line-height: 46k; color: var(--muted); }
+.quote footer::before { content: "\2014\00a0"; }
+
+.steps { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 28k; text-align: left; }
+.steps li { position: relative; padding-top: 84k; }
+.steps .num { position: absolute; top: 0; left: 0; width: 64k; height: 64k; border-radius: 8u; background: var(--star); color: var(--on-star); font: 700 34k/64k var(--font-mono); text-align: center; }
+.steps .stitle { font-size: 36k; line-height: 46k; font-weight: 600; }
+.steps .stext { font-size: 30k; line-height: 42k; color: var(--muted); margin-top: 8k; }
+
+.columns { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 56k; text-align: left; }
+.col { --k: calc(var(--u) * var(--s, 1) * 0.85); display: flex; flex-direction: column; gap: 28k; min-width: 0; }
+.col h3, .card h3 { letter-spacing: 0; text-wrap: wrap; }
+.col h3 { font-size: 44k; line-height: 54k; font-weight: 600; margin-bottom: -8k; }
+
+.cards { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 32k; text-align: left; }
+.card { background: var(--plate); border: 3u solid var(--line); border-radius: 8u; padding: 36k; }
+.card h3 { font-size: 40k; line-height: 50k; font-weight: 600; }
+.card p { font-size: 32k; line-height: 45k; color: var(--muted); margin-top: 12k; }
+.card ul { list-style: none; padding: 0; }
+.card li { position: relative; font-size: 30k; line-height: 42k; padding-left: 36k; margin-top: 10k; }
+.card li::before { content: ""; position: absolute; left: 6k; top: 15k; width: 12k; height: 12k; background: var(--star); }
+.card.highlight { border-color: var(--star); background: var(--raised); }
+.card.highlight h3 { color: var(--star-text); }
+
+.progress { display: flex; flex-direction: column; gap: 28k; text-align: left; }
+.progress .row { display: flex; justify-content: space-between; gap: 32k; font-size: 36k; line-height: 50k; font-weight: 500; }
+.progress .row span:last-child { font-family: var(--font-mono); color: var(--muted); }
+.progress .track { margin-top: 16k; height: 20k; border-radius: 10u; background: var(--raised); overflow: hidden; }
+.progress .fill { height: 100%; background: var(--info); border-radius: 10u; }
+
+.layout-error { justify-content: center; }
+.layout-error .title { color: var(--danger); }
+.layout-error .problems { font: 400 28u/40u var(--font-mono); white-space: pre-wrap; color: var(--muted); }
+
+/* The controls exist only when the player script runs, so a page shown without
+   script (a gallery thumbnail) is just the first slide. */
+.controls { display: none; flex: none; height: 52px; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; font: 500 14px/1 var(--font-sans); }
+.deck.js .controls { display: flex; }
+.deck.full .controls { position: fixed; left: 0; right: 0; bottom: 0; background: color-mix(in oklch, var(--night) 88%, transparent); transition: opacity 200ms; }
+.deck.full .controls.idle:not(:focus-within) { opacity: 0; }
+/* In the viewer (?embed) the shell draws the filmstrip, so the controls show only while presenting. */
+.deck.embed { --bar-h: 0px; }
+.deck.embed .controls { display: none; }
+.deck.embed.full .controls { display: flex; }
+.controls button { min-height: 0; display: inline-block; font: inherit; color: var(--text); background: var(--plate); border: 1px solid var(--line); border-radius: 4px; padding: 9px 14px; cursor: pointer; }
+.controls button:hover:not(:disabled) { background: var(--raised); }
+.controls button:focus-visible { outline: 2px solid var(--star); outline-offset: 2px; }
+.controls button:disabled { opacity: 0.4; cursor: default; }
+.controls button[aria-pressed="true"] { background: var(--star); color: var(--on-star); border-color: var(--star); }
+.controls .count { min-width: 6ch; text-align: center; font: 400 13px/1 var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.notes-panel { display: none; flex: none; height: var(--notes-h); overflow: auto; padding: 14px 28px; background: var(--field); border-top: 1px solid var(--line); font: 400 18px/1.55 var(--font-sans); white-space: pre-wrap; }
+.deck.with-notes .notes-panel { display: block; }
+.notes-panel .none { color: var(--muted); }
+
+/* Printing (Export, PDF) gives every slide a page the size of the canvas, in
+   order, whichever slide is on screen, with the canvas background kept and none of
+   the controls or notes. */
+@media print {
+  @page { size: 1920px 1080px; margin: 0; }
+  html, body { height: auto; overflow: visible; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .deck, .deck.js, .deck.with-notes { --bar-h: 0px; --notes-h: 0px; height: auto; display: block; }
+  .stage { height: auto; display: block; }
+  .frame { width: 100%; aspect-ratio: auto; }
+  .canvas { position: static; overflow: visible; }
+  .slide, .slide.on { display: flex; position: relative; inset: auto; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: var(--night); break-after: page; }
+  .slide:last-child { break-after: auto; }
+  .deck.js .controls, .deck.with-notes .notes-panel { display: none; }
+}

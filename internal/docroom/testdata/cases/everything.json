@@ -1,0 +1,80 @@
+{"tabs": [
+  {"id": "t_overview", "title": "Overview", "blocks": [
+    {"id": "b_h1", "type": "heading", "level": 1, "content": [{"text": "Everything 世界 😀"}]},
+    {"id": "b_marks", "type": "paragraph", "content": [
+      {"text": "plain "},
+      {"text": "bold", "marks": ["bold"]},
+      {"text": " "},
+      {"text": "italic", "marks": ["italic"]},
+      {"text": " "},
+      {"text": "underline", "marks": ["underline"]},
+      {"text": " "},
+      {"text": "strike", "marks": ["strike"]},
+      {"text": " "},
+      {"text": "code", "marks": ["code"]},
+      {"text": " "},
+      {"text": "highlight", "marks": ["highlight"]},
+      {"text": " "},
+      {"text": "link", "marks": ["link"], "href": "https://example.com/?a=1&b=2"},
+      {"text": " "},
+      {"text": "bold italic", "marks": ["bold", "italic"]},
+      {"text": " "},
+      {"text": "bold link", "marks": ["bold", "link"], "href": "mailto:logan@example.com"},
+      {"text": " "},
+      {"text": "anchor", "marks": ["link"], "href": "#everything"},
+      {"text": " end"}
+    ]},
+    {"id": "b_break", "type": "paragraph", "content": [
+      {"text": "first line\nsecond line 𠮷野家", "marks": ["bold"]},
+      {"text": " then plain\nand more"}
+    ]},
+    {"id": "b_empty", "type": "paragraph"},
+    {"id": "b_h2", "type": "heading", "level": 2, "content": [{"text": "Two"}]},
+    {"id": "b_h3", "type": "heading", "level": 3, "content": [{"text": "Three", "marks": ["bold"]}]},
+    {"id": "b_h4", "type": "heading", "level": 4, "content": [{"text": "Four"}]},
+    {"id": "b_h5", "type": "heading", "level": 5, "content": [{"text": "Five"}]},
+    {"id": "b_h6", "type": "heading", "level": 6, "content": [{"text": "Six"}]},
+    {"id": "b_bullets", "type": "bullet_list", "items": [
+      {"content": [{"text": "one"}]},
+      {"content": [{"text": "two ", "marks": ["italic"]}, {"text": "with"}], "items": [
+        {"content": [{"text": "nested"}], "items": [{"content": [{"text": "deeper"}]}]},
+        {"content": [{"text": "nested again"}]}
+      ]},
+      {}
+    ]},
+    {"id": "b_numbers", "type": "numbered_list", "start": 3, "items": [
+      {"content": [{"text": "third"}], "items": [{"content": [{"text": "sub"}]}]},
+      {"content": [{"text": "fourth"}]}
+    ]},
+    {"id": "b_numbers_one", "type": "numbered_list", "items": [{"content": [{"text": "first"}]}]},
+    {"id": "b_tasks", "type": "task_list", "items": [
+      {"content": [{"text": "done"}], "checked": true},
+      {"content": [{"text": "todo"}], "checked": false, "items": [
+        {"content": [{"text": "sub done"}], "checked": true},
+        {"content": [{"text": "sub todo"}], "checked": false}
+      ]}
+    ]},
+    {"id": "b_quote", "type": "quote", "blocks": [
+      {"id": "b_q1", "type": "paragraph", "content": [{"text": "quoted "}, {"text": "text", "marks": ["bold"]}]},
+      {"id": "b_q2", "type": "quote", "blocks": [{"id": "b_q3", "type": "paragraph", "content": [{"text": "nested quote"}]}]},
+      {"id": "b_q4", "type": "bullet_list", "items": [{"content": [{"text": "a list in a quote"}]}]}
+    ]},
+    {"id": "b_code", "type": "code", "lang": "go", "text": "func main() {\n\tfmt.Println(\"héllo 😀\")\n}\n"},
+    {"id": "b_code_plain", "type": "code", "text": "no language"},
+    {"id": "b_rule", "type": "rule"},
+    {"id": "b_table", "type": "table", "header": true, "rows": [
+      {"cells": [{"content": [{"text": "Name", "marks": ["bold"]}]}, {"align": "center", "content": [{"text": "Qty"}]}, {"align": "right", "content": [{"text": "Price"}]}]},
+      {"cells": [{"content": [{"text": "Tea 🍵"}]}, {"align": "center", "content": [{"text": "2"}]}, {"align": "right", "content": [{"text": "3.50", "marks": ["code"]}]}]},
+      {"cells": [{}, {"align": "left", "content": [{"text": "line\nbreak"}]}, {"content": [{"text": "x", "marks": ["link"], "href": "https://example.com"}]}]}
+    ]},
+    {"id": "b_table_plain", "type": "table", "rows": [
+      {"cells": [{"content": [{"text": "a"}]}, {"content": [{"text": "b"}]}]}
+    ]},
+    {"id": "b_image", "type": "image", "src": "https://example.com/pic.png", "alt": "A picture of 世界", "size": "large"},
+    {"id": "b_image_file", "type": "image", "src": "/files/diagram.png"},
+    {"id": "b_pending", "type": "pending", "intent": "Goals: the three outcomes this quarter commits to"}
+  ]},
+  {"id": "t_second", "title": "Second tab", "blocks": [
+    {"id": "b_second", "type": "paragraph", "content": [{"text": "On the second tab."}]}
+  ]}
+]}

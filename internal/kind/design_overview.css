@@ -1,0 +1,27 @@
+/* The overview of a design: every frame as a thumbnail, page by page. The kit is
+   imported into a layer below this sheet, so only its tokens and fonts are used. */
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+body { background: var(--night); color: var(--text); font: 400 16px/1.4 var(--font-sans); padding: 32px 24px 64px; }
+main { display: flex; flex-direction: column; gap: 56px; max-width: 1680px; margin: 0 auto; }
+h2 { margin-bottom: 20px; font: 500 13px/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.row { display: flex; align-items: flex-start; gap: 24px; margin-bottom: 28px; }
+.frame { min-width: 0; }
+.thumb { container-type: inline-size; position: relative; overflow: hidden; background: #fff; border: 1px solid var(--line); border-radius: 6px; }
+.thumb iframe { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; pointer-events: none; }
+figcaption { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; font-size: 14px; }
+figcaption span { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+
+/* Print (a design's PDF: the browser prints this page). One page per frame, the
+   page as large as the frame (the @page rules per size are written into the page's
+   head, with each figure's `page`), the frame at its own size and unscaled, so its
+   text stays text. Nothing else is printed. */
+@media print {
+  body { background: none; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  main { display: block; max-width: none; }
+  h2, figcaption { display: none; }
+  .row { display: block; margin: 0; }
+  .frame { break-after: page; break-inside: avoid; }
+  main > .page:last-child .row:last-child .frame:last-child { break-after: auto; }
+  .thumb { container-type: normal; width: var(--w); height: var(--h); aspect-ratio: auto; border: 0; border-radius: 0; overflow: hidden; }
+  .thumb iframe { position: static; transform: none !important; }
+}

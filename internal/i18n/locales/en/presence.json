@@ -1,0 +1,8 @@
+{
+  "presence.label": "Viewing now",
+  "presence.everyone": "Everyone viewing now",
+  "presence.you": "You",
+  "presence.agent": "AI agent",
+  "presence.guest": "Guest",
+  "presence.more": "{count} more viewing"
+}

@@ -1,0 +1,19 @@
+/* Additions to the reading style for format 2 docs (blocks). */
+.tab { margin: 0 0 3rem; }
+.tab-title { margin: 0 0 1.4rem; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.task-list { list-style: none; padding-left: 0.2rem; }
+.task-list .task-list { padding-left: 1.4rem; }
+.task-list input { margin-right: 0.5em; vertical-align: -0.1em; }
+th.align-left, td.align-left { text-align: left; }
+th.align-center, td.align-center { text-align: center; }
+th.align-right, td.align-right { text-align: right; }
+p.image { margin: 0 0 1.1em; }
+p.image img { max-width: 100%; height: auto; border-radius: 6px; }
+.pending {
+  margin: 0 0 1.1em; padding: 0.9em 1.1em;
+  border: 1px dashed var(--line); border-radius: 6px;
+  background: var(--plate); color: var(--muted);
+  font-size: 0.94em; font-style: italic;
+}
+p.missing { margin: 0 0 1.1em; padding: 0.9em 1.1em; border: 1px dashed var(--line); border-radius: 6px; background: var(--plate); color: var(--muted); font-size: 0.94em; }
+.mention { color: var(--muted); }

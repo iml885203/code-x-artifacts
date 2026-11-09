@@ -1,0 +1,24 @@
+{
+  "name": "bold-and-break",
+  "body": "<div data-pid=\"e2\">Hello <b data-pid=\"e3\">bold</b><br data-pid=\"e4\">line2</div>",
+  "pid": "e2",
+  "delta": [
+    {
+      "insert": "Hello "
+    },
+    {
+      "attributes": {
+        "f:e3": "{\"t\":\"b\",\"d\":0,\"a\":[[\"\",\"data-pid\",\"e3\"]]}"
+      },
+      "insert": "bold"
+    },
+    {
+      "insert": {
+        "br": "[[\"\",\"data-pid\",\"e4\"]]"
+      }
+    },
+    {
+      "insert": "line2"
+    }
+  ]
+}

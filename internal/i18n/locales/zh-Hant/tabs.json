@@ -1,0 +1,14 @@
+{
+  "tabs.label": "分頁",
+  "tabs.untitled": "未命名分頁",
+  "tabs.add": "新增分頁",
+  "tabs.rename": "重新命名分頁",
+  "tabs.renameField": "分頁名稱",
+  "tabs.moveUp": "分頁上移",
+  "tabs.moveDown": "分頁下移",
+  "tabs.delete": "刪除分頁",
+  "tabs.confirmDelete": "要刪除這個分頁嗎？",
+  "tabs.confirmDeleteHint": "分頁「{name}」和裡面的所有內容會對所有人刪除。",
+  "tabs.deleteConfirm": "刪除分頁",
+  "tabs.deleteFailed": "無法刪除分頁，請再試一次。"
+}

@@ -1,0 +1,29 @@
+{"tabs": [
+  {"id": "t_mentions", "title": "Mentions", "blocks": [
+    {"id": "b_mention", "type": "paragraph", "content": [
+      {"user": "anna.lee", "name": "Anna Lee"},
+      {"text": " asks "},
+      {"user": "bob", "name": "Bob 王小明 😀"},
+      {"text": "bold", "marks": ["bold"]},
+      {"user": "carol", "name": "Carol <script>"},
+      {"text": "link", "marks": ["link"], "href": "https://example.com"},
+      {"text": " then "},
+      {"user": "dave", "name": "Dave"},
+      {"text": "\nnext line "},
+      {"user": "erin", "name": "Erin"}
+    ]},
+    {"id": "b_mention_only", "type": "paragraph", "content": [{"user": "anna.lee", "name": "Anna Lee"}]},
+    {"id": "b_mention_h", "type": "heading", "level": 2, "content": [{"text": "For "}, {"user": "anna.lee", "name": "Anna Lee"}]},
+    {"id": "b_mention_tasks", "type": "task_list", "items": [
+      {"content": [{"user": "bob", "name": "Bob"}, {"text": " to review"}], "checked": false, "items": [
+        {"content": [{"text": "cc "}, {"user": "carol", "name": "Carol"}], "checked": true}
+      ]}
+    ]},
+    {"id": "b_mention_quote", "type": "quote", "blocks": [
+      {"id": "b_mention_q1", "type": "paragraph", "content": [{"text": "said "}, {"user": "dave", "name": "Dave"}]}
+    ]},
+    {"id": "b_mention_table", "type": "table", "rows": [
+      {"cells": [{"content": [{"user": "anna.lee", "name": "Anna Lee"}]}, {"content": [{"text": "x"}]}]}
+    ]}
+  ]}
+]}

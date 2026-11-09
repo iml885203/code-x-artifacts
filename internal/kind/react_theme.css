@@ -1,0 +1,32 @@
+/* shadcn's semantic colour names, pointed at the kit's tokens. Tailwind turns
+   each into a utility (bg-primary, text-muted-foreground, border-border, ...),
+   and because the values are variables the page follows the viewer's light or
+   dark setting without generating anything again. */
+@theme inline {
+  --color-background: var(--night);
+  --color-foreground: var(--text);
+  --color-card: var(--plate);
+  --color-card-foreground: var(--text);
+  --color-popover: var(--plate);
+  --color-popover-foreground: var(--text);
+  --color-primary: var(--star);
+  --color-primary-foreground: var(--on-star);
+  --color-secondary: var(--raised);
+  --color-secondary-foreground: var(--text);
+  --color-muted: var(--raised);
+  --color-muted-foreground: var(--muted);
+  --color-accent: var(--raised);
+  --color-accent-foreground: var(--text);
+  --color-destructive: var(--danger);
+  --color-border: var(--line);
+  --color-input: var(--line);
+  --color-ring: var(--star);
+  --color-ok: var(--ok);
+  --color-info: var(--info);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+}

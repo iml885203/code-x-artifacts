@@ -1,0 +1,19 @@
+{
+  "name": "a word deleted",
+  "before": [
+    {
+      "insert": "Hello brave world"
+    }
+  ],
+  "after": [
+    {
+      "insert": "Hello world"
+    }
+  ],
+  "want": {
+    "start": 6,
+    "end": 12,
+    "insert": [],
+    "formats": []
+  }
+}

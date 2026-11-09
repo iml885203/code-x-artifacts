@@ -1,0 +1,9 @@
+# Preserve verbatim third-party license whitespace; application code uses defaults.
+THIRD_PARTY_NOTICES.md whitespace=-blank-at-eol,-blank-at-eof
+internal/web/static/third-party-notices.txt whitespace=-blank-at-eol,-blank-at-eof
+docs/licenses/** whitespace=-blank-at-eol,-blank-at-eof
+web/fonts/OFL-Arimo.txt whitespace=-blank-at-eol,-blank-at-eof
+website/fonts/OFL-FamiljenGrotesk.txt whitespace=-blank-at-eol,-blank-at-eof
+# Versioned runtime bundles and embedded font notices retain upstream bytes.
+internal/jsruntime/v1/** whitespace=-blank-at-eol,-blank-at-eof
+internal/web/static/fonts/OFL-*.txt whitespace=-blank-at-eol,-blank-at-eof

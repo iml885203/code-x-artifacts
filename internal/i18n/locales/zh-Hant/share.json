@@ -1,0 +1,17 @@
+{
+  "share.title": "誰可以開啟",
+  "share.button": "分享",
+  "share.dialog": "分享「{title}」",
+  "share.link": "連結",
+  "share.people": "有權限的人",
+  "share.owner": "擁有者",
+  "share.editor": "可編輯",
+  "share.reader": "可檢視",
+  "share.everyone": "組織內所有人",
+  "share.anyone": "知道連結的人",
+  "share.done": "完成",
+  "share.saving": "正在儲存權限…",
+  "share.saved": "權限已儲存。",
+  "share.immediate": "每次變更都會立即儲存。",
+  "share.accountHint": "請填寫同事登入時使用的帳號。"
+}

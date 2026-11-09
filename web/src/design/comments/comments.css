@@ -1,0 +1,49 @@
+.canvas .design-comments {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.canvas .design-comments button {
+  position: absolute;
+  pointer-events: auto;
+  min-height: 44px;
+  font: inherit;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.canvas .design-comments .design-comment-pin {
+  width: 44px;
+  border: 1px solid var(--edge);
+  border-radius: 0 50% 50% 50%;
+  background: var(--plate);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.canvas .design-comments .design-comment-pin.active {
+  background: var(--star);
+  color: var(--on-star);
+  border-color: var(--star-edge);
+}
+.canvas .design-comments .design-comment-pin:hover,
+.canvas .design-comments .design-comment-selection:hover {
+  background: var(--raised);
+  color: var(--text);
+}
+.canvas .design-comments .design-comment-selection {
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  background: var(--plate);
+  color: var(--text);
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .canvas .design-comments button { transition: none; }
+}
+
+
+.canvas .design-comments .design-comment-selection {
+  left: 16px;
+  bottom: 16px;
+}

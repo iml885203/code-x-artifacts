@@ -1,0 +1,23 @@
+{
+  "name": "everything replaced",
+  "before": [
+    {
+      "insert": "Hello"
+    }
+  ],
+  "after": [
+    {
+      "insert": "你好"
+    }
+  ],
+  "want": {
+    "start": 0,
+    "end": 5,
+    "insert": [
+      {
+        "insert": "你好"
+      }
+    ],
+    "formats": []
+  }
+}

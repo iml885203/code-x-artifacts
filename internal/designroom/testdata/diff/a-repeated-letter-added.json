@@ -1,0 +1,23 @@
+{
+  "name": "a repeated letter added",
+  "before": [
+    {
+      "insert": "aa"
+    }
+  ],
+  "after": [
+    {
+      "insert": "aaa"
+    }
+  ],
+  "want": {
+    "start": 2,
+    "end": 2,
+    "insert": [
+      {
+        "insert": "a"
+      }
+    ],
+    "formats": []
+  }
+}

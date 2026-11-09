@@ -1,0 +1,6 @@
+# Source files already over the 600-line limit (scripts/verify-size.sh): "<lines> <path>".
+# The number is the file's exact size. Growing past it fails, and so does
+# shrinking below it until the entry is lowered, so this list only gets shorter.
+# Split a file by responsibility, then delete its line.
+604 internal/docfmt/markdown_in.go
+626 internal/kind/slides.go

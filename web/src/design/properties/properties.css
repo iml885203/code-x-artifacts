@@ -1,0 +1,31 @@
+/* The properties panel: groups of small controls in the width of the side panel. */
+.side-panel .side-tabs { display: flex; gap: var(--space-1); }
+.side-panel .side-tabs button { min-height: 32px; padding: 0 var(--space-3); border-color: transparent; color: var(--muted); }
+.side-panel .side-tabs button[aria-selected="true"] { color: var(--text); background: var(--raised); border-color: var(--line); }
+.props-body { display: flex; flex-direction: column; gap: var(--space-4); }
+.prop-section { display: flex; flex-direction: column; gap: var(--space-2); padding-bottom: var(--space-3); border-bottom: 1px solid var(--line); }
+.prop-section:last-child { border-bottom: 0; }
+.prop-section summary { margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.prop-row { display: flex; align-items: center; gap: var(--space-2); }
+.prop-field { display: flex; align-items: center; flex: 1; min-width: 0; gap: var(--space-1); color: var(--muted); font-size: 12px; }
+.prop-field.wide { flex: none; width: 100%; }
+.prop-field input { min-height: 32px; padding: 0 var(--space-2); font-size: 13px; color: var(--text); }
+.props-body select { min-height: 32px; flex: 1; min-width: 0; padding: 0 var(--space-2); border: 1px solid var(--line); border-radius: var(--r-control); background: var(--field); font-size: 13px; }
+.props-body button { min-height: 32px; padding: 0 var(--space-2); font-size: 12px; }
+.prop-segmented { display: flex; flex: 1; }
+.prop-segmented button { flex: 1; border-radius: 0; margin-left: -1px; }
+.prop-segmented button:first-child { border-radius: var(--r-control) 0 0 var(--r-control); margin-left: 0; }
+.prop-segmented button:last-child { border-radius: 0 var(--r-control) var(--r-control) 0; }
+.props-body button[aria-pressed="true"] { background: var(--raised); box-shadow: inset 0 0 0 1px var(--star); }
+.prop-title { color: var(--muted); font-size: 12px; }
+.prop-box { display: flex; flex-direction: column; gap: var(--space-1); }
+.prop-color { display: flex; align-items: center; gap: var(--space-2); }
+.prop-swatch { flex: none; width: 32px; height: 32px; padding: 0; border: 1px solid var(--line); border-radius: var(--r-control); cursor: pointer; }
+.prop-color .prop-field:last-child { flex: 0 0 76px; }
+.prop-refused { margin: 0; font-size: 12px; }
+
+.prop-section summary { cursor: pointer; min-height: 32px; align-content: center; }
+.prop-section:not([open]) > :not(summary) { display: none; }
+.prop-border { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.prop-paint { display: flex; flex-direction: column; gap: var(--space-1); }

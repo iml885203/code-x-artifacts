@@ -1,0 +1,79 @@
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { Check } from "../icons/chrome";
+import { Chevron } from "../icons/nav";
+import { keepFocusWhereItWent } from "../menuFocus";
+import type { Boot } from "../boot";
+import { Brand } from "../Header";
+import { Warning } from "../icons/chrome";
+import { useT, type Key } from "../i18n";
+import { useDocumentTitle } from "../title";
+import "./login.css";
+
+/** A plain form post to /login: the server signs in, redirects, and answers a failed attempt with this page again. */
+export function Login({ boot }: { boot: Boot }) {
+  const t = useT();
+  const login = boot.login;
+  if (!login) throw new Error("the sign-in page has no login data");
+  useDocumentTitle(t("login.title"));
+  // The server cannot say which of the two was wrong, so the error sits under the pair and both are marked; the account name stays typed.
+  const failed = login.error !== "";
+  const invalid = failed ? { "aria-invalid": true, "aria-describedby": "login-error" } : {};
+
+  return (
+    <div className="signin">
+      <div className="signin-stage">
+        <section className="signin-hero" aria-labelledby="workspace-intro">
+          <div className="signin-field-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3H15V9L9 15H3Z"/><path d="M16 10H22V22H10V16Z"/></svg></div>
+          <h2 id="workspace-intro">{t("login.headline")}</h2>
+          <p>{t("login.description")}</p>
+          <div className="signin-formats" aria-label={t("login.formats")}><span>Web</span><span>Docs</span><span>Design</span><span>Board</span><span>Slides</span></div>
+        </section>
+        <div className="signin-account">
+          <Brand link={false} />
+          <form className="signin-panel" method="post" action="/login" aria-labelledby="signin-title" aria-describedby="signin-help">
+            <input type="hidden" name="next" value={login.next} />
+            <h1 id="signin-title">{t("login.title")}</h1>
+            <div className="signin-field">
+              <label htmlFor="username">{t("login.username")}</label>
+              <input id="username" name="username" autoComplete="username" defaultValue={login.username} autoFocus={!failed} required {...invalid} />
+            </div>
+            <div className="signin-field">
+              <label htmlFor="password">{t("login.password")}</label>
+              <input id="password" name="password" type="password" autoComplete="current-password" autoFocus={failed} required {...invalid} />
+              {failed && (
+                <p id="login-error" className="field-error" role="alert">
+                  <Warning />
+                  {t(login.error as Key)}
+                </p>
+              )}
+            </div>
+            <button className="primary" type="submit">{t("login.submit")}</button>
+            <p id="signin-help" className="signin-help">{t("login.help")}</p>
+          </form>
+        </div>
+      </div>
+      <form id="signin-language" className="signin-foot" method="post" action="/lang">
+        <input type="hidden" name="next" value={boot.here} />
+        <DropdownMenu.Root modal={false}>
+          <DropdownMenu.Trigger className="signin-language" aria-label={`${t("lang.label")}: ${t(`shell.language.${boot.lang}` as Key)}`}>
+            {t(`shell.language.${boot.lang}` as Key)}<Chevron />
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content className="menu" side="top" sideOffset={8} collisionPadding={12} onCloseAutoFocus={keepFocusWhereItWent} aria-label={t("lang.label")}>
+              <DropdownMenu.RadioGroup value={boot.lang}>
+                {boot.langs.map((tag) => (
+                  <DropdownMenu.RadioItem key={tag} className="menu-item" value={tag} asChild>
+                    <button type="submit" form="signin-language" name="lang" value={tag}>
+                      <DropdownMenu.ItemIndicator className="menu-check"><Check /></DropdownMenu.ItemIndicator>
+                      {t(`shell.language.${tag}` as Key)}
+                    </button>
+                  </DropdownMenu.RadioItem>
+                ))}
+              </DropdownMenu.RadioGroup>
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu.Root>
+      </form>
+    </div>
+  );
+}

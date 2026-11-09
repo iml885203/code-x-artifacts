@@ -1,0 +1,8 @@
+{
+  "kit.title": "Kit",
+  "kit.intro": "agent 發佈到 CodeXArtifacts 的頁面共用的樣式表：亮色與暗色、字體、表格、提示框、卡片、按鈕、表單控制項和圖表色盤。頁面只要連結一次，純 HTML 就已經好看。每個元件都在下面，亮暗兩種各一份。",
+  "kit.stylesheet": "開啟樣式表",
+  "kit.openSample": "開啟範例頁面",
+  "kit.light": "亮色",
+  "kit.dark": "暗色"
+}

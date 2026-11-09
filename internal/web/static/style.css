@@ -1,0 +1,196 @@
+/* Design tokens and the base every page shares: the only place colours, type,
+   shape and motion are defined. See DESIGN.md. Component styles live next to
+   their components in web/src and only use what is defined here. */
+@font-face {
+  font-family: "Familjen Grotesk";
+  src: url("/static/fonts/FamiljenGrotesk.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Martian Mono";
+  src: url("/static/fonts/MartianMono.woff2") format("woff2");
+  font-weight: 100 800;
+  font-display: swap;
+}
+
+/* Both themes are first class and every colour token has a value in each:
+   light-dark() picks by the used colour scheme. The scheme follows the system
+   unless <html data-theme="light|dark"> pins one (the avatar menu; applied
+   before first paint). Contrast is held by web/src/tokens.test.ts. */
+:root {
+  color-scheme: light dark;
+
+  --night: light-dark(oklch(0.98 0.006 84), oklch(0.16 0.018 268));
+  --plate: light-dark(oklch(1 0 0), oklch(0.21 0.023 265));
+  --raised: light-dark(oklch(0.94 0.014 84), oklch(0.25 0.030 267));
+  /* Dividers and card edges: decoration, so they stay quiet. */
+  --line: light-dark(oklch(0.91 0.015 80), oklch(0.30 0.031 266));
+  /* Edge of an input, button or toggle: 3:1 against every surface it sits on. */
+  --edge: light-dark(oklch(0.62 0.019 83), oklch(0.56 0.046 268));
+  --edge-pop: light-dark(oklch(0.62 0.019 83), oklch(0.38 0.045 267));
+  --field: light-dark(oklch(1 0 0), oklch(0.16 0.018 268));
+  --text: light-dark(oklch(0.21 0.007 78), oklch(0.94 0.008 271));
+  --text-2: light-dark(oklch(0.35 0.014 76), oklch(0.84 0.019 265));
+  --muted: light-dark(oklch(0.46 0.015 75), oklch(0.71 0.028 264));
+  /* Legacy token names stay compatible. Deep berry actions retain AAA text
+     contrast on light surfaces; dark surfaces use the lighter berry shade. */
+  --star: light-dark(oklch(0.46097675 0.12476191 3.36827942), oklch(0.78814786 0.08290537 359.64197897));
+  --star-edge: light-dark(oklch(0.46097675 0.12476191 3.36827942), oklch(0.78814786 0.08290537 359.64197897));
+  /* The fixed brand berry, independent of the action shades. */
+  --mark-amber: oklch(0.54448866 0.13410650 3.21803959);
+  /* Hover deepens light actions and brightens dark actions. */
+  --star-hover: light-dark(oklch(0.39979732 0.11091987 5.45027163), oklch(0.84813914 0.06216926 353.78671224));
+  --star-wash: light-dark(oklch(0.94267007 0.01551775 351.98172394), oklch(0.29321377 0.03513702 345.36252633));
+  /* Text-safe berry for links and glyphs in both themes. */
+  --star-text: light-dark(oklch(0.46097675 0.12476191 3.36827942), oklch(0.78814786 0.08290537 359.64197897));
+  --on-star: light-dark(oklch(0.99999999 0.00000004 89.87556310), oklch(0.22978010 0.01487173 261.63745821));
+  --danger: light-dark(oklch(0.48 0.160 30), oklch(0.76 0.143 27));
+  --connected: light-dark(oklch(0.52 0.145 150), oklch(0.78 0.170 150));
+  --dust-1: light-dark(oklch(0.20 0.03 265 / 0.10), oklch(0.95 0 0 / 0.38));
+  --dust-2: light-dark(oklch(0.20 0.03 265 / 0.05), oklch(0.95 0 0 / 0.16));
+  --float: 0 8px 24px light-dark(oklch(0.2 0.02 80 / 0.14), oklch(0.05 0.02 265 / 0.5));
+
+  /* Kinds: a tile colour and a glyph colour each, both themes. The reserved
+     kinds (dashboard, motion, design system) have their colours ready. */
+  --kind-web-bg: light-dark(#eaeae6, #2a3040);
+  --kind-web-fg: light-dark(#3a3a36, #c9cfdc);
+  --kind-doc-bg: light-dark(#dde6f8, #1e2d4d);
+  --kind-doc-fg: light-dark(#1f3f80, #a9c3f5);
+  --kind-slides-bg: light-dark(#f8d99a, #4f3d14);
+  --kind-slides-fg: light-dark(#7a4b00, #f2cc7a);
+  --kind-design-bg: light-dark(#d9c8f0, #36274f);
+  --kind-design-fg: light-dark(#4b2e83, #cdb5f2);
+  --kind-board-bg: light-dark(#f0b896, #4a2716);
+  --kind-board-fg: light-dark(#7a3210, #f5b38c);
+  --kind-dashboard-bg: light-dark(#a9d8cf, #1c3f3a);
+  --kind-dashboard-fg: light-dark(#0e4a42, #8fdccf);
+  --kind-motion-bg: light-dark(#f6d5d8, #4a2330);
+  --kind-motion-fg: light-dark(#8a1f35, #f3a8b6);
+  --kind-system-bg: light-dark(#cfe0a8, #35401c);
+  --kind-system-fg: light-dark(#3f4f14, #c5db8e);
+
+  --font-sans: "Familjen Grotesk", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --font-mono: "Martian Mono", "PingFang TC", "Noto Sans TC", ui-monospace, monospace;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --gutter: 32px;
+  --r-icon: 8px;
+  --r-field: 10px;
+  --r-card: 12px;
+  --r-login: 14px;
+  --r-tip: 6px;
+  --r-control: var(--r-icon);
+  --r-pop: var(--r-card);
+  --target: 44px;
+  --bar-h: 56px;
+  --nav-w: 220px;
+  --row-h: 52px;
+  --kind-box: 40px;
+
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --dur-slow: 320ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+@media (max-width: 640px) {
+  :root { --gutter: 16px; }
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html { scrollbar-color: var(--line) var(--night); }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--text);
+  font: 400 14px/1.55 var(--font-sans);
+  caret-color: var(--star-text);
+  -webkit-text-size-adjust: 100%;
+}
+::selection { background: var(--star); color: var(--on-star); }
+h1, h2, h3 { text-wrap: balance; letter-spacing: -0.02em; }
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.open { color: var(--star-text); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* The night sky: two grids of dust at different pitches, so the stars do not
+   line up. Only the overview and sign-in carry it; the viewer stays plain so
+   nothing competes with the artifact. */
+.sky {
+  min-height: 100dvh;
+  background-color: var(--night);
+  background-image:
+    radial-gradient(circle at 17px 9px, var(--dust-1) 0.7px, transparent 1.1px),
+    radial-gradient(circle at 41px 33px, var(--dust-2) 0.7px, transparent 1.1px);
+  background-size: 113px 97px, 59px 67px;
+}
+
+/* Controls */
+button, input, select { font: inherit; color: inherit; }
+button, .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--target);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--edge);
+  border-radius: var(--r-field);
+  background: transparent;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+button:hover, .btn:hover { background: var(--raised); }
+button:active, .btn:active { transform: translateY(1px); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button.primary, .btn.primary { background: var(--star); border-color: var(--star-edge); color: var(--on-star); }
+button.primary:hover, .btn.primary:hover { background: var(--star-hover); }
+button.danger, .btn.danger { color: var(--danger); }
+button.quiet, .btn.quiet { border-color: transparent; }
+input[type="text"], input[type="password"], input:not([type]), input[type="search"] {
+  width: 100%;
+  min-height: var(--target);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--edge);
+  border-radius: var(--r-field);
+  background: var(--field);
+  transition: border-color var(--dur) var(--ease-out);
+}
+input:hover { border-color: var(--muted); }
+input::placeholder { color: var(--muted); opacity: 0.8; }
+svg.icon { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: square; stroke-linejoin: miter; }
+
+/* Navigation between pages. A page-to-page navigation crossfades quickly (the
+   language switch included); the shared artifact between the overview and the
+   viewer is named by the code that moves it. */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) {
+  animation-duration: var(--dur-fast);
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-group(artifact) {
+  animation-duration: var(--dur-slow);
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-old(artifact), ::view-transition-new(artifact) { animation-duration: var(--dur-slow); }
+@media (prefers-reduced-motion: reduce) {
+  /* Movement and scaling go; a quick fade stays so a change is still seen. */
+  ::view-transition-group(artifact) { animation: none; }
+  ::view-transition-old(artifact), ::view-transition-new(artifact) { animation-duration: var(--dur-fast); }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "a word typed in the middle",
+  "before": [
+    {
+      "insert": "Hello world"
+    }
+  ],
+  "after": [
+    {
+      "insert": "Hello brave world"
+    }
+  ],
+  "want": {
+    "start": 6,
+    "end": 6,
+    "insert": [
+      {
+        "insert": "brave "
+      }
+    ],
+    "formats": []
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "kinds.web": "Web page",
+  "kinds.doc": "Doc",
+  "kinds.slides": "Slides",
+  "kinds.design": "Design",
+  "kinds.board": "Board",
+  "kinds.dashboard": "Dashboard",
+  "kinds.motion": "Animation",
+  "kinds.designSystem": "Design system"
+}

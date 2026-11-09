@@ -1,0 +1,16 @@
+{
+  "name": "pictor-realtime-interop",
+  "private": true,
+  "type": "module",
+  "description": "Produces the Yjs updates the Go room is tested with, and checks the updates Go produced with the real yjs library. See docs/realtime.md.",
+  "engines": {
+    "node": "24.22.0"
+  },
+  "scripts": {
+    "generate": "node generate.mjs",
+    "check": "node check.mjs"
+  },
+  "dependencies": {
+    "yjs": "13.6.33"
+  }
+}

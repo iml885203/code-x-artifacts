@@ -1,0 +1,182 @@
+{
+  "tabs": [
+    {
+      "id": "t_dropdown",
+      "title": "Dropdowns",
+      "blocks": [
+        {
+          "id": "p_date",
+          "type": "paragraph",
+          "content": [
+            {
+              "text": "Due "
+            },
+            {
+              "dropdown": {
+                "options": [
+                  "Ready",
+                  "Done",
+                  "<script>",
+                  "王😀"
+                ],
+                "value": "Ready"
+              }
+            },
+            {
+              "text": " now\n"
+            },
+            {
+              "dropdown": {
+                "options": [
+                  "Ready",
+                  "Done",
+                  "<script>",
+                  "王😀"
+                ],
+                "value": "Ready"
+              }
+            },
+            {
+              "dropdown": {
+                "options": [
+                  "Ready",
+                  "Done",
+                  "<script>",
+                  "王😀"
+                ],
+                "value": "Ready"
+              }
+            }
+          ]
+        },
+        {
+          "id": "h_date",
+          "type": "heading",
+          "level": 2,
+          "content": [
+            {
+              "dropdown": {
+                "options": [
+                  "Ready",
+                  "Done",
+                  "<script>",
+                  "王😀"
+                ],
+                "value": "Ready"
+              }
+            }
+          ]
+        },
+        {
+          "id": "l_date",
+          "type": "bullet_list",
+          "items": [
+            {
+              "content": [
+                {
+                  "dropdown": {
+                    "options": [
+                      "Ready",
+                      "Done",
+                      "<script>",
+                      "王😀"
+                    ],
+                    "value": "Ready"
+                  }
+                }
+              ],
+              "items": [
+                {
+                  "content": [
+                    {
+                      "dropdown": {
+                        "options": [
+                          "Ready",
+                          "Done",
+                          "<script>",
+                          "王😀"
+                        ],
+                        "value": "Ready"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "task_date",
+          "type": "task_list",
+          "items": [
+            {
+              "checked": false,
+              "content": [
+                {
+                  "dropdown": {
+                    "options": [
+                      "Ready",
+                      "Done",
+                      "<script>",
+                      "王😀"
+                    ],
+                    "value": "Ready"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "table_date",
+          "type": "table",
+          "header": true,
+          "rows": [
+            {
+              "cells": [
+                {
+                  "content": [
+                    {
+                      "dropdown": {
+                        "options": [
+                          "Ready",
+                          "Done",
+                          "<script>",
+                          "王😀"
+                        ],
+                        "value": "Ready"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "quote_date",
+          "type": "quote",
+          "blocks": [
+            {
+              "id": "inside_date",
+              "type": "paragraph",
+              "content": [
+                {
+                  "dropdown": {
+                    "options": [
+                      "Ready",
+                      "Done",
+                      "<script>",
+                      "王😀"
+                    ],
+                    "value": "Ready"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

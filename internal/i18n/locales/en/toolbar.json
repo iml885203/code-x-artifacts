@@ -1,0 +1,23 @@
+{
+  "toolbar.page": "Page: {name}",
+  "toolbar.renamePage": "Rename page",
+  "toolbar.deletePage": "Delete page",
+  "toolbar.frame": "Artboard",
+  "toolbar.drawing": "Draw an artboard",
+  "toolbar.shape": "Shape",
+  "toolbar.present": "Present",
+  "toolbar.panel": "Properties",
+  "toolbar.view": "View",
+  "toolbar.zoom": "Zoom {percent}%",
+  "toolbar.drawingTools": "Drawing",
+  "toolbar.pencil": "Pencil",
+  "toolbar.pathDraw": "Draw a connected path",
+  "toolbar.path": "Path",
+  "toolbar.line": "Line",
+  "toolbar.arrow": "Arrow",
+  "toolbar.copyPageLink": "Copy link to page",
+  "toolbar.pageMore": "More actions for {name}",
+  "toolbar.expandArtboard": "Expand {name}",
+  "toolbar.selection": "Selection actions",
+  "toolbar.delete": "Delete"
+}

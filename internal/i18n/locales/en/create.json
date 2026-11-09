@@ -1,0 +1,16 @@
+{
+  "create.new": "New",
+  "create.document": "Document",
+  "create.design": "Design",
+  "create.board": "Board",
+  "create.documentFor": "Write notes, reports and plans",
+  "create.designFor": "Design how a page looks",
+  "create.boardFor": "Draw flows, architecture and ideas",
+  "create.untitledDocument": "Untitled document",
+  "create.untitledDesign": "Untitled design",
+  "create.untitledBoard": "Untitled board",
+  "create.failed": "Couldn't create it. Try again.",
+  "create.rename": "Rename",
+  "create.titleField": "Title",
+  "create.renameFailed": "Couldn't rename it. Try again."
+}

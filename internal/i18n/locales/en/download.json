@@ -1,0 +1,6 @@
+{
+  "download.title": "Save {name}?",
+  "download.hint": "“{page}” wants to save a file to your device: {type}, {size}. Save it only if you expect it.",
+  "download.save": "Save",
+  "download.failed": "Couldn't save the file. Try again."
+}

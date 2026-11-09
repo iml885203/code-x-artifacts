@@ -1,0 +1,7 @@
+{
+  "mention.list": "People",
+  "mention.none": "No one found",
+  "mention.cannotOpen": "{name} cannot open this doc.",
+  "mention.dismiss": "Dismiss",
+  "mention.incomplete": "Some people may be missing. Signing in again refreshes the list."
+}

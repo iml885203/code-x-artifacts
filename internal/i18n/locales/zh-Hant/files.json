@@ -1,0 +1,15 @@
+{
+  "files.title": "檔案",
+  "files.close": "關閉",
+  "files.drop": "把檔案拖到這裡，或選擇檔案",
+  "files.uploading": "正在上傳 {name}…",
+  "files.empty": "還沒有檔案。把檔案的 URL 放進頁面就能顯示它。",
+  "files.copyUrl": "複製 URL",
+  "files.delete": "刪除",
+  "files.loadFailed": "無法載入檔案，請再試一次。",
+  "files.uploadFailed": "無法上傳 {name}：{reason}",
+  "files.uploadFailedNoReason": "無法上傳 {name}，請再試一次。",
+  "files.confirmDelete": "刪除 {name}？",
+  "files.confirmDeleteHint": "顯示它的頁面會失去這個檔案，無法復原。",
+  "files.deleteFailed": "無法刪除這個檔案，請再試一次。"
+}

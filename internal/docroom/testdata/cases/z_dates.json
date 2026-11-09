@@ -1,0 +1,110 @@
+{
+  "tabs": [
+    {
+      "id": "t_date",
+      "title": "Dates",
+      "blocks": [
+        {
+          "id": "p_date",
+          "type": "paragraph",
+          "content": [
+            {
+              "text": "Due "
+            },
+            {
+              "date": "2026-10-24"
+            },
+            {
+              "text": " now\n"
+            },
+            {
+              "date": "2026-10-24"
+            },
+            {
+              "date": "2026-10-24"
+            }
+          ]
+        },
+        {
+          "id": "h_date",
+          "type": "heading",
+          "level": 2,
+          "content": [
+            {
+              "date": "2026-10-24"
+            }
+          ]
+        },
+        {
+          "id": "l_date",
+          "type": "bullet_list",
+          "items": [
+            {
+              "content": [
+                {
+                  "date": "2026-10-24"
+                }
+              ],
+              "items": [
+                {
+                  "content": [
+                    {
+                      "date": "2026-10-24"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "task_date",
+          "type": "task_list",
+          "items": [
+            {
+              "checked": false,
+              "content": [
+                {
+                  "date": "2026-10-24"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "table_date",
+          "type": "table",
+          "header": true,
+          "rows": [
+            {
+              "cells": [
+                {
+                  "content": [
+                    {
+                      "date": "2026-10-24"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "quote_date",
+          "type": "quote",
+          "blocks": [
+            {
+              "id": "inside_date",
+              "type": "paragraph",
+              "content": [
+                {
+                  "date": "2026-10-24"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

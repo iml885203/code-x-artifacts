@@ -1,0 +1,3 @@
+/* The element operations: the arrange bar over a selection, and the notice for what cannot be done. */
+.canvas-arrange { position: absolute; left: 50%; top: calc(var(--space-4) + 56px); transform: translateX(-50%); display: flex; align-items: center; gap: 2px; padding: 4px; background: var(--plate); border: 1px solid var(--line); border-radius: var(--r-pop); box-shadow: 0 8px 24px oklch(0 0 0 / 0.3); }
+.arrange-item { display: inline-flex; align-items: center; gap: 2px; }

@@ -1,0 +1,8 @@
+{
+  "editors.account": "帳號名稱",
+  "editors.add": "加入",
+  "editors.remove": "移除",
+  "editors.organisation": "組織內所有人都能編輯",
+  "editors.hint": "編輯者可以發佈新版本、還原版本和管理檔案，但不能改變誰看得到、誰能編輯，也不能刪除。",
+  "editors.failed": "無法變更編輯者，請再試一次。"
+}

@@ -1,0 +1,6 @@
+{
+  "download.title": "要儲存 {name} 嗎？",
+  "download.hint": "「{page}」想把一個檔案存到你的裝置：{type}，{size}。只有在你預期會有這個檔案時才儲存。",
+  "download.save": "儲存",
+  "download.failed": "無法儲存檔案，請再試一次。"
+}

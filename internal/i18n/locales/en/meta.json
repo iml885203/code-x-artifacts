@@ -1,0 +1,8 @@
+{
+  "meta.description.login": "Sign in to CodeXArtifacts with your company account.",
+  "meta.description.gallery": "The artifacts you made and the ones shared with you, on CodeXArtifacts.",
+  "meta.description.viewer": "An artifact on CodeXArtifacts, shared by its author.",
+  "meta.description.connect": "Connect your agent to CodeXArtifacts so it can publish artifacts for you.",
+  "meta.description.kit": "The stylesheet and components for pages published to CodeXArtifacts.",
+  "meta.description.error": "This page isn't here, or it isn't open to you."
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="{{.L.Tag}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<script src="/static/theme.js"></script>
+<script src="/static/transitions.js"></script>
+<title>{{.Title}}</title>
+<meta name="description" content="{{.Description}}">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0d15">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf8f4">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CodeXArtifacts">
+<meta property="og:title" content="{{.Title}}">
+<meta property="og:description" content="{{.Description}}">
+<meta property="og:image" content="{{.Image}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{.Title}}">
+<meta name="twitter:description" content="{{.Description}}">
+<meta name="twitter:image" content="{{.Image}}">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/favicon.png" type="image/png" sizes="16x16">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="preload" href="/static/fonts/FamiljenGrotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/style.css">
+{{range .Bundle.CSS}}<link rel="stylesheet" href="/{{.}}">
+{{end}}{{range .Bundle.Preload}}<link rel="modulepreload" href="/{{.}}">
+{{end}}</head>
+<body>
+<div id="root"></div>
+<script type="application/json" id="pictor-boot">{{.Boot}}</script>
+<script type="module" src="/{{.Bundle.Entry}}"></script>
+</body>
+</html>

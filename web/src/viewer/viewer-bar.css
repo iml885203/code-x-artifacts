@@ -1,0 +1,47 @@
+/* One quiet shell for every artifact; the title yields to the primary action. */
+.viewer .vbar { height: 56px; gap: var(--space-3); padding: 0 var(--space-4); background: var(--plate); }
+.viewer .vbar .icon-link { display: inline-grid; place-items: center; min-width: var(--target); height: var(--target); }
+.viewer .vtitle { display: flex; flex: 1; min-width: 0; align-items: center; gap: var(--space-3); }
+.viewer .vtitle h1 { flex: 0 1 auto; min-width: 0; max-width: 42vw; font-size: 15px; line-height: 1.3; }
+.title-menu { min-width: 0; }
+.title-button { all: unset; box-sizing: border-box; display: inline-flex; min-height: var(--target); align-items: center; gap: var(--space-1); max-width: 100%; padding: 0 var(--space-1); border-radius: var(--r-control); cursor: pointer; transition: background var(--dur) var(--ease-out); }
+.title-button:hover, .title-button[data-state="open"] { background: var(--raised); }
+.title-button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.title-button .title-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.title-button .icon { flex: none; width: 14px; height: 14px; color: var(--muted); transition: transform var(--dur) var(--ease-out); }
+.title-button[data-state="open"] .icon { transform: rotate(180deg); }
+.viewer .vtitle .facts { flex: 0 1 auto; min-width: 0; align-items: center; gap: 0 var(--space-2); margin: 0; overflow: hidden; }
+.viewer .vtitle .facts > * { flex: none; }
+.viewer .vtitle .facts > * + *::before { content: "·"; margin-right: var(--space-2); }
+.viewer .vtitle .facts > .audience + *::before { content: none; }
+.viewer .vtitle .facts > .audience { color: var(--muted); }
+.share-button { flex: none; white-space: nowrap; }
+.viewer .comments-button { position: relative; border-color: transparent; background: transparent; color: var(--text-2); }
+.viewer .comments-button:hover, .viewer .comments-button[aria-pressed="true"] { background: var(--raised); color: var(--text); }
+.viewer .comments-count { position: absolute; right: -2px; top: 0; min-width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; padding: 0 4px; font-family: var(--font-sans); font-variant-numeric: tabular-nums; }
+.viewer-secondary { max-width: min(320px, calc(100vw - 32px)); }
+.viewer-overflow { max-height: calc(100dvh - 80px); overflow-y: auto; overscroll-behavior: contain; }
+.viewer-people ul { list-style: none; padding: 0 var(--space-2); margin: 0 0 var(--space-2); }
+.viewer-people li { display: flex; align-items: center; gap: var(--space-2); min-height: var(--target); overflow-wrap: anywhere; }
+.viewer-people .pr-face { border-color: var(--plate); }
+@media (max-width: 1100px) and (min-width: 641px) {
+  .viewer .vtitle .facts > :nth-child(n + 3):not(.ed-saved) { display: none; }
+}
+@media (max-width: 640px) {
+  .viewer .vbar { padding: 0 var(--space-2); gap: var(--space-2); }
+  .viewer .vtitle { gap: var(--space-1); }
+  .viewer .vtitle h1 { flex: 1; max-width: none; }
+  .viewer .vtitle .facts { flex: none; }
+  .viewer .vtitle .facts > :nth-child(n + 2) { display: none; }
+  .viewer .vbar .brand .wordmark { display: none; }
+}
+/* The printable page is outside the live editor/canvas and does not depend on the lazy editor's styles. */
+.print-frame { position: fixed; left: -10000px; top: 0; width: 794px; height: 1123px; border: 0; background: #fff; }
+@media print { .print-frame { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .title-button { transition: none; }
+  .title-button .icon { transition: none; }
+}
+.viewer-people ul { max-height: 160px; overflow-y: auto; }
+.viewer-account-link { display: flex; justify-content: space-between; gap: var(--space-3); }
+.viewer-account-link .icon { transform: rotate(-90deg); }
