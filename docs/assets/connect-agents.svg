@@ -30,7 +30,7 @@
     </g>
     <rect x="338" y="193" width="136" height="76" rx="14" fill="#f5e8ed" stroke="#ad4968"/>
     <text x="406" y="227" fill="#8e3451" font-size="25" font-weight="600">MCP</text>
-    <text x="406" y="250" fill="#6b4a56" font-size="14">HTTP + OAuth / PAT</text>
+    <text x="406" y="250" fill="#6b4a56" font-size="14">OAuth / PAT</text>
     <text x="406" y="302" fill="#625b60" font-family="monospace" font-size="15">/api/mcp</text>
   </g>
   <rect x="560" y="92" width="372" height="294" rx="18" fill="#fff" stroke="#d8d1d1"/>
