@@ -99,6 +99,21 @@ describe("typing @ in a doc", () => {
     expect(mentions(view)).toEqual([]);
   });
 
+  it("selects a discovered OIDC account and preserves it across save, reload and clipboard parsing", async () => {
+    const oidc: Person = { user: "oidc:0123456789abcdef0123456789abcdef", name: "OIDC colleague", canOpen: true };
+    const doc = room(para("b_1", "Ask "));
+    const { view } = editorWith(doc, [oidc]);
+    typeAt(view, 6, "@OIDC");
+    await vi.waitFor(() => { expect(rows()).toEqual(["OIDC colleague"]); });
+    key(view, { key: "Enter" });
+    expect(mentions(view)).toEqual([{ user: oidc.user, name: oidc.name }]);
+    const restored = person(reload(doc));
+    expect(mentions(restored)).toEqual([{ user: oidc.user, name: oidc.name }]);
+    const pasted = person(room(para("b_paste", "")));
+    pasted.pasteHTML(`<p><span class="ed-mention" data-user="${oidc.user}">@${oidc.name}</span></p>`, new Event("paste") as ClipboardEvent);
+    expect(mentions(pasted)).toEqual([{ user: oidc.user, name: oidc.name }]);
+  });
+
   it("picks with the arrow keys and Tab, and with a click, and keeps the caret in the editor", async () => {
     const { view } = editorWith(room(para("b_1", "")));
     typeAt(view, 2, "@");
@@ -235,7 +250,7 @@ describe("what a mention is in the document", () => {
     const kept = parse(`<span class="ed-mention" data-user="anna.lee">@Anna Lee</span>`);
     expect(kept.firstChild?.type.name).toBe("mention");
     expect(kept.firstChild?.attrs).toMatchObject({ user: "anna.lee", name: "Anna Lee" });
-    for (const bad of [`data-user="a b"`, `data-user="javascript:x"`, `data-user=""`, `data-user="${"a".repeat(65)}"`]) {
+    for (const bad of [`data-user="a b"`, `data-user="javascript:x"`, `data-user=""`, `data-user="${"a".repeat(65)}"`, `data-user="oidc:short"`, `data-user="oidc:${"a".repeat(31)}"`, `data-user="oidc:${"a".repeat(33)}"`, `data-user="oidc:${"A".repeat(32)}"`, `data-user="other:${"a".repeat(32)}"`]) {
       expect(parse(`<span class="ed-mention" ${bad}>@Anna</span>`).firstChild?.type.name, bad).toBe("text");
     }
     expect(parse(`<span class="ed-mention" data-user="anna">@${"n".repeat(101)}</span>`).firstChild?.type.name).toBe("text");

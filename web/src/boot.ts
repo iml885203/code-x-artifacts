@@ -29,7 +29,7 @@ export interface Boot {
   /** Only the viewer page has this: the artifact, already checked against who is looking. */
   artifact?: Artifact;
   /** Only the sign-in page: where signing in leads, what went wrong (a catalogue key) and what was typed. */
-  login?: { next: string; error: string; username: string };
+  login?: { next: string; error: string; username: string; oidc?: { providerName: string; startUrl: string } };
   /** Only the connect page: the address its commands point at, and the person's tokens (no secrets). */
   connect?: { baseUrl: string; tokens: TokenItem[]; oauthEnabled?: boolean };
   /** Validated browser authorization request; fields include its consent-bound CSRF token. */

@@ -87,7 +87,7 @@ operator has enabled OAuth. See [OAuth setup and compatibility](docs/mcp-oauth.m
 
 - **Early release.** No external security review or production-readiness claim.
 - **One server instance.** Go + React, SQLite and local files; multiple replicas are unsupported.
-- **Operator-managed accounts.** No self-registration or email password reset; LDAP is optional.
+- **Operator-managed accounts.** Local accounts, LDAP or [OIDC](docs/oidc.md); no built-in self-registration or email password reset.
 - **Remote hosting needs HTTPS.** Public links are off by default. See [deployment and backups](docs/deployment.md).
 - **Format-specific limits apply.** React uses a bundled runtime; DOCX export is experimental.
   Slides have a different editing model from Docs, Design and Board. See [artifact contracts](docs/artifact-types.md).

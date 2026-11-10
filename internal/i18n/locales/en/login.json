@@ -9,5 +9,11 @@
   "login.error.unavailable": "Sign-in is unavailable. Try again in a moment.",
   "login.headline": "Turn ideas into artifacts. Keep creating value.",
   "login.description": "A home for work you and your agents can keep building on. Create, share and continue together.",
-  "login.formats": "Artifact formats"
+  "login.formats": "Artifact formats",
+  "login.oidc.help": "Sign in with your workspace’s identity provider. You’ll return here to continue.",
+  "login.oidc.continue": "Continue with {provider}",
+  "login.oidc.retry": "Try again with {provider}",
+  "login.error.oidcUnavailable": "Your sign-in provider is unavailable. Try again in a moment, or contact your workspace administrator.",
+  "login.error.oidcInvalid": "This sign-in attempt expired or could not be verified. Start again to sign in.",
+  "login.error.oidcDenied": "Sign-in was cancelled or access was denied. Try again, or ask your workspace administrator for access."
 }

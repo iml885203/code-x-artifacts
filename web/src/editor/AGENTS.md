@@ -35,3 +35,5 @@ Docs 編輯器（`docs/editor.md`）：schema、id plugin、socket provider、vi
 
 - `web/` 禁止 `innerHTML`／`outerHTML` 賦值、`insertAdjacentHTML`、`createContextualFragment`、`document.write` 與 `dangerouslySetInnerHTML`；這是 lint gate（`eslint.config.js`，`web/src/lint.test.ts` 測它），被擋時改寫成 DOM API，不要關掉規則。
 - Docker 的 web stage 只複製 `internal/docroom/interop/schema.mjs`（編輯器 import 的共用 schema，套件從 `web/node_modules` 解析）；搬動或改名 schema 檔時一起改 `Dockerfile`。
+
+- **Known OIDC people can be selected as mentions, persisted through the room and reloaded. Clipboard mentions retain only original directory-account identifiers or the exact assigned `oidc:[0-9a-f]{32}` grammar; arbitrary colon values become plain text.** Tests: web/src/editor/features/mention/mention.test.ts (selects a discovered OIDC account and preserves it across save, reload and clipboard parsing).

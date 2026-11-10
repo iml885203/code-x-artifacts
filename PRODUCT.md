@@ -20,7 +20,7 @@ home outside a conversation, where people and their preferred agents can continu
 HTML and React pages, Docs, Design, Board and Slides; shared authorization,
 versions, files, comments, live collaboration and an MCP API with personal tokens and optional browser OAuth.
 Web content remains in an opaque-origin sandbox. One replica owns in-memory rooms.
-Local accounts and optional explicitly configured LDAP support self-hosting.
+Local accounts, LDAP or a configured OIDC identity provider support self-hosting.
 Native Cloudflare and a TypeScript backend are deferred. MCP OAuth is opt-in with a fixed public origin.
 
 ## Brand Commitments

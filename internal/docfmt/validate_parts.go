@@ -66,7 +66,7 @@ func checkRun(raw any, path string) error {
 	return runHref(obj["href"], linked, path+".href")
 }
 
-var accountPattern = regexp.MustCompile(`^[A-Za-z0-9._-]+$`)
+var accountPattern = regexp.MustCompile(`^(?:[A-Za-z0-9._-]+|oidc:[0-9a-f]{32})$`)
 
 // checkMention validates a run that mentions a person: the account and the name
 // it had then, and nothing a text run has.
@@ -97,7 +97,7 @@ func mentionUser(raw any, path string) error {
 	case utf8.RuneCountInString(s) > MaxMentionUserRunes:
 		return at(path, "is %d characters; at most %d", utf8.RuneCountInString(s), MaxMentionUserRunes)
 	case !accountPattern.MatchString(s):
-		return at(path, "must be letters, digits, . _ or - (the sign-in name, such as anna.lee)")
+		return at(path, "must be letters, digits, . _ or - (a sign-in name such as anna.lee), or an assigned oidc: account")
 	}
 	return nil
 }

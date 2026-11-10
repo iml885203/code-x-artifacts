@@ -64,9 +64,10 @@ type loginBoot struct {
 	// Next is where signing in leads, Error the catalogue key of what went
 	// wrong (empty on a fresh page) and Username what was typed, so a failed
 	// attempt does not make a person type it again.
-	Next     string `json:"next"`
-	Error    string `json:"error"`
-	Username string `json:"username"`
+	Next     string         `json:"next"`
+	Error    string         `json:"error"`
+	Username string         `json:"username"`
+	OIDC     *oidcLoginBoot `json:"oidc,omitempty"`
 }
 
 // connectBoot is what the "Connect your agent" page needs: the address the

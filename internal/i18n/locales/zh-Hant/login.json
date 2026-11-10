@@ -9,5 +9,11 @@
   "login.error.unavailable": "目前無法登入，請稍後再試。",
   "login.headline": "把想法做成作品，讓作品持續發揮價值。",
   "login.description": "讓你與慣用的 AI 一起創作、分享與編輯，持續推進每一份作品。",
-  "login.formats": "作品類型"
+  "login.formats": "作品類型",
+  "login.oidc.help": "使用工作空間的身分驗證服務登入，完成後會返回這裡繼續。",
+  "login.oidc.continue": "使用 {provider} 繼續",
+  "login.oidc.retry": "使用 {provider} 再試一次",
+  "login.error.oidcUnavailable": "目前無法連線到登入服務，請稍後再試，或聯絡工作空間管理者。",
+  "login.error.oidcInvalid": "這次登入已過期或無法驗證，請重新開始登入。",
+  "login.error.oidcDenied": "登入已取消或存取遭到拒絕。請重試，或向工作空間管理者申請存取權限。"
 }

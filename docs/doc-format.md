@@ -36,7 +36,7 @@ Markdown、Word 與 PDF 只保留目前可見的日期文字；重新發佈 Mark
 
 ## 提及人員（mention）
 
-`content` 也接受 `{"user":"anna.lee","name":"Anna Lee"}`，可放在段落、標題、清單項目與表格儲存格，與文字 run 相鄰。`user` 是必填的登入帳號（1–64 個英文字母、數字、`.`、`_`、`-`）；`name` 是提及時的名稱（非空白、單行、至多 100 個 Unicode 字元，不含 NUL 或控制字元）。mention 不接受 `text`、`marks`、`href` 或未知欄位；拒絕訊息包含位置，例如 `tabs[0].blocks[2].content[1].user`。
+`content` 也接受 `{"user":"anna.lee","name":"Anna Lee"}`，可放在段落、標題、清單項目與表格儲存格，與文字 run 相鄰。`user` 是必填的登入帳號（1–64 個英文字母、數字、`.`、`_`、`-`），或系統分配的 OIDC 帳號（精確的 `oidc:` 加上 32 個小寫十六進位字元）；其他帶冒號的值不接受。`name` 是提及時的名稱（非空白、單行、至多 100 個 Unicode 字元，不含 NUL 或控制字元）。mention 不接受 `text`、`marks`、`href` 或未知欄位；拒絕訊息包含位置，例如 `tabs[0].blocks[2].content[1].user`。
 
 Markdown 寫成 `[@Anna Lee](mention:anna.lee)`，讀回保留帳號與名稱；一般 Markdown 閱讀器仍能顯示 `@Anna Lee`。名稱裡的 Markdown 字元由匯出器跳脫。唯讀頁面、PDF 與 Word 顯示 `@` 加儲存的名稱，沒有連結；名稱始終是文字；唯讀頁面與列印以低彩度文字保留提及時的名稱，離開名錄也不改寫文件。提及不授予權限，也不發送通知（#144）。
 

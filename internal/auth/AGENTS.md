@@ -17,3 +17,6 @@
 
 - **同一條已綁定連線的組織名錄讀取只提供查找資料，不改登入政策。只有群組範圍、全部分頁和每筆資料驗證完成才產生完整快照；失敗不拒絕已通過的登入、不保存憑證或連線。**
   Tests: `TestDirectoryPagingIsCompleteOnlyAfterAValidatedTerminalPage`, `TestDirectoryGroupScopeMustResolveInsideTheConfiguredBase`, `TestDirectoryFailureAndCancellationCannotBecomeAnEmptyCompleteRoster`.
+
+- **OIDC is an alternative configured browser login mode. Discovery/code exchange/JWKS use bounded fetches and normal TLS verification (HTTP loopback development only). Code uses PKCE S256; signed ID tokens must bind nonce, issuer, audience and authorized party. Subject/group admission intersects all configured restrictions; trusting provider assignment never bypasses a restriction. Provider groups enter application profiles only through an explicit map.**
+  Tests: `TestOIDCRejectsInvalidTokensAndRestrictedIdentities`, `TestOIDCUntrustedTokenSignatureCannotCreateASession`, `TestOIDCAdmissionIntersectsSubjectAndGroupRestrictions`, `TestOIDCConfigurationRequiresTrustedEndpointsAndExplicitAdmission` (internal/web).
