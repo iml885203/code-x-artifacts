@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
-# Installed by `make hooks`. A convenience, not a gate: `git push --no-verify`
-# skips it and the pipeline runs these checks again.
+# Installed by `make hooks`; keep these local checks enabled.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 echo "pre-push: build and tests"
 if ! make --no-print-directory verify-prepush; then
 	echo
-	echo "pre-push: refused. Fix the above, or 'git push --no-verify' to skip"
-	echo "          and let the pipeline tell you instead."
+	echo "pre-push: checks failed. Fix the reported cause and retry the push."
 	exit 1
 fi

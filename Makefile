@@ -112,6 +112,7 @@ e2e: web e2e-tools
 # installed it. Every checkout opts into the same committed hook scripts.
 .PHONY: hooks
 hooks:
+	@if [ ! -e .claude/skills ] && [ ! -L .claude/skills ]; then mkdir -p .claude; ln -s ../.agents/skills .claude/skills; fi
 	@git config core.hooksPath .githooks
 	@echo "hooks installed: pre-commit runs verify-precommit, pre-push runs verify-prepush"
 
@@ -276,8 +277,8 @@ test-unit: web
 test-web: verify-web-tools
 	$(TEST_WRAP) sh -c '$(NPM) run test'
 
-# What the hooks run. A hook is a convenience, not a gate: `git commit -n`
-# skips it, so the pipeline runs every one of these again.
+# Local hooks run these checks; keep them enabled. `make verify` is the
+# final completion gate, including when remote CI is not configured.
 .PHONY: verify-precommit
 verify-precommit: verify-fmt verify-lint verify-mod verify-docs verify-size verify-tracked verify-e2e-boxes verify-e2e-budget verify-agents-md verify-web verify-runtime verify-inspector verify-interop
 

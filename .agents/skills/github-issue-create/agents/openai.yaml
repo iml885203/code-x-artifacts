@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Issue Review"
+  short_description: "Create Scrum-style issues with evidence and product-fit review"
+  default_prompt: "Use $github-issue-create to review this request against the current product and create a Scrum-style GitHub issue when it is ready."

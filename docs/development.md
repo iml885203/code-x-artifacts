@@ -43,6 +43,22 @@ make e2e
 See [test strategy](test-strategy.md) and the scoped `AGENTS.md` files before
 changing artifact contracts, authorization or sandbox behavior.
 
+## Agent workflows
+
+Repository skills are available under `.agents/skills` after cloning:
+
+- [`$github-issue-create`](../.agents/skills/github-issue-create/SKILL.md) checks
+  product fit and source evidence, then drafts/reviews a Scrum-style GitHub item.
+- [`$github-issue-implement`](../.agents/skills/github-issue-implement/SKILL.md)
+  implements a referenced issue using the project's checks and independent review.
+  It adapts Orbit's workflow; publishing, merging or updating a runtime still
+  requires authorization in the request/session.
+
+For example: `Use $github-issue-implement to implement issue #<number> and open a PR.`
+`make hooks` also creates `.claude/skills -> ../.agents/skills` for Claude Code,
+without replacing an existing file/link. Codex can discover `.agents/skills`
+directly; clients without skill discovery can read the linked `SKILL.md` files.
+
 ## Website
 
 The public website is static HTML, CSS and JavaScript under `website/`:
