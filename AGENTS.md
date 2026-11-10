@@ -18,3 +18,14 @@ Do not migrate the backend to TypeScript or Cloudflare native in this scope.
 - Run focused checks during iteration; browser checks for UI and sign-in changes.
 - Do not enable remote CI, buy services, or change unrelated deployments.
 - Keep changes small and use Conventional Commits.
+
+## Project skills
+
+- [github-issue-create](.agents/skills/github-issue-create/SKILL.md): refine and
+  review product need, evidence and acceptance criteria before creating an issue.
+- [github-issue-implement](.agents/skills/github-issue-implement/SKILL.md): implement
+  a referenced issue with isolation, verification and review; PR/merge/runtime
+  actions follow the user's authorized scope.
+
+Skills live in the repository; `make hooks` exposes them to Claude Code through
+an ignored `.claude/skills` link while preserving any existing custom entry.

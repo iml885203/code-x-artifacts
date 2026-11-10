@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Issue Implement"
+  short_description: "Implement CodeXArtifacts issues with review and verification"
+  default_prompt: "Use $github-issue-implement to implement the referenced CodeXArtifacts issue within the authorized scope."
