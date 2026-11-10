@@ -152,7 +152,7 @@ describe("the connect page", () => {
   it("lists the person's tokens by name and when they were made, and says so when there are none", async () => {
     const first = open();
     expect(screen.getByRole("heading", { name: "Your tokens" })).toBeInTheDocument();
-    expect(screen.getByText(/No tokens yet/)).toBeInTheDocument();
+    expect(screen.getByText(/No personal tokens yet/)).toBeInTheDocument();
     first.unmount();
     open("en", existing);
     const row = screen.getByRole("row", { name: /ci/ });

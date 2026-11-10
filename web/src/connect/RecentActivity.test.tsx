@@ -115,14 +115,14 @@ describe("personal recent activity", () => {
     pending[0]?.resolve(response(page()));
     await screen.findByText("Planning notes");
     const user = userEvent.setup();
-    await user.selectOptions(screen.getByLabelText("Token"), "t1");
-    await user.selectOptions(screen.getByLabelText("Token"), "t2");
+    await user.selectOptions(screen.getByLabelText("Access"), "t1");
+    await user.selectOptions(screen.getByLabelText("Access"), "t2");
     expect(pending[1]?.signal.aborted).toBe(true);
     pending[2]?.resolve(response(page([{ ...event, id: "current", tokenID: "t2", client: "Current client" }])));
     await screen.findByText("Current client");
     pending[1]?.resolve(response(page([{ ...event, id: "stale", client: "Stale client" }])));
     await waitFor(() => { expect(screen.queryByText("Stale client")).not.toBeInTheDocument(); });
-    expect(screen.getByLabelText("Token")).toHaveValue("t2");
+    expect(screen.getByLabelText("Access")).toHaveValue("t2");
   });
 
   it("keeps loaded rows on a pagination error, retries the same cursor and deduplicates overlapping events", async () => {
@@ -160,7 +160,7 @@ describe("personal recent activity", () => {
     await screen.findByText("Planning notes");
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Show activity for Laptop" }));
-    expect(screen.getByLabelText("Token")).toHaveValue("t1");
+    expect(screen.getByLabelText("Access")).toHaveValue("t1");
     await user.click(screen.getByRole("button", { name: "Revoke Laptop" }));
     const dialog = await screen.findByRole("alertdialog");
     await user.click(within(dialog).getByRole("button", { name: "Revoke" }));

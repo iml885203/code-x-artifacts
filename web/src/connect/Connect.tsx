@@ -47,6 +47,12 @@ export function Connect({ boot }: { boot: Boot }) {
   const [tokens, setTokens] = useState(data.tokens);
   const [activityToken, setActivityToken] = useState("");
   const [activityRevision, setActivityRevision] = useState(0);
+  const [manualOpen, setManualOpen] = useState(() => window.location.hash === "#tokens");
+  useEffect(() => {
+    const revealTokens = () => { if (window.location.hash === "#tokens") setManualOpen(true); };
+    window.addEventListener("hashchange", revealTokens);
+    return () => { window.removeEventListener("hashchange", revealTokens); };
+  }, []);
 
   // A token just made is in the list below it; the list is the server's, so ask again.
   useEffect(() => {
@@ -55,60 +61,56 @@ export function Connect({ boot }: { boot: Boot }) {
       console.error("list tokens", err);
     });
   }, [step.status]);
+  const tokenSetup = <>
+    <section className="step" aria-labelledby="step-1">
+      <h2 id="step-1"><span className="num mono">1</span>{t("connect.step1.title")}</h2>
+      <TokenStep step={step} onStep={setStep} />
+    </section>
+    <section className="step" aria-labelledby="step-2">
+      <h2 id="step-2"><span className="num mono">2</span>{t("connect.step2.title")}</h2>
+      {step.status !== "made" && <p className="lead">{format(t("connect.step2.waiting"), { placeholder: tokenPlaceholder })}</p>}
+      <ClientTabs baseUrl={data.baseUrl} token={token} />
+    </section>
+  </>;
+  const tokenManagement = <section className="step" id="tokens" aria-labelledby="step-tokens">
+    <h2 id="step-tokens">{t("connect.tokens.title")}</h2>
+    <TokenList items={tokens}
+      onActivity={(id) => {
+        setActivityToken(id);
+        document.getElementById("activity-token")?.focus({ preventScroll: true });
+        document.getElementById("recent-activity")?.scrollIntoView({ block: "start" });
+      }}
+      onRevoked={(id) => {
+        setTokens((list) => list.filter((x) => x.id !== id));
+        setActivityRevision((value) => value + 1);
+      }} />
+  </section>;
   return (
     <div className="library">
       <Nav boot={boot} />
       <main className="lib-main connect">
-      <div className="connect-content">
-        <h1>{t("connect.title")}</h1>
-        <p className="lead">{t(data.oauthEnabled ? "connect.oauth.intro" : "connect.intro")}</p>
-        {data.oauthEnabled && <OAuthSetup baseUrl={data.baseUrl} />}
-        <details className="connect-manual" open={!data.oauthEnabled}>
-          <summary>{t("connect.oauth.manual")}</summary>
-        <section className="step" aria-labelledby="step-1">
-          <h2 id="step-1">
-            <span className="num mono">1</span>
-            {t("connect.step1.title")}
-          </h2>
-          <TokenStep step={step} onStep={setStep} />
-        </section>
-        <section className="step" aria-labelledby="step-2">
-          <h2 id="step-2">
-            <span className="num mono">2</span>
-            {t("connect.step2.title")}
-          </h2>
-          {step.status !== "made" && (
-            <p className="lead">
-              {format(t("connect.step2.waiting"), {
-                placeholder: tokenPlaceholder,
-              })}
-            </p>
-          )}
-          <ClientTabs baseUrl={data.baseUrl} token={token} />
-        </section>
-        </details>
-        {data.oauthEnabled && <OAuthGrants />}
-        <section className="step" aria-labelledby="step-try">
-          <h2 id="step-try">{t("connect.try.title")}</h2>
-          <Code text={t("connect.try.prompt")} />
-        </section>
-        <section className="step" id="tokens" aria-labelledby="step-tokens">
-          <h2 id="step-tokens">{t("connect.tokens.title")}</h2>
-          <TokenList
-            items={tokens}
-            onActivity={(id) => {
-              setActivityToken(id);
-              document.getElementById("activity-token")?.focus({ preventScroll: true });
-              document.getElementById("recent-activity")?.scrollIntoView({ block: "start" });
-            }}
-            onRevoked={(id) => {
-              setTokens((list) => list.filter((x) => x.id !== id));
-              setActivityRevision((value) => value + 1);
-            }}
-          />
-        </section>
-        <RecentActivity tokenID={activityToken} onTokenIDChange={setActivityToken} refreshKey={activityRevision} />
-      </div>
+        <div className="connect-content">
+          <h1>{t("connect.title")}</h1>
+          <p className="lead">{t(data.oauthEnabled ? "connect.oauth.intro" : "connect.intro")}</p>
+          {data.oauthEnabled ? <OAuthSetup baseUrl={data.baseUrl} /> : tokenSetup}
+          <section className="step connect-try" aria-labelledby="step-try">
+            <h2 id="step-try">{t("connect.try.title")}</h2>
+            <p className="lead">{t("connect.try.where")}</p>
+            <Code text={t("connect.try.prompt")} />
+          </section>
+          <div className="connect-management">
+            <h2>{t("connect.manage.title")}</h2>
+            <p className="lead">{t("connect.manage.hint")}</p>
+            {data.oauthEnabled && <OAuthGrants onRefresh={() => { setActivityRevision((value) => value + 1); }} />}
+            {data.oauthEnabled ? <details className="connect-manual" open={manualOpen} onToggle={(event) => { setManualOpen(event.currentTarget.open); }}>
+              <summary>{t("connect.oauth.manual")}{tokens.length > 0 && <span className="manual-count">{format(t("connect.manual.count"), { count: String(tokens.length) })}</span>}</summary>
+              <p className="lead">{t("connect.manual.hint")}</p>
+              {tokenSetup}
+              {tokenManagement}
+            </details> : tokenManagement}
+            <RecentActivity tokenID={activityToken} onTokenIDChange={setActivityToken} refreshKey={activityRevision} />
+          </div>
+        </div>
       </main>
     </div>
   );
@@ -206,8 +208,9 @@ function ClientTabs({ baseUrl, token }: { baseUrl: string; token: string }) {
           <>
             <p className="lead">{t("connect.codex.run")}</p>
             <Code text={`${codexEnv(token)}\n${codexCommand(baseUrl)}`} />
-            <p className="lead">{t("connect.codex.config")}</p>
-            <Code text={codexConfig(baseUrl)} />
+            <details className="connect-config"><summary>{t("connect.codex.config")}</summary>
+              <Code text={codexConfig(baseUrl)} />
+            </details>
           </>
         )}
         {active === "other" && (

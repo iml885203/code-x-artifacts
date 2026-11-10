@@ -5,3 +5,25 @@
 .connect .agent-tabs .tab:focus-visible { outline-offset: -3px; }
 .connect .tab-panel { animation: none; }
 @media (max-width: 640px) { .connect .agent-tabs .tab { padding-inline: var(--space-3); font-size: 13px; } }
+
+.connect > .connect-content > .lead { max-width: 70ch; }
+.connect-instructions { margin: var(--space-4) 0 0; padding-inline-start: var(--space-5); }
+.connect-instructions li { padding-inline-start: var(--space-2); }
+.connect-instructions li + li { margin-top: var(--space-4); }
+.connect-instructions li::marker { color: var(--muted); font-variant-numeric: tabular-nums; }
+.connect-instructions p { margin: 0 0 var(--space-3); max-width: 70ch; }
+.connect-management { margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--line); }
+.connect-management > h2 { margin: 0 0 var(--space-2); }
+.connect-management > .lead { max-width: 70ch; }
+.connect-management .activity-heading h2 { margin: 0; }
+.connect-management .activity-heading { margin-top: var(--space-6); gap: var(--space-3); }
+.connect .connect-manual { margin-top: var(--space-6); }
+.connect-manual > summary { min-height: 44px; }
+.manual-count { margin-inline-start: var(--space-3); color: var(--muted); font-weight: 400; }
+.connect-config { margin-top: var(--space-4); }
+.connect-config > summary { cursor: pointer; padding-block: var(--space-2); min-height: 44px; }
+@media (max-width: 640px) {
+  .connect-management { margin-top: var(--space-8); }
+  .connect-instructions { padding-inline-start: var(--space-4); }
+  .manual-count { display: block; margin: var(--space-1) 0 0 var(--space-4); }
+}

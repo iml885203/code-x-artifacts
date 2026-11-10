@@ -11,7 +11,7 @@ test("Connect your agent: a token made in step 1 is filled into every client, co
   await expect(page).toHaveURL(/\/connect$/);
   await expect(page.getByRole("heading", { name: "Connect your agent" })).toBeVisible();
 
-  await page.getByText("Use a personal access token instead", { exact: true }).click();
+  await page.locator("details.connect-manual > summary").click();
 
   // Before a token exists the snippets carry a placeholder and this server's own address.
   const manual = page.locator("details.connect-manual");
@@ -57,7 +57,7 @@ test("Connect your agent: a token made in step 1 is filled into every client, co
   // The secret is nowhere in the address, and a reload does not bring it back.
   expect(page.url()).not.toContain(token);
   await page.reload();
-  await page.getByText("Use a personal access token instead", { exact: true }).click();
+  await page.locator("details.connect-manual > summary").click();
   await expect(page.getByRole("textbox", { name: "Token name" })).toHaveValue("");
   await expect(page.locator("body")).not.toContainText(token);
   await expect(page.locator("details .code pre", { hasText: "claude mcp add" })).toContainText("<YOUR_TOKEN>");
@@ -92,7 +92,6 @@ test("Your tokens: a token made in step 1 appears at once, and the old /tokens a
   await page.goto("/tokens");
   await expect(page).toHaveURL(/\/connect#tokens$/);
   await expect(page.getByRole("heading", { name: "Your tokens" })).toBeVisible();
-  await page.getByText("Use a personal access token instead", { exact: true }).click();
   await page.getByRole("textbox", { name: "Token name" }).fill("ci runner");
   await page.getByRole("button", { name: "Create token" }).click();
   await expect(page.getByRole("row", { name: /ci runner/ })).toBeVisible();
@@ -108,7 +107,7 @@ test("Your tokens: a token made in step 1 appears at once, and the old /tokens a
   const row = activity.getByRole("listitem").filter({ hasText: "Connect narrow layout client" });
   await expect(row).toBeVisible();
   await row.scrollIntoViewIfNeeded();
-  const filter = activity.getByLabel("Token", { exact: true });
+  const filter = activity.getByLabel("Access", { exact: true });
   await expect(filter).toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   for (const item of [row, filter, row.locator("time")]) {
@@ -124,8 +123,11 @@ test("Your tokens: a token made in step 1 appears at once, and the old /tokens a
 });
 
 
-test("OAuth browser consent connects two clients and revokes only the chosen client", async ({ page, request, baseURL }) => {
+test("OAuth browser consent connects two clients and revokes only the chosen client", async ({ page, request, baseURL, watch }) => {
   await signIn(page, "alice");
+  const managementPage = watch(await page.context().newPage());
+  await managementPage.goto("/connect");
+  await expect(managementPage.getByRole("button", { name: "Refresh authorizations" })).toBeEnabled();
   const resource = `${baseURL ?? ""}/api/mcp`;
   const metadata = await (await request.get("/.well-known/oauth-authorization-server")).json() as { registration_endpoint: string; authorization_endpoint: string; token_endpoint: string };
   const callbackServer = createServer((_req, res) => { res.setHeader("Content-Type", "text/html"); res.end("Connected. Return to your agent."); });
@@ -166,19 +168,19 @@ test("OAuth browser consent connects two clients and revokes only the chosen cli
   }
   expect(await initialize(first.access_token)).toBe(200);
   expect(await initialize(second.access_token)).toBe(200);
-  await page.goto("/connect");
-  const grants = page.locator("#oauth-grants");
+  await managementPage.getByRole("button", { name: "Refresh authorizations" }).click();
+  const grants = managementPage.locator("#oauth-grants");
   const row = grants.getByRole("row").filter({ hasText: "Browser OAuth first client" });
   await row.getByRole("button", { name: "Revoke" }).click();
-  const dialog = page.getByRole("alertdialog");
+  const dialog = managementPage.getByRole("alertdialog");
   await expect(dialog).toBeVisible();
   await dialog.getByRole("button", { name: "Revoke", exact: true }).click();
   await expect(row).toHaveCount(0);
   expect(await initialize(first.access_token)).toBe(401);
   expect(await initialize(second.access_token)).toBe(200);
-  await page.reload();
+  await managementPage.reload();
   await expect(grants.getByRole("row").filter({ hasText: "Browser OAuth second client" })).toBeVisible();
-  await page.setViewportSize({ width: 390, height: 844 });
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await managementPage.setViewportSize({ width: 390, height: 844 });
+  expect(await managementPage.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   } finally { await new Promise<void>((resolve, reject) => callbackServer.close((err) => { if (err) reject(err); else resolve(); })); }
 });
