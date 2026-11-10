@@ -36,7 +36,7 @@ func (s *Server) sessionUser(r *http.Request) (string, bool) {
 	if err != nil {
 		return "", false
 	}
-	return s.sessions.verify(c.Value, time.Now())
+	return s.sessions.verify(r.Context(), c.Value, time.Now())
 }
 
 // page serves a signed-in person's browser; anyone else is sent to sign in.

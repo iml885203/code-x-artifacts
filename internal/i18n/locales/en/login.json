@@ -15,5 +15,6 @@
   "login.oidc.retry": "Try again with {provider}",
   "login.error.oidcUnavailable": "Your sign-in provider is unavailable. Try again in a moment, or contact your workspace administrator.",
   "login.error.oidcInvalid": "This sign-in attempt expired or could not be verified. Start again to sign in.",
-  "login.error.oidcDenied": "Sign-in was cancelled or access was denied. Try again, or ask your workspace administrator for access."
+  "login.error.oidcDenied": "Sign-in was cancelled or access was denied. Try again, or ask your workspace administrator for access.",
+  "login.error.sessionChanged": "Your session format has changed. Sign in again to continue; your work is unchanged."
 }

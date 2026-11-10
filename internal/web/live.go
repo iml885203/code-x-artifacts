@@ -101,8 +101,9 @@ type live struct {
 // one artifact, and nothing else. The person's rights are decided again when
 // the socket opens, not read from the ticket.
 type ticket struct {
-	user, room string
-	expires    time.Time
+	user, room  string
+	sessionHash string
+	expires     time.Time
 }
 
 type ticketBook struct {
@@ -115,7 +116,7 @@ func newTicketBook(clock Clock) *ticketBook {
 	return &ticketBook{clock: clock, byID: map[string]ticket{}}
 }
 
-func (b *ticketBook) issue(user, room string) string {
+func (b *ticketBook) issue(user, room, sessionHash string) string {
 	var raw [24]byte
 	if _, err := rand.Read(raw[:]); err != nil {
 		panic(fmt.Sprintf("no randomness for a ticket: %v", err))
@@ -139,21 +140,21 @@ func (b *ticketBook) issue(user, room string) string {
 	if mine >= maxTicketsPerUser {
 		delete(b.byID, oldest)
 	}
-	b.byID[id] = ticket{user: user, room: room, expires: now.Add(ticketLife)}
+	b.byID[id] = ticket{user: user, room: room, sessionHash: sessionHash, expires: now.Add(ticketLife)}
 	return id
 }
 
 // redeem spends a ticket. It is spent whatever the answer: a ticket that was
 // presented for the wrong artifact, or too late, is not kept for another try.
-func (b *ticketBook) redeem(id, room string) (user string, ok bool) {
+func (b *ticketBook) redeem(id, room string) (ticket, bool) {
 	b.mu.Lock()
 	t, found := b.byID[id]
 	delete(b.byID, id)
 	b.mu.Unlock()
 	if !found || !b.clock.Now().Before(t.expires) || t.room != room {
-		return "", false
+		return ticket{}, false
 	}
-	return t.user, true
+	return t, true
 }
 
 func newLive(cfg Config, svc *service.Service) *live {
@@ -212,8 +213,12 @@ func (s *Server) liveTicket(w http.ResponseWriter, r *http.Request) {
 		s.serverError(w, err)
 		return
 	}
+	sessionHash := ""
+	if c, err := r.Cookie(sessionCookie); err == nil {
+		sessionHash = s.sessions.sign("browser:" + c.Value)
+	}
 	writeJSON(w, http.StatusOK, map[string]any{
-		"ticket":           s.live.tickets.issue(currentUser(r), id),
+		"ticket":           s.live.tickets.issue(currentUser(r), id, sessionHash),
 		"epoch":            epoch,
 		"expiresInSeconds": int(ticketLife / time.Second),
 		"path":             "/ws/" + id,
@@ -273,7 +278,7 @@ func (s *Server) liveSocket(w http.ResponseWriter, r *http.Request) {
 		jsonError(w, http.StatusForbidden, "cross-origin socket refused")
 		return
 	}
-	user, ok := s.live.tickets.redeem(r.URL.Query().Get("ticket"), room)
+	ticket, ok := s.live.tickets.redeem(r.URL.Query().Get("ticket"), room)
 	if !ok {
 		jsonError(w, http.StatusUnauthorized, "the ticket is missing, used, expired or for another artifact; ask for a new one")
 		return
@@ -281,7 +286,7 @@ func (s *Server) liveSocket(w http.ResponseWriter, r *http.Request) {
 	// Admission covers rights and Join, never the connection's lifetime.
 	ctx, cancel := context.WithCancel(context.WithoutCancel(r.Context()))
 	defer cancel()
-	c, peer := s.openLivePeer(ctx, w, r, user, room)
+	c, peer := s.openBrowserLivePeer(ctx, w, r, ticket, room)
 	if peer == nil {
 		return
 	}
@@ -289,6 +294,21 @@ func (s *Server) liveSocket(w http.ResponseWriter, r *http.Request) {
 	readerDone := make(chan struct{})
 	go s.socketReads(ctx, readerDone, c, peer)
 	s.socketWrites(ctx, readerDone, c, peer)
+}
+
+// The browser authority gate covers credential validation through Join, not a
+// socket's lifetime. A revocation cannot acknowledge between those operations.
+func (s *Server) openBrowserLivePeer(ctx context.Context, w http.ResponseWriter, r *http.Request, ticket ticket, room string) (*websocket.Conn, *realtime.Peer) {
+	if ticket.sessionHash != "" {
+		s.browserAdmission.RLock()
+		defer s.browserAdmission.RUnlock()
+		user, err := s.store.BrowserSession(ctx, ticket.sessionHash, time.Now())
+		if err != nil || user != ticket.user {
+			jsonError(w, http.StatusUnauthorized, "browser session expired or revoked")
+			return nil, nil
+		}
+	}
+	return s.openLivePeer(ctx, w, r, ticket.user, room)
 }
 
 // openLivePeer prevents a join from straddling an authority-change watcher.

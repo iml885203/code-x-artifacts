@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/go-jose/go-jose/v4"
 	"golang.org/x/oauth2"
 )
 
@@ -33,15 +34,18 @@ var ErrOIDCUnavailable = errors.New("OIDC provider is temporarily unavailable")
 type OIDCIdentity struct {
 	Issuer, Subject, DisplayName, Email string
 	Groups                              []string
+	IssuedAt                            float64
 }
 
 // OIDC is a single configured provider and its validated protocol endpoints.
 type OIDC struct {
-	cfg      OIDCConfig
-	oauth    oauth2.Config
-	verifier *oidc.IDTokenVerifier
-	client   *http.Client
-	failures *atomic.Uint64
+	logoutKeys       oidc.KeySet
+	logoutAlgorithms []jose.SignatureAlgorithm
+	cfg              OIDCConfig
+	oauth            oauth2.Config
+	verifier         *oidc.IDTokenVerifier
+	client           *http.Client
+	failures         *atomic.Uint64
 }
 
 // NewOIDC performs bounded discovery at startup and fails closed on invalid
@@ -79,8 +83,9 @@ func NewOIDC(ctx context.Context, cfg OIDCConfig) (*OIDC, error) {
 	}
 	endpoint := provider.Endpoint()
 	var metadata struct {
-		JWKS string   `json:"jwks_uri"`
-		PKCE []string `json:"code_challenge_methods_supported"`
+		JWKS    string   `json:"jwks_uri"`
+		PKCE    []string `json:"code_challenge_methods_supported"`
+		Signing []string `json:"id_token_signing_alg_values_supported"`
 	}
 	if err := provider.Claims(&metadata); err != nil {
 		return nil, errors.New("invalid OIDC discovery metadata")
@@ -93,8 +98,12 @@ func NewOIDC(ctx context.Context, cfg OIDCConfig) (*OIDC, error) {
 	if len(metadata.PKCE) > 0 && !slices.Contains(metadata.PKCE, "S256") {
 		return nil, errors.New("OIDC provider must support PKCE S256")
 	}
+	algorithms := logoutSigningAlgorithms(metadata.Signing)
+	if len(algorithms) == 0 {
+		return nil, errors.New("OIDC provider has no supported asymmetric signing algorithm")
+	}
 	scopes := oidcScopes(cfg.Scopes)
-	return &OIDC{cfg: cfg, client: &client, failures: failures, oauth: oauth2.Config{ClientID: cfg.ClientID, ClientSecret: cfg.ClientSecret, RedirectURL: cfg.Origin + "/auth/oidc/callback", Endpoint: endpoint, Scopes: scopes}, verifier: provider.VerifierContext(context.WithoutCancel(ctx), &oidc.Config{ClientID: cfg.ClientID})}, nil
+	return &OIDC{logoutKeys: oidc.NewRemoteKeySet(context.WithoutCancel(ctx), metadata.JWKS), logoutAlgorithms: algorithms, cfg: cfg, client: &client, failures: failures, oauth: oauth2.Config{ClientID: cfg.ClientID, ClientSecret: cfg.ClientSecret, RedirectURL: cfg.Origin + "/auth/oidc/callback", Endpoint: endpoint, Scopes: scopes}, verifier: provider.VerifierContext(context.WithoutCancel(ctx), &oidc.Config{ClientID: cfg.ClientID})}, nil
 }
 
 func oidcScopes(configured []string) []string {
@@ -213,7 +222,7 @@ func (o *OIDC) profile(id *oidc.IDToken, claims map[string]any) (OIDCIdentity, e
 			mapped = append(mapped, internal)
 		}
 	}
-	return OIDCIdentity{Issuer: id.Issuer, Subject: id.Subject, DisplayName: name, Email: email, Groups: mapped}, nil
+	return OIDCIdentity{IssuedAt: claims["iat"].(float64), Issuer: id.Issuer, Subject: id.Subject, DisplayName: name, Email: email, Groups: mapped}, nil
 }
 
 func (o *OIDC) allowed(subject string, groups []string) bool {
