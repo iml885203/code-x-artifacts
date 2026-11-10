@@ -96,7 +96,7 @@ test("a card says who can open it with an icon and wears a badge for its type, a
   // The author's name is whole beside the time, not cut to a letter.
   await expect(phoneCard.locator("time")).toHaveText("Edited 30 minutes ago");
   const author = await phoneCard.locator(".card-author-name").evaluate((n) => ({ text: n.textContent, shown: n.clientWidth, needs: n.scrollWidth }));
-  expect(author.text).toBe("alice");
+  expect(author.text).toBe("ALICE");
   expect(author.shown).toBeGreaterThan(0);
   expect(author.shown).toBeGreaterThanOrEqual(author.needs);
   const phoneBox = await phoneCard.boundingBox(); // page-level
@@ -186,7 +186,7 @@ test("carol does not see bob's pin, groups the library by owner as a list, and f
   await carol.getByRole("button", { name: /^Group by/ }).click();
   await carol.getByRole("menuitemradio", { name: "Owner" }).click();
   await carol.getByRole("button", { name: "List" }).click();
-  const underBob = () => carol.getByRole("region", { name: "bob" }).locator(`li.lib-row[data-artifact-id="${a.id}"]`);
+  const underBob = () => carol.getByRole("region", { name: "BOB", exact: true }).locator(`li.lib-row[data-artifact-id="${a.id}"]`);
   await expect(underBob()).toBeVisible();
   await carol.reload();
   await expect(carol.getByRole("button", { name: "List" })).toHaveAttribute("aria-pressed", "true");

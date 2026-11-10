@@ -11,6 +11,8 @@ export interface Artifact {
   /** The number of the newest saved version. */
   version: number;
   author: string;
+  /** Presentation only; author remains the stable account identity. */
+  authorDisplayName?: string;
   visibility: string;
   createdAt: string;
   updatedAt: string;

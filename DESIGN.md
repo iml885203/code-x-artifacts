@@ -281,3 +281,5 @@ artifacts, selected by default inside the same product-view selector. It preserv
 search, grouping, sidebar and multiple artifact cards in one view. Gallery card
 footers align type icons to the first title line; titles occupy only their actual
 height (clamped at two lines), with the time and author directly below at an 8px gap.
+
+Library author labels and initials use the persisted display name, falling back to the account identifier. Owner headings use the same name in grid and list layouts. Identity-based grouping and ownership remain tied to the account, even when names match.

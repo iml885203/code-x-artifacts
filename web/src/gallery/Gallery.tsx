@@ -1,3 +1,4 @@
+import { authorName } from "./author";
 import { Tooltip } from "../Tooltip";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
@@ -51,7 +52,7 @@ function headerOf(g: Group, t: (key: Key) => string): string | null {
     case "none":
       return null;
     case "owner":
-      return g.owner;
+      return g.items[0] === undefined ? g.owner : authorName(g.items[0]);
     case "date":
       return t(dateLabel[g.key]);
     case "kind":

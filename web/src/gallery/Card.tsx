@@ -6,6 +6,7 @@ import { inApp, useRouter } from "../router";
 import { KindMark } from "../kinds/KindMark";
 import { displayOf, kindsTable } from "../kinds/kinds";
 import { Audience, AuthorFace, RenameField, useItemActions } from "./itemActions";
+import { authorName } from "./author";
 import { Preview } from "./Preview";
 
 interface Props {
@@ -39,8 +40,8 @@ export function Card({ artifact: a, beforePin }: Props) {
           <div className="card-sub">
             <RelativeTime iso={a.updatedAt} sentence="time.edited" />
             <span className="card-author">
-              <AuthorFace name={a.author} />
-              <span className="card-author-name">{a.author}</span>
+              <AuthorFace name={authorName(a)} />
+              <span className="card-author-name">{authorName(a)}</span>
             </span>
           </div>
         </div>

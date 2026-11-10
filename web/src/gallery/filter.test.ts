@@ -31,3 +31,10 @@ describe("visibleArtifacts", () => {
     expect(titles("all", "report alice")).toEqual(["Sprint report"]);
   });
 });
+
+it("searches displayed names without confusing ownership when names match", () => {
+  const people = [artifact({ id: "one", title: "First", author: "oidc:one", authorDisplayName: "Same Name" }), artifact({ id: "two", title: "Second", author: "oidc:two", authorDisplayName: "Same Name" })];
+  expect(visibleArtifacts(people, "all", "same name", "oidc:one")).toHaveLength(2);
+  expect(visibleArtifacts(people, "mine", "same name", "oidc:one").map((a) => a.id)).toEqual(["one"]);
+  expect(visibleArtifacts(people, "shared", "oidc:two", "oidc:one").map((a) => a.id)).toEqual(["two"]);
+});
