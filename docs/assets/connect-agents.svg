@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="480" viewBox="0 0 960 480" role="img" aria-labelledby="title desc">
+  <title id="title">Multiple AI agents, one CodeXArtifacts workspace</title>
+  <desc id="desc">Claude Code, Codex, Cursor, OpenCode and other MCP clients each connect using their own personal token through the MCP endpoint to the same CodeXArtifacts workspace, with shared artifacts, files and versions subject to token permissions.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#ad4968" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+  <rect width="960" height="480" rx="22" fill="#f5f3ed"/>
+  <g fill="none" stroke="#c39aa8" stroke-width="2">
+    <path d="M232 76C285 76 285 230 338 230"/>
+    <path d="M232 154C285 154 285 230 338 230"/>
+    <path d="M232 232H338"/>
+    <path d="M232 310C285 310 285 230 338 230"/>
+    <path d="M232 388C285 388 285 230 338 230"/>
+  </g>
+  <path d="M474 230H553" fill="none" stroke="#ad4968" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
+    <g fill="#fff" stroke="#d8d1d1">
+      <rect x="28" y="46" width="204" height="60" rx="12"/>
+      <rect x="28" y="124" width="204" height="60" rx="12"/>
+      <rect x="28" y="202" width="204" height="60" rx="12"/>
+      <rect x="28" y="280" width="204" height="60" rx="12"/>
+      <rect x="28" y="358" width="204" height="60" rx="12"/>
+    </g>
+    <g fill="#211e20" font-size="22" font-weight="600">
+      <text x="130" y="84">Claude Code</text>
+      <text x="130" y="162">Codex</text>
+      <text x="130" y="240">Cursor</text>
+      <text x="130" y="318">OpenCode</text>
+      <text x="130" y="396">Other MCP clients</text>
+    </g>
+    <rect x="338" y="193" width="136" height="76" rx="14" fill="#f5e8ed" stroke="#ad4968"/>
+    <text x="406" y="227" fill="#8e3451" font-size="25" font-weight="600">MCP</text>
+    <text x="406" y="250" fill="#6b4a56" font-size="14">HTTP + token</text>
+    <text x="406" y="302" fill="#625b60" font-family="monospace" font-size="15">/api/mcp</text>
+  </g>
+  <rect x="560" y="92" width="372" height="294" rx="18" fill="#fff" stroke="#d8d1d1"/>
+  <g transform="translate(590 122) scale(1.5)" fill="#ad4968"><path d="M3 3H15V9L9 15H3Z M16 10H22V22H10V16Z"/></g>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="637" y="149" fill="#211e20" font-size="28" font-weight="700">CodeXArtifacts</text>
+    <text x="590" y="202" fill="#211e20" font-size="24" font-weight="600">The same workspace.</text>
+    <text x="590" y="232" fill="#625b60" font-size="17">Artifacts · files · versions</text>
+    <path d="M590 256H902" stroke="#e5dfe1"/>
+    <g fill="#f5e8ed">
+      <rect x="590" y="278" width="96" height="31" rx="7"/>
+      <rect x="696" y="278" width="60" height="31" rx="7"/>
+      <rect x="766" y="278" width="75" height="31" rx="7"/>
+      <rect x="590" y="322" width="86" height="31" rx="7"/>
+      <rect x="686" y="322" width="77" height="31" rx="7"/>
+    </g>
+    <g fill="#8e3451" font-size="16" text-anchor="middle">
+      <text x="638" y="299">Web page</text><text x="726" y="299">Doc</text><text x="803.5" y="299">Slides</text>
+      <text x="633" y="343">Design</text><text x="724.5" y="343">Board</text>
+    </g>
+    <text x="480" y="455" text-anchor="middle" fill="#625b60" font-size="16">Separate client tokens. Shared work. Your existing permissions.</text>
+  </g>
+</svg>

@@ -47,28 +47,39 @@ Prefer containers? Follow the [Docker Compose instructions](docs/deployment.md#d
 
 ## Connect your agent
 
-```mermaid
-flowchart LR
-  clients["AI agents"]
-  workspace["CodeXArtifacts"]
-  clients -->|MCP| workspace
-  classDef client fill:#f5f3ed,stroke:#d8d1d1,color:#211e20;
-  classDef shared fill:#f5e8ed,stroke:#ad4968,color:#211e20;
-  class clients client;
-  class workspace shared;
-```
+![Claude Code, Codex, Cursor, OpenCode and other MCP clients connect through MCP to the same CodeXArtifacts workspace](docs/assets/connect-agents.svg)
 
-Claude Code, Codex, Cursor, OpenCode and other compatible MCP clients can use the same workspace.
+Connect multiple agents to the same artifacts. Give each client its own personal
+token so you can name, track and revoke its access independently.
 
-1. Open **Connect your agent** in the app.
-2. Create a personal token and copy the connection settings for your client.
-3. Add the MCP server in that client, then ask:
+1. Open **Connect your agent** in the app and create a token for your first client.
+2. Copy the generated settings into that client. For another client, create a separate token.
+3. Ask the first agent to create an artifact:
 
    > Publish a one-page project overview to CodeXArtifacts.
 
-You can connect multiple clients to the same workspace. Tokens use your existing
-artifact permissions and can be revoked individually. Clients need Streamable HTTP
-and Bearer-token support; browser OAuth is not supported.
+4. Continue from a different connected agent:
+
+   > Open the project overview in CodeXArtifacts and add a next-steps section.
+
+Both agents work in the same workspace; you can inspect the result in the browser.
+Each client connects independently with its token owner's artifact permissions.
+
+<details>
+<summary>Manual connection settings</summary>
+
+| Setting | Value for the local quick start |
+|---|---|
+| Server URL | `http://localhost:8080/api/mcp` |
+| Transport | Streamable HTTP |
+| Authentication | `Authorization: Bearer <YOUR_TOKEN>` |
+
+For a remote workspace, use its HTTPS address instead of `localhost`.
+Use your client's remote MCP configuration format; the app provides ready-to-copy
+settings for Claude Code and Codex, plus a generic JSON example for other clients.
+Browser OAuth is not supported.
+
+</details>
 
 ## Limitations
 
