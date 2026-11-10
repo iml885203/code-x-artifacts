@@ -54,20 +54,49 @@ Simple bind is used only over LDAPS; other LDAP connections use NTLM.
 
 ## Docker
 
-The Compose application runs as uid/gid 65532 and uses one named `data` volume.
-Build it, initialize accounts once, read the password, then start it:
+The published image is `ghcr.io/iml885203/code-x-artifacts:v0.1.0`, for Linux
+AMD64 and ARM64. Download [the release Compose file](https://github.com/iml885203/code-x-artifacts/releases/download/v0.1.0/compose.release.yaml)
+as `compose.yaml` in a new directory. It pulls the image without a source checkout
+or build tools, runs as uid/gid 65532, binds only `127.0.0.1:8080`, and keeps all
+application data in one named `data` volume:
 
 ```sh
-docker compose build
+docker compose pull app
 docker compose run --rm app init /data
 docker compose run --rm password cat /data/admin-password
 docker compose run --rm password rm /data/admin-password
 docker compose up -d
 ```
 
-The `password` helper has no listener and uses the same non-root identity.
-Save the password before deleting its plaintext bootstrap file. The bcrypt account
-file remains. The image contains no runtime Node.js or shell.
+Save the generated password privately before deleting its plaintext bootstrap
+file; the bcrypt account file remains. The `password` helper has no listener and
+uses the same non-root identity. The server image contains no runtime Node.js or
+shell; `/licenses` carries the project and third-party notices. The image's
+`codexartifacts healthcheck` command probes the configured local listener within
+three seconds without opening SQLite or loading sign-in configuration. Container
+health is liveness, not proof that login or persistence works.
+
+The original `compose.yaml` in a source checkout remains a build-based option:
+run `docker compose build` before the same initialization/start steps above.
+Do not use a source-build Compose file as a replacement for a deployed release
+file without preserving its project name and data volume.
+
+### Updates
+
+Use a concrete version, never an automatically moving `latest` tag. The matching
+GitHub release's `image.json` records the source revision, multi-platform manifest
+digest and platforms. To pin the exact published content, replace the app's image
+with `ghcr.io/iml885203/code-x-artifacts@sha256:<recorded-digest>`; Docker selects
+the matching platform. Keep the recorded previous image and compatible data backup.
+
+Before updating, stop this app and back up its full volume as described below.
+Edit only the image reference in the existing release Compose file, then pull and
+recreate the app with that same Compose project and volume. Verify sign-in,
+representative artifacts, uploads and editing. Never run `down -v` for an update.
+An older image is not a database rollback; restore a matching backup into a
+separate volume if schema compatibility requires it. In particular, do not
+restore revoked browser sessions or roll back to stateless sessions without
+following [OIDC session recovery](oidc.md#upgrade-and-rollback).
 
 For a remote deployment, put a trusted HTTPS reverse proxy in front of the
 loopback port, configure login rate limiting and request-size/time limits there,

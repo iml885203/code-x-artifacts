@@ -18,6 +18,7 @@ Start with the [quick start](../README.md#quick-start) and
 ## Contributing
 
 - [Development, verification and website preview](development.md)
+- [Maintainer container release procedure](releasing.md)
 
 ## Architecture
 

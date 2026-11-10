@@ -26,6 +26,25 @@ you choose who can view or edit them. See [format details and exports](docs/arti
 
 ## Quick start
 
+With Docker and Compose, download [compose.release.yaml](https://github.com/iml885203/code-x-artifacts/releases/download/v0.1.0/compose.release.yaml)
+as `compose.yaml` into a new directory, then run:
+
+```sh
+docker compose pull app
+docker compose run --rm app init /data
+docker compose run --rm password cat /data/admin-password
+# Store the password privately before removing the bootstrap file.
+docker compose run --rm password rm /data/admin-password
+docker compose up -d
+```
+
+Open **http://localhost:8080** and sign in as `admin` with the saved password.
+The image supports Linux AMD64 and ARM64. Docker keeps
+accounts, artifacts and uploads in the Compose data volume. See
+[deployment and updates](docs/deployment.md#docker) for HTTPS, OIDC and backups.
+
+### Build from source
+
 Install **Go 1.27.1, Git and Make**, then run:
 
 ```sh

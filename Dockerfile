@@ -37,7 +37,16 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags=
 RUN mkdir /data
 
 FROM gcr.io/distroless/static-debian12:nonroot
+ARG VERSION=dev
+ARG REVISION=unknown
+LABEL org.opencontainers.image.source="https://github.com/iml885203/code-x-artifacts" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${REVISION}" \
+      org.opencontainers.image.licenses="MIT"
+COPY LICENSE THIRD_PARTY_NOTICES.md /licenses/
+COPY docs/licenses /licenses/third-party/
 COPY --chown=65532:65532 --from=build /data /data
 WORKDIR /data
 COPY --from=build /codexartifacts /codexartifacts
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 CMD ["/codexartifacts", "healthcheck"]
 ENTRYPOINT ["/codexartifacts"]

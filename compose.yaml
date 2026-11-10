@@ -2,6 +2,7 @@ services:
   app:
     build: .
     restart: unless-stopped
+    stop_grace_period: 30s
     environment:
       PICTOR_ADDR: "0.0.0.0:8080"
       PICTOR_DB: /data/codexartifacts.db
