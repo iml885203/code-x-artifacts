@@ -3,6 +3,7 @@ services:
   app:
     image: ghcr.io/iml885203/code-x-artifacts:v0.1.0
     restart: unless-stopped
+    stop_grace_period: 30s
     environment:
       PICTOR_ADDR: "0.0.0.0:8080"
       PICTOR_DB: /data/codexartifacts.db

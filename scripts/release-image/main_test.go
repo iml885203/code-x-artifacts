@@ -26,7 +26,7 @@ func exerciseRelease(t *testing.T, scenario string) {
 			t.Fatal(err)
 		}
 	}
-	env := append(os.Environ(), "GIT_CONFIG_GLOBAL="+os.DevNull, "GIT_CONFIG_NOSYSTEM=1")
+	env := isolatedGitEnvironment(append(os.Environ(), "GIT_DIR=/must-not-use-parent-repository", "GIT_INDEX_FILE=/must-not-use-parent-index"))
 	git := func(args ...string) {
 		t.Helper()
 		command := exec.CommandContext(t.Context(), "git", args...) //nolint:gosec // G204: fixed git executable, only test-owned arguments/paths.
@@ -153,4 +153,16 @@ func checkReleaseEvidence(t *testing.T, version, output, calls string) {
 	if !strings.Contains(string(invocation), "--platform linux/amd64,linux/arm64") || !strings.Contains(string(invocation), "--push") {
 		t.Fatal("missing dual-platform publication")
 	}
+}
+
+// Git hooks export repository selectors. A fixture must never inherit those
+// selectors or accidentally stage/change the contributor's real checkout.
+func isolatedGitEnvironment(input []string) []string {
+	var result []string
+	for _, entry := range input {
+		if !strings.HasPrefix(entry, "GIT_") {
+			result = append(result, entry)
+		}
+	}
+	return append(result, "GIT_CONFIG_GLOBAL="+os.DevNull, "GIT_CONFIG_NOSYSTEM=1")
 }
