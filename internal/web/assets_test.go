@@ -449,7 +449,7 @@ func TestAGrantIsStableForAnHourExpiresAfterSixAndOnlyFitsItsArtifact(t *testing
 	if _, ok := (sessions{key: []byte("other")}).openGrant(g, "art1", at); ok {
 		t.Error("a grant signed with another key was accepted")
 	}
-	if _, ok := s.verify(g, at); ok {
+	if _, ok := s.verify(t.Context(), g, at); ok {
 		t.Error("a grant was accepted as a session cookie")
 	}
 }

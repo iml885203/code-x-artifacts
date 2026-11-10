@@ -20,3 +20,5 @@
 
 - **OIDC is an alternative configured browser login mode. Discovery/code exchange/JWKS use bounded fetches and normal TLS verification (HTTP loopback development only). Code uses PKCE S256; signed ID tokens must bind nonce, issuer, audience and authorized party. Subject/group admission intersects all configured restrictions; trusting provider assignment never bypasses a restriction. Provider groups enter application profiles only through an explicit map.**
   Tests: `TestOIDCRejectsInvalidTokensAndRestrictedIdentities`, `TestOIDCUntrustedTokenSignatureCannotCreateASession`, `TestOIDCAdmissionIntersectsSubjectAndGroupRestrictions`, `TestOIDCConfigurationRequiresTrustedEndpointsAndExplicitAdmission` (internal/web).
+
+- **Back-channel logout is a separate signed token type, restricted to the configured provider, subject-wide sub without sid, bounded issuance/expiry, event and replay identifier, and no nonce. Its trusted JWKS transport is bounded like login; ID/access tokens cannot substitute for logout tokens.** Tests: `TestOIDCLogoutRevokesOnlyTheSubjectAndRejectsInvalidNotifications` (internal/web).

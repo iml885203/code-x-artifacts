@@ -96,11 +96,67 @@ and `OIDC_ORIGIN`. Do not copy provider tokens into agent configuration.
 
 ## Logout, outages and recovery
 
-Application logout clears its browser session. It does not sign the user out at
-the provider or invalidate a copy of an issued session. The existing application
-session lifetime is seven days. Upstream account removal/logout does not immediately
-revoke existing application sessions, PATs or MCP grants. Provider-wide/back-channel
-logout and automatic deprovisioning are outside this release.
+Browser sessions use random opaque cookies and durable keyed indexes in SQLite,
+with the existing seven-day lifetime. Application logout revokes the current
+session (including retained cookie copies), clears session/pending-login cookies,
+and returns to explicit login. It does not sign the user out at the provider or
+revoke other devices, PATs or MCP grants.
+
+### Subject-wide back-channel logout
+
+Register the exact HTTPS receiver `<application origin>/auth/backchannel-logout`
+on the configured OIDC client. It accepts POST form `logout_token` notifications
+signed by that provider, with `typ=logout+jwt`, the correct issuer/audience,
+`sub`, `jti`, the back-channel logout event, valid `iat`/`exp`, and no `nonce` or
+`sid`. This initial receiver supports subject-wide notifications (including
+Pocket ID); sid-only and sub+sid notifications are rejected rather than broadened
+to every session. Tokens may live at most five minutes, with at most one minute
+of future issuance allowance. Providers with different token profiles need
+separate interoperability validation.
+
+After a valid notification commits, all browser sessions for the exact
+issuer/subject are invalid. Unknown subjects create no account but retain a
+cutoff to block callbacks already in flight. Callbacks issued at/before the
+cutoff or started before notification receipt cannot recreate a session; a
+same-second sign-in may need retry. Identical `jti` replay succeeds without
+repeating revocation, including across restart. A freshly signed provider retry
+is a new subject-wide event and can revoke a later login.
+
+Private HTTP requests and new browser socket handshakes reject revoked sessions,
+including tickets issued before revocation. Already-open realtime connections
+can remain until their existing maximum one-hour lifetime. Previously issued
+artifact/file grants keep their existing up-to-six-hour lifetime and artifact
+permission checks; delivered content cannot be recalled. Browser-session
+revocation does not revoke these capabilities or independent PAT/MCP grants.
+
+Each authentication table has a 10,000-record cap: active browser sessions,
+subject cutoffs, and unexpired event replay markers. Sessions expire after seven
+days; cutoffs remain eight days (covering the session and ten-minute callback
+windows), and replay markers remain until token expiry. Expired records are
+cleaned on session creation/notification. Capacity exhaustion refuses new
+sessions or returns retryable 503 for notifications, without discarding active
+protection; investigate load and retry after expiry.
+
+Ordinary provider logout is not global application logout. Administrative
+account/group/client-access changes revoke application sessions only when the
+provider sends and successfully delivers a supported notification. Outages,
+exhausted provider retries, and unsupported events may leave sessions valid
+until expiry; restore delivery and revoke sessions through a supported provider
+administrative action. Do not assume missed notifications are replayed forever.
+Invalid tokens return 400; transient key-fetch/storage failures return 503 and
+success is sent only after durable revocation.
+
+### Upgrade and rollback
+
+This session-format upgrade invalidates old stateless browser cookies once; the
+login page asks those users to sign in again. Accounts, artifacts, ownership,
+PATs, MCP grants and the stored signing key are preserved. Back up the stopped
+application's full data directory before upgrading. Never restore old session
+state to recover revoked sessions. Rolling back to a stateless-session binary
+can resurrect old signed cookies: invalidate/rotate its signing key as part of
+rollback (also invalidating existing signed artifact/file grants), or keep the
+revocable-session version. This is an explicit recovery operation, not an
+ordinary image rollback. Test recovery against a separate data copy first.
 
 Provider outages block new sign-ins; invalid callbacks create no session. Existing
 sessions keep their normal lifetime. Invalid configuration fails closed rather
@@ -110,7 +166,7 @@ For recovery, stop the app, restore the prior local/LDAP mode and its private
 account file or directory settings, then restart against the same data directory.
 Keep those settings/backups before switching. This restores a login mode without
 merging identities or transferring artifacts. If recovering from a compromise,
-plan separate session and credential invalidation.
+plan separate session and credential invalidation; switching login modes alone does not revoke existing sessions.
 
 ## Verified providers
 
@@ -129,3 +185,13 @@ separate Go integration tests; they were not exercised against these live
 providers. Pocket ID's passkey was a browser test authenticator, not a physical
 security key. Remote HTTPS deployments and other versions/connectors have not
 been exercised and are not claimed verified.
+
+Back-channel logout was separately verified with official Pocket ID 2.19.1 on
+isolated loopback HTTP origins using Chrome and a CDP virtual passkey: actual
+OIDC login, local logout, rejection of a retained cookie, re-login and an
+administrative account-disable notification followed by private API rejection
+passed. A second run used a public HTTPS application/callback/notification
+origin behind Cloudflare Tunnel with the same isolated loopback HTTP provider;
+login and notification-driven rejection passed there too. This is synthetic-account
+interoperability evidence, not proof of a physical passkey or a remote HTTPS
+identity-provider deployment.

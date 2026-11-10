@@ -807,7 +807,7 @@ func TestAPageGrantIsStableForAnHourExpiresAfterSixAndOnlyFitsItsArtifactAndVers
 	if _, _, ok := s.openPageGrant(s.grant("art1", store.VisibilityPrivate, at), "art1", at); ok {
 		t.Error("an asset's grant opened a page")
 	}
-	if _, ok := s.verify(g, at); ok {
+	if _, ok := s.verify(t.Context(), g, at); ok {
 		t.Error("a page grant was accepted as a session cookie")
 	}
 }

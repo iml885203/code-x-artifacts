@@ -21,9 +21,11 @@ unset PASSWORD
 Paste the resulting hash into the private JSON file. Passwords must be 12–72 bytes.
 Accounts in the file can sign in; group membership is shared with the existing
 artifact authorization model. There is no signup or email password reset.
-Removing an account blocks new sign-ins; to revoke its existing sessions and
-personal tokens, stop the service and invalidate the account's sessions/tokens
-before exposing it again. Account removal alone is not immediate session revocation.
+Removing an account blocks new sign-ins but does not immediately revoke existing
+sessions or personal tokens. Local logout revokes only the current browser session.
+OIDC deployments can use [subject-wide back-channel logout](oidc.md#subject-wide-back-channel-logout);
+PATs and MCP grants remain independently revoked. For a compromise, stop the
+service and plan session/credential invalidation before exposing it again.
 
 For centrally managed identities, configure [OIDC browser sign-in](oidc.md), for
 example with Pocket ID. OIDC is an alternative authentication mode and does not

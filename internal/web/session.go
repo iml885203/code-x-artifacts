@@ -1,9 +1,11 @@
 package web
 
 import (
+	"context"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/hmac"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
@@ -18,30 +20,36 @@ import (
 const sessionCookie = "pictor_session"
 
 type sessions struct {
-	key []byte
-	ttl time.Duration
+	key   []byte
+	store *store.Store
+	ttl   time.Duration
 }
 
-func (s sessions) issue(username string, now time.Time) string {
-	payload := base64.RawURLEncoding.EncodeToString([]byte(username + "|" + strconv.FormatInt(now.Add(s.ttl).Unix(), 10)))
-	return payload + "." + s.sign(payload)
+// Browser cookies are opaque and versioned; legacy signed payloads are refused.
+func (s sessions) issue(ctx context.Context, username string, identity store.BrowserIdentity, now time.Time) (string, error) {
+	var raw [32]byte
+	rand.Read(raw[:])
+	value := "bs_" + base64.RawURLEncoding.EncodeToString(raw[:])
+	if err := s.store.CreateBrowserSession(ctx, s.sign("browser:"+value), username, identity, now, now.Add(s.ttl)); err != nil {
+		return "", err
+	}
+	return value, nil
 }
 
-func (s sessions) verify(value string, now time.Time) (string, bool) {
-	payload, sig, ok := strings.Cut(value, ".")
-	if !ok || !hmac.Equal([]byte(sig), []byte(s.sign(payload))) {
+func (s sessions) verify(ctx context.Context, value string, now time.Time) (string, bool) {
+	if s.store == nil || !validBrowserCookie(value) {
 		return "", false
 	}
-	raw, err := base64.RawURLEncoding.DecodeString(payload)
-	if err != nil {
-		return "", false
+	username, err := s.store.BrowserSession(ctx, s.sign("browser:"+value), now)
+	return username, err == nil
+}
+
+func validBrowserCookie(value string) bool {
+	if len(value) != 46 || !strings.HasPrefix(value, "bs_") {
+		return false
 	}
-	username, exp, ok := strings.Cut(string(raw), "|")
-	expiry, err := strconv.ParseInt(exp, 10, 64)
-	if !ok || err != nil || now.Unix() > expiry {
-		return "", false
-	}
-	return username, true
+	raw, err := base64.RawURLEncoding.DecodeString(value[3:])
+	return err == nil && len(raw) == 32
 }
 
 func (s sessions) sign(payload string) string {

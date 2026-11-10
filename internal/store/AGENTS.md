@@ -24,3 +24,6 @@ Own-comment deletion requires artifact access and author ownership; it clears th
 
 - **People search includes bounded results for OIDC profiles that have already signed in, without importing unknown provider accounts or claiming a complete provider directory. LDAP/local snapshot validation remains unchanged.**
   Tests: `TestKnownOIDCProfilesCanBeFoundWithoutInventingACompleteProviderDirectory`.
+
+- **Browser session indexes contain no bearer cookies. Session creation and subject revocation serialize before cutoff reads, including across SQLite connections. Revocation, unknown-subject cutoff and jti replay records commit atomically; active protection is never evicted on capacity exhaustion.**
+  Tests: `TestBrowserRevocationSurvivesReopenSerializesCallbacksAndExpiresSafely`, `TestBrowserStorageCapacityFailsClosedAndCleanupRestoresCapacity`.

@@ -11,6 +11,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/iml885203/code-x-artifacts/internal/artifactguard"
@@ -41,6 +42,8 @@ type Server struct {
 	auth     auth.Authenticator
 	oidc     *auth.OIDC
 	sessions sessions
+	// browserAdmission serializes browser socket validation/Join with revocation.
+	browserAdmission sync.RWMutex
 	// shell is the page the React app mounts on; every page of the site is the
 	// same shell with a different boot block. bundle is the build it loads, or
 	// the reason there is none.
@@ -114,7 +117,7 @@ func New(cfg Config) *Server {
 		svc:      newService(cfg),
 		auth:     cfg.Authenticator,
 		oidc:     cfg.OIDC,
-		sessions: sessions{key: cfg.SessionKey, ttl: 7 * 24 * time.Hour},
+		sessions: sessions{key: cfg.SessionKey, store: cfg.Store, ttl: 7 * 24 * time.Hour},
 		langs:    langs,
 		log:      cfg.Logger,
 

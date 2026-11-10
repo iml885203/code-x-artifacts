@@ -24,10 +24,14 @@ type oidcLoginBoot struct {
 	ProviderName string `json:"providerName"`
 	StartURL     string `json:"startUrl"`
 }
-type oidcTransaction struct{ Browser, Nonce, Next string }
+type oidcTransaction struct {
+	Browser, Nonce, Next string
+	StartedAt            int64
+}
 
 func (s *Server) routesOIDC(mux *http.ServeMux) {
 	mux.HandleFunc("GET /auth/oidc/start", s.oidcStart)
+	mux.HandleFunc("POST /auth/backchannel-logout", s.oidcBackchannelLogout)
 	mux.HandleFunc("GET /auth/oidc/callback", s.oidcCallback)
 }
 
@@ -57,7 +61,7 @@ func (s *Server) oidcStart(w http.ResponseWriter, r *http.Request) {
 	}
 	oauthHeaders(w)
 	state, nonce, verifier := oauthSecret("state_"), oauthSecret("nonce_"), oauthSecret("verifier_")
-	tx := oidcTransaction{Browser: oidcDigest(verifier), Nonce: nonce, Next: safeNext(r.URL.Query().Get("next"))}
+	tx := oidcTransaction{Browser: oidcDigest(verifier), Nonce: nonce, Next: safeNext(r.URL.Query().Get("next")), StartedAt: time.Now().UnixNano()}
 	data, _ := json.Marshal(tx)
 	if err := s.store.OAuthPut(r.Context(), "oidc-login", oidcDigest(state), data, time.Now().Add(oidcTransactionLife)); err != nil {
 		s.renderShell(w, r, s.oidcLogin(tx.Next, "login.error.oidcUnavailable", http.StatusServiceUnavailable))
@@ -103,7 +107,9 @@ func (s *Server) oidcCallback(w http.ResponseWriter, r *http.Request) {
 		s.renderShell(w, r, s.oidcLogin(tx.Next, "login.error.oidcUnavailable", http.StatusServiceUnavailable))
 		return
 	}
-	s.issueBrowserSession(w, user.Username)
+	if !s.issueBrowserSession(w, r, user.Username, store.BrowserIdentity{Issuer: identity.Issuer, Subject: identity.Subject, IssuedAt: identity.IssuedAt, StartedAt: tx.StartedAt}) {
+		return
+	}
 	http.Redirect(w, r, tx.Next, http.StatusSeeOther)
 }
 
@@ -136,8 +142,18 @@ func oidcDigest(value string) string {
 	return hex.EncodeToString(sum[:])
 }
 
-func (s *Server) issueBrowserSession(w http.ResponseWriter, username string) {
-	http.SetCookie(w, &http.Cookie{Name: sessionCookie, Value: s.sessions.issue(username, time.Now()), Path: "/", HttpOnly: true, Secure: true, SameSite: http.SameSiteLaxMode, MaxAge: int(s.sessions.ttl.Seconds())})
+func (s *Server) issueBrowserSession(w http.ResponseWriter, r *http.Request, username string, identity store.BrowserIdentity) bool {
+	value, err := s.sessions.issue(r.Context(), username, identity, time.Now())
+	if err != nil {
+		key, status := "login.error.unavailable", http.StatusServiceUnavailable
+		if errors.Is(err, store.ErrBrowserRevoked) {
+			key, status = "login.error.oidcInvalid", http.StatusUnauthorized
+		}
+		s.renderShell(w, r, s.oidcLogin("/", key, status))
+		return false
+	}
+	http.SetCookie(w, &http.Cookie{Name: sessionCookie, Value: value, Path: "/", HttpOnly: true, Secure: true, SameSite: http.SameSiteLaxMode, MaxAge: int(s.sessions.ttl.Seconds())})
+	return true
 }
 
 func reservedOIDCAccount(username string) bool {

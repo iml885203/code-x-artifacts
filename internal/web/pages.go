@@ -8,10 +8,15 @@ import (
 	"github.com/iml885203/code-x-artifacts/internal/auth"
 	"github.com/iml885203/code-x-artifacts/internal/kind"
 	"github.com/iml885203/code-x-artifacts/internal/service"
+	"github.com/iml885203/code-x-artifacts/internal/store"
 )
 
 func (s *Server) loginPage(w http.ResponseWriter, r *http.Request) {
-	s.renderShell(w, r, s.oidcLogin(r.URL.Query().Get("next"), "", http.StatusOK))
+	key := ""
+	if c, err := r.Cookie(sessionCookie); err == nil && !validBrowserCookie(c.Value) {
+		key = "login.error.sessionChanged"
+	}
+	s.renderShell(w, r, s.oidcLogin(r.URL.Query().Get("next"), key, http.StatusOK))
 }
 
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
@@ -48,11 +53,23 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 		s.log.Error("record directory lookup", "err", err)
 	}
 	s.log.Info("login", "user", user.Username)
-	s.issueBrowserSession(w, user.Username)
+	if !s.issueBrowserSession(w, r, user.Username, store.BrowserIdentity{}) {
+		return
+	}
 	http.Redirect(w, r, next, http.StatusSeeOther) // safeNext reduces next to a path on this site (TestLoginOnlyRedirectsWithinTheSite)
 }
 
 func (s *Server) logout(w http.ResponseWriter, r *http.Request) {
+	s.browserAdmission.Lock()
+	defer s.browserAdmission.Unlock()
+	c, err := r.Cookie(sessionCookie)
+	if err == nil {
+		if err = s.store.RevokeBrowserSession(r.Context(), s.sessions.sign("browser:"+c.Value)); err != nil {
+			http.Error(w, "logout temporarily unavailable", http.StatusServiceUnavailable)
+			return
+		}
+	}
+	http.SetCookie(w, &http.Cookie{Name: oidcCookie, Path: "/auth/oidc", MaxAge: -1, HttpOnly: true, Secure: true, SameSite: http.SameSiteLaxMode})
 	http.SetCookie(w, &http.Cookie{Name: sessionCookie, Value: "", Path: "/", MaxAge: -1, HttpOnly: true, Secure: true, SameSite: http.SameSiteLaxMode})
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
