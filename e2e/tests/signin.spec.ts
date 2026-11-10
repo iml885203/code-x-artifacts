@@ -8,6 +8,10 @@ test("sign-in errors preserve the username, valid credentials open the workspace
   await expect(page.getByRole("heading", { name: "Turn ideas into artifacts. Keep creating value." })).toBeVisible();
   await page.getByLabel("Username").fill("alice");
   await page.getByLabel("Password").fill("not-the-password");
+  await page.getByRole("button", { name: "Animate CodeXArtifacts mark", exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByLabel("Username")).toHaveValue("alice");
+  await expect(page.getByLabel("Password")).toHaveValue("not-the-password");
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("alert")).toContainText("Wrong username or password");
   await expect(page.getByLabel("Username")).toHaveValue("alice");

@@ -1,6 +1,6 @@
 import { expect, test } from "./support";
 
-test("the language is picked in the sign-in footer and in the avatar menu, and sticks", async ({ page }) => {
+test("the language is picked in the sign-in header and in the avatar menu, and sticks", async ({ page }) => {
   await page.goto("/login");
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible();

@@ -101,6 +101,8 @@ describe("OIDC sign-in", () => {
     expect(screen.queryByLabelText(/Username|Password|帳號|密碼/)).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     await user.tab();
+    expect(screen.getByRole("button", { name: lang === "en" ? "Animate CodeXArtifacts mark" : "讓 CodeXArtifacts 標誌動起來" })).toHaveFocus();
+    await user.tab();
     expect(action).toHaveFocus();
   });
 

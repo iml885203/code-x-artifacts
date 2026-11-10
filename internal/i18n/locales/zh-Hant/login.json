@@ -16,5 +16,6 @@
   "login.error.oidcUnavailable": "目前無法連線到登入服務，請稍後再試，或聯絡工作空間管理者。",
   "login.error.oidcInvalid": "這次登入已過期或無法驗證，請重新開始登入。",
   "login.error.oidcDenied": "登入已取消或存取遭到拒絕。請重試，或向工作空間管理者申請存取權限。",
-  "login.error.sessionChanged": "登入狀態已更新，請重新登入以繼續使用；你的作品不受影響。"
+  "login.error.sessionChanged": "登入狀態已更新，請重新登入以繼續使用；你的作品不受影響。",
+  "login.mark.interact": "讓 CodeXArtifacts 標誌動起來"
 }

@@ -58,7 +58,7 @@ bundle 在 image build 時建好、`embed` 進 binary（`internal/web/bundle.go`
 - **選單（總覽的「New」與帳號選單、卡片的「⋮」、viewer 的「⋯」）關閉時不把 focus 搶回按鈕：Radix 在選單離開頁面後的下一個 task 才把 focus 還給按鈕，選單淡出的那一瞬間點進文件的人，打的字會進按鈕；所以每個選單的 `onCloseAutoFocus` 都用 `menuFocus.ts` 的 `keepFocusWhereItWent`，focus 已在別處就留在那裡，沒有人動才還給按鈕。**
   Tests: web/src/create/Create.test.tsx（leaves focus where the person put it…）。
 
-- **語言與主題只在頭像選單（`shell/AccountMenu.tsx`）：目前的有勾，改了立刻生效、不重新載入；主題記在這個瀏覽器（儲存被擋時仍可切換，只是不記住）、語言由 server 記住（同一個 `POST /lang`，回應的 boot 區塊帶新的目錄）；登入頁沒有頭像，語言選單在頁尾，共用 Radix radio menu 與 menu tokens，選項以原生 `POST /lang` 表單提交並保留 `next`，Escape 還焦點、點進欄位不搶回焦點。** 登入失敗的訊息在欄位下面（`role="alert"`，兩個欄位 `aria-invalid`），帳號不清掉。
+- **語言與主題只在頭像選單（`shell/AccountMenu.tsx`）：目前的有勾，改了立刻生效、不重新載入；主題記在這個瀏覽器（儲存被擋時仍可切換，只是不記住）、語言由 server 記住（同一個 `POST /lang`，回應的 boot 區塊帶新的目錄）；登入頁沒有頭像，語言選單在登入外框右上方（手機版與標誌同列），共用 Radix radio menu 與 menu tokens，選項以原生 `POST /lang` 表單提交並保留 `next`，Escape 還焦點、點進欄位不搶回焦點。** 登入失敗的訊息在欄位下面（`role="alert"`，兩個欄位 `aria-invalid`），帳號不清掉。
   登入頁以品牌幾何與產品介紹搭配帳號表單；不啟動背景 canvas。表單錯誤、語言切換、焦點與兩個主題持續可用。
   Tests: web/src/login/Login.test.tsx、web/src/pages.test.tsx、web/src/tokens.test.ts；e2e/tests/signin.spec.ts。
 

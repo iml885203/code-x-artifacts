@@ -7,6 +7,7 @@ import { Brand } from "../Header";
 import { Warning } from "../icons/chrome";
 import { format, useT, type Key } from "../i18n";
 import { useDocumentTitle } from "../title";
+import { LoginShowcase } from "./LoginShowcase";
 import "./login.css";
 
 /** Sign in with the configured mode; provider navigation begins only after an explicit action. */
@@ -23,7 +24,7 @@ export function Login({ boot }: { boot: Boot }) {
     <div className="signin">
       <div className="signin-stage">
         <section className="signin-hero" aria-labelledby="workspace-intro">
-          <div className="signin-field-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3H15V9L9 15H3Z"/><path d="M16 10H22V22H10V16Z"/></svg></div>
+          <LoginShowcase animate={!failed} />
           <h2 id="workspace-intro">{t("login.headline")}</h2>
           <p>{t("login.description")}</p>
           <div className="signin-formats" aria-label={t("login.formats")}><span>Web</span><span>Docs</span><span>Design</span><span>Board</span><span>Slides</span></div>
@@ -57,29 +58,29 @@ export function Login({ boot }: { boot: Boot }) {
             </form>
           )}
         </div>
+        <form id="signin-language" className="signin-tools" method="post" action="/lang">
+          <input type="hidden" name="next" value={boot.here} />
+          <DropdownMenu.Root modal={false}>
+            <DropdownMenu.Trigger className="signin-language" aria-label={`${t("lang.label")}: ${t(`shell.language.${boot.lang}` as Key)}`}>
+              {t(`shell.language.${boot.lang}` as Key)}<Chevron />
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content className="menu" side="bottom" align="end" sideOffset={8} collisionPadding={12} onCloseAutoFocus={keepFocusWhereItWent} aria-label={t("lang.label")}>
+                <DropdownMenu.RadioGroup value={boot.lang}>
+                  {boot.langs.map((tag) => (
+                    <DropdownMenu.RadioItem key={tag} className="menu-item" value={tag} asChild>
+                      <button type="submit" form="signin-language" name="lang" value={tag}>
+                        <DropdownMenu.ItemIndicator className="menu-check"><Check /></DropdownMenu.ItemIndicator>
+                        {t(`shell.language.${tag}` as Key)}
+                      </button>
+                    </DropdownMenu.RadioItem>
+                  ))}
+                </DropdownMenu.RadioGroup>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
+        </form>
       </div>
-      <form id="signin-language" className="signin-foot" method="post" action="/lang">
-        <input type="hidden" name="next" value={boot.here} />
-        <DropdownMenu.Root modal={false}>
-          <DropdownMenu.Trigger className="signin-language" aria-label={`${t("lang.label")}: ${t(`shell.language.${boot.lang}` as Key)}`}>
-            {t(`shell.language.${boot.lang}` as Key)}<Chevron />
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content className="menu" side="top" sideOffset={8} collisionPadding={12} onCloseAutoFocus={keepFocusWhereItWent} aria-label={t("lang.label")}>
-              <DropdownMenu.RadioGroup value={boot.lang}>
-                {boot.langs.map((tag) => (
-                  <DropdownMenu.RadioItem key={tag} className="menu-item" value={tag} asChild>
-                    <button type="submit" form="signin-language" name="lang" value={tag}>
-                      <DropdownMenu.ItemIndicator className="menu-check"><Check /></DropdownMenu.ItemIndicator>
-                      {t(`shell.language.${tag}` as Key)}
-                    </button>
-                  </DropdownMenu.RadioItem>
-                ))}
-              </DropdownMenu.RadioGroup>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu.Root>
-      </form>
     </div>
   );
 }

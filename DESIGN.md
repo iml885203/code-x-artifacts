@@ -204,8 +204,29 @@ blanket minimum-size claim for every illustrative element.
 
 Existing state transitions use 120–320ms ease-out motion. Radix owns menus and
 keyboard behavior.
-Theme and language remain in the account menu; sign-in exposes language in its
-footer. Keep loading, errors, empty states and recovery paths visible.
+The sign-in hero mark reuses the approved 3.2-second dot-to-ring, split and
+offset-field formation once on entry, followed by a 10-second CSS cycle of
+small independent translations and rotations of its two planes. The mark is
+256px on desktop and 80px on mobile; no product screenshots surround it.
+There are no separate playback controls. The mark itself is a native button with
+an English/Traditional Chinese accessible name. Click, tap, Enter or Space bursts
+its two planes outward with opposing rotations, then settles them back over 900ms.
+Repeated activation retargets from the current transform. Reduced motion uses a
+brief opacity response instead. Activation never submits the login form or changes
+its entered credentials.
+Hidden tabs suspend motion; reduced motion and failed sign-in responses show
+a static final mark. The form remains immediately usable and never moves.
+Fine pointers can add up to 7px of depth to the mark; touch and reduced motion
+disable that response. Ambient motion uses CSS transforms;
+there is no ongoing JavaScript frame loop after formation.
+The sign-in surface follows a media/form split informed by Astryx CLI 0.7.12's
+`login-split` template and motion guidance, adapted to native form posts and the
+existing OIDC branch. A single 1280px shell contains a berry-wash mark pane and
+a stable account pane, using the existing login radius and theme tokens.
+The CLI was used as design tooling; no Astryx runtime or global reset is added.
+Theme and language remain in the account menu; sign-in exposes language at the
+upper right of its split shell (beside the compact hero mark on mobile), in a
+separate native form. Keep loading, errors, empty states and recovery paths visible.
 The website's native radio tabs select the Overview or one of five actual types:
 Web page, Doc, Slides, Design and Board. HTML and React belong to Web page. Screenshot images
 are static WebP files displayed in place, with no image links or new-tab action.

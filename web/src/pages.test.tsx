@@ -26,7 +26,7 @@ describe("the sign-in page", () => {
     expect(screen.getByLabelText("密碼")).toHaveValue("");
   });
 
-  it("keeps the language menu in a separate footer form with the sign-in destination", async () => {
+  it("keeps the language menu in a separate form with the sign-in destination", async () => {
     const user = userEvent.setup();
     renderIn(<App boot={bootFor("en", { page: "login", user: "", initials: "", here: "/login?next=%2Fa%2Fx", login })} />, "en", "/login");
     const trigger = screen.getByRole("button", { name: "Interface language: English" });
