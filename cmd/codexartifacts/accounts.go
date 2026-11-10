@@ -62,20 +62,27 @@ func createPrivateFile(path string, data []byte) error {
 }
 
 func runCommand(args []string, in io.Reader, out io.Writer) error {
-	usage := func() error { return fmt.Errorf("usage: codexartifacts [init [account-directory] | hash-password]") }
+	usage := func() error {
+		return fmt.Errorf("usage: codexartifacts [init [account-directory] | hash-password | healthcheck]")
+	}
 	if len(args) == 0 {
 		return usage()
 	}
 	switch args[0] {
-	case "init":
-		if len(args) > 2 {
+	case "healthcheck":
+		if len(args) != 1 {
 			return usage()
 		}
-		dir := ".local"
-		if len(args) == 2 {
-			dir = args[1]
+		return healthcheck(listenAddress())
+	case "init":
+		switch len(args) {
+		case 1:
+			return initAccounts(".local", out)
+		case 2:
+			return initAccounts(args[1], out)
+		default:
+			return usage()
 		}
-		return initAccounts(dir, out)
 	case "hash-password":
 		if len(args) != 1 {
 			return usage()

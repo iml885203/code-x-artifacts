@@ -12,3 +12,9 @@ e2e
 .work
 website
 .impeccable
+
+.env
+**/*.env
+.claude
+output
+tmp

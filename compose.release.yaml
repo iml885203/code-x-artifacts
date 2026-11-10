@@ -1,0 +1,22 @@
+# Download this file from the matching GitHub release; no source checkout is needed.
+services:
+  app:
+    image: ghcr.io/iml885203/code-x-artifacts:v0.1.0
+    restart: unless-stopped
+    environment:
+      PICTOR_ADDR: "0.0.0.0:8080"
+      PICTOR_DB: /data/codexartifacts.db
+      PICTOR_USERS_FILE: /data/users.json
+      PICTOR_OAUTH_ORIGIN: ${PICTOR_OAUTH_ORIGIN:-}
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - data:/data
+  password:
+    image: busybox:1.37.0
+    profiles: [tools]
+    user: "65532:65532"
+    volumes:
+      - data:/data
+volumes:
+  data:

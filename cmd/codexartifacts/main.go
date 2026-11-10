@@ -100,7 +100,7 @@ func run(log *slog.Logger) error {
 	// Deferred after the store's close, so it runs before it: the hub writes its last compactions on the way out.
 	defer func() { <-appDone }()
 	srv := &http.Server{
-		Addr:              cmp.Or(os.Getenv("PICTOR_ADDR"), "127.0.0.1:8080"),
+		Addr:              listenAddress(),
 		Handler:           app.Handler(),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
