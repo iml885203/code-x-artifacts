@@ -1,8 +1,6 @@
 /* OAuth extends the quiet connect workspace, using its existing controls and tokens. */
 .connect-manual { margin-top: var(--space-8); }
 .connect-manual > summary { cursor: pointer; font-weight: 500; padding-block: var(--space-3); }
-.oauth-clients { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); margin-top: var(--space-6); }
-.oauth-clients h3 { font-size: 16px; font-weight: 500; margin: 0 0 var(--space-2); }
 .oauth-client-id { display: block; overflow-wrap: anywhere; margin-top: var(--space-1); font-size: 12px; }
 .oauth-consent { max-width: 680px; padding-top: var(--space-8); }
 .oauth-eyebrow { color: var(--star-text); font-weight: 500; margin-bottom: var(--space-3); }
@@ -13,4 +11,4 @@
 .oauth-request dd { margin: 0; overflow-wrap: anywhere; font-size: 13px; }
 .oauth-warning { border-left: 2px solid var(--line); padding-left: var(--space-4); }
 .oauth-actions { display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-8); }
-@media (max-width: 640px) { .oauth-clients { grid-template-columns: 1fr; } .oauth-actions > button { flex: 1; } }
+@media (max-width: 640px) { .oauth-actions > button { flex: 1; } }

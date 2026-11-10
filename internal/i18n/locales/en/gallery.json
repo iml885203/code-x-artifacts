@@ -10,7 +10,6 @@
   "gallery.noMatch": "Nothing matches",
   "gallery.empty": "Nothing here yet. Connect your agent to publish an artifact, or use New to start a document, design or board.",
   "gallery.loadFailed": "Couldn't load the artifacts. Reload the page to try again.",
-  "gallery.createToken": "Create a token",
   "gallery.group": "Group by",
   "gallery.group.none": "None (last edited)",
   "gallery.group.date": "Edit date",

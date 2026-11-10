@@ -1,0 +1,7 @@
+.connect-content { max-width: 1000px; margin-inline: auto; }
+.connect .agent-tabs { width: fit-content; max-width: 100%; gap: var(--space-1); padding: var(--space-1); margin-block: var(--space-5) var(--space-4); border: 1px solid var(--line); border-radius: var(--r-control); background: var(--raised); }
+.connect .agent-tabs .tab { flex: none; padding-inline: var(--space-4); border: 0; border-radius: var(--r-tip); background: transparent; }
+.connect .agent-tabs .tab[aria-selected="true"] { background: var(--plate); color: var(--text); }
+.connect .agent-tabs .tab:focus-visible { outline-offset: -3px; }
+.connect .tab-panel { animation: none; }
+@media (max-width: 640px) { .connect .agent-tabs .tab { padding-inline: var(--space-3); font-size: 13px; } }

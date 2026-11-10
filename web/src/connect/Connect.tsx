@@ -1,10 +1,8 @@
 import {
   useEffect,
-  useId,
   useRef,
   useState,
   type SyntheticEvent,
-  type KeyboardEvent,
 } from "react";
 import { OAuthSetup } from "./OAuthSetup";
 import { OAuthGrants } from "./OAuthGrants";
@@ -13,28 +11,21 @@ import { createToken, listTokens, revokeToken } from "../api";
 import { Code } from "../Code";
 import { CopyButton } from "../Copy";
 import { RelativeTime } from "../RelativeTime";
-import { Header } from "../Header";
-import { format, useT, type Key } from "../i18n";
+import { Nav } from "../gallery/Nav";
+import { AgentTabs } from "./AgentTabs";
+import "./connect.css";
+import { format, useT } from "../i18n";
 import { useDocumentTitle } from "../title";
 import type { Boot, TokenItem } from "../boot";
 import { ConfirmDialog } from "../viewer/ConfirmDialog";
 import {
   claudeCommand,
-  clients,
   codexCommand,
   codexConfig,
   codexEnv,
   mcpJson,
   tokenPlaceholder,
-  type Client,
 } from "./snippets";
-
-/** Each client's tab label, by literal key so the catalogue check can see it is used. */
-const clientLabel: Record<Client, Key> = {
-  claude: "connect.client.claude",
-  codex: "connect.client.codex",
-  other: "connect.client.other",
-};
 
 type Step1 =
   | { status: "naming"; failed: boolean }
@@ -65,9 +56,10 @@ export function Connect({ boot }: { boot: Boot }) {
     });
   }, [step.status]);
   return (
-    <>
-      <Header boot={boot} />
-      <main className="page connect">
+    <div className="library">
+      <Nav boot={boot} />
+      <main className="lib-main connect">
+      <div className="connect-content">
         <h1>{t("connect.title")}</h1>
         <p className="lead">{t(data.oauthEnabled ? "connect.oauth.intro" : "connect.intro")}</p>
         {data.oauthEnabled && <OAuthSetup baseUrl={data.baseUrl} />}
@@ -116,8 +108,9 @@ export function Connect({ boot }: { boot: Boot }) {
           />
         </section>
         <RecentActivity tokenID={activityToken} onTokenIDChange={setActivityToken} refreshKey={activityRevision} />
+      </div>
       </main>
-    </>
+    </div>
   );
 }
 
@@ -202,55 +195,7 @@ function TokenStep({
 
 function ClientTabs({ baseUrl, token }: { baseUrl: string; token: string }) {
   const t = useT();
-  const id = useId();
-  const [active, setActive] = useState<Client>("claude");
-
-  function onKey(e: KeyboardEvent) {
-    const move = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
-    if (move === undefined) return;
-    e.preventDefault();
-    const next =
-      clients[
-        (clients.indexOf(active) + move + clients.length) % clients.length
-      ];
-    if (!next) return;
-    setActive(next);
-    document.getElementById(`${id}-tab-${next}`)?.focus();
-  }
-
-  return (
-    <>
-      <div
-        className="tabs"
-        role="tablist"
-        aria-label={t("connect.clients")}
-        onKeyDown={onKey}
-      >
-        {clients.map((c) => (
-          <button
-            key={c}
-            id={`${id}-tab-${c}`}
-            className="tab quiet"
-            type="button"
-            role="tab"
-            aria-selected={c === active}
-            aria-controls={`${id}-panel`}
-            tabIndex={c === active ? 0 : -1}
-            onClick={() => {
-              setActive(c);
-            }}
-          >
-            {t(clientLabel[c])}
-          </button>
-        ))}
-      </div>
-      <div
-        className="tab-panel"
-        key={active}
-        id={`${id}-panel`}
-        role="tabpanel"
-        aria-labelledby={`${id}-tab-${active}`}
-      >
+  return <AgentTabs>{active => <>
         {active === "claude" && (
           <>
             <p className="lead">{t("connect.claude.run")}</p>
@@ -271,9 +216,7 @@ function ClientTabs({ baseUrl, token }: { baseUrl: string; token: string }) {
             <Code text={mcpJson(baseUrl, token)} />
           </>
         )}
-      </div>
-    </>
-  );
+    </>}</AgentTabs>;
 }
 
 /** The person's tokens by name, with a revoke that asks first. Revoking takes effect on the server at once. */

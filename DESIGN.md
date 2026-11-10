@@ -202,6 +202,15 @@ artifact cards use quiet borders, 12px corners and a 4px hover lift that is
 removed for reduced motion. These are existing role-specific behaviors, not a
 blanket minimum-size claim for every illustrative element.
 
+Connect your agent uses the library's shared left navigation, with Connect marked
+current and normal server navigation back to Artifacts or Recently opened. On
+phones it uses the same compact navigation row and collapsible links. Browser
+OAuth and optional personal-token setup share segmented Claude Code, Codex and
+Cursor/other tabs, with arrow/Home/End keyboard selection and labelled panels.
+Switching tabs keeps a newly created personal token only in page memory. The
+empty-library action reads "Connect your agent" in the current language. The
+sticky library controls retain 12px below their buttons/tabs before the divider.
+
 Existing state transitions use 120–320ms ease-out motion. Radix owns menus and
 keyboard behavior.
 The sign-in hero mark reuses the approved 3.2-second dot-to-ring, split and

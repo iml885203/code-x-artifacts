@@ -14,6 +14,9 @@ test("Connect your agent: a token made in step 1 is filled into every client, co
   await page.getByText("Use a personal access token instead", { exact: true }).click();
 
   // Before a token exists the snippets carry a placeholder and this server's own address.
+  const manual = page.locator("details.connect-manual");
+  const nav = page.getByRole("navigation", { name: "Library" });
+  await expect(nav.getByRole("link", { name: "Connect your agent", exact: true })).toHaveAttribute("aria-current", "page");
   const claude = page.locator("details .code pre", { hasText: "claude mcp add" });
   await expect(claude).toContainText(`${baseURL ?? ""}/api/mcp`);
   await expect(claude).toContainText("Bearer <YOUR_TOKEN>");
@@ -34,15 +37,15 @@ test("Connect your agent: a token made in step 1 is filled into every client, co
 
   // Every client's snippet has the token in it.
   await expect(claude).toContainText(`Authorization: Bearer ${token}`);
-  await page.getByRole("tab", { name: "Codex" }).click();
-  await expect(page.getByRole("tabpanel")).toContainText(`export PICTOR_TOKEN=${token}`);
-  await expect(page.getByRole("tabpanel")).toContainText("codex mcp add pictor");
-  await page.getByRole("tab", { name: "Cursor & others" }).click();
-  await expect(page.getByRole("tabpanel")).toContainText(`"Authorization": "Bearer ${token}"`);
+  await manual.getByRole("tab", { name: "Codex" }).click();
+  await expect(manual.getByRole("tabpanel")).toContainText(`export PICTOR_TOKEN=${token}`);
+  await expect(manual.getByRole("tabpanel")).toContainText("codex mcp add pictor");
+  await manual.getByRole("tab", { name: "Cursor & others" }).click();
+  await expect(manual.getByRole("tabpanel")).toContainText(`"Authorization": "Bearer ${token}"`);
 
   // A snippet's own copy button copies the snippet as written.
-  await page.getByRole("tabpanel").getByRole("button", { name: "Copy" }).click();
-  await expect(page.getByRole("tabpanel").getByRole("button", { name: "Copied" })).toBeVisible();
+  await manual.getByRole("tabpanel").getByRole("button", { name: "Copy" }).click();
+  await expect(manual.getByRole("tabpanel").getByRole("button", { name: "Copied" })).toBeVisible();
   expect(JSON.parse(await page.evaluate(() => navigator.clipboard.readText()))).toMatchObject({ mcpServers: { pictor: { url: `${baseURL ?? ""}/api/mcp`, headers: { Authorization: `Bearer ${token}` } } } });
 
   // The token is a working one: the MCP endpoint takes it, and refuses a made-up one.
@@ -77,6 +80,11 @@ test("Connect your agent: a token made in step 1 is filled into every client, co
   await page.reload();
   await expect(page.getByRole("heading", { name: "Your tokens" })).toBeVisible();
   await expect(page.getByRole("row", { name: /e2e laptop/ })).toHaveCount(0);
+  await nav.getByRole("link", { name: "Artifacts", exact: true }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await page.getByRole("navigation", { name: "Library" }).getByRole("link", { name: "Connect your agent", exact: true }).click();
+  await expect(page).toHaveURL(/\/connect$/);
+  await expect(page.getByRole("navigation", { name: "Library" }).getByRole("link", { name: "Connect your agent", exact: true })).toHaveAttribute("aria-current", "page");
 });
 
 test("Your tokens: a token made in step 1 appears at once, and the old /tokens address and the account menu lead to Connect", async ({ page, request }) => {

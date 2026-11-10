@@ -1,3 +1,4 @@
+import "./gallery.css";
 import { useState, type ReactNode } from "react";
 import type { Boot } from "../boot";
 import { Brand } from "../Header";
@@ -19,16 +20,18 @@ interface Item {
 }
 
 /** The library's left rail: where you can go, and you, at the bottom. */
-export function Nav({ boot, artifacts }: { boot: Boot; artifacts: number }) {
+export function Nav({ boot, artifacts = 0 }: { boot: Boot; artifacts?: number }) {
   const t = useT();
   const router = useRouter();
   // On a phone the links fold behind a button; on a wide screen the button is not drawn and the links always show.
   const [open, setOpen] = useState(false);
   const recent = isRecentPath(router.path);
+  const pathname = router.path.split(/[?#]/)[0];
+  const inLibraryApp = boot.page === "gallery" || boot.page === "viewer";
   const items: Item[] = [
-    { label: "nav.artifacts", href: "/", count: artifacts, current: !recent, inApp: true, icon: <Grid /> },
+    { label: "nav.artifacts", href: "/", count: artifacts, current: pathname === "/", inApp: true, icon: <Grid /> },
     { label: "nav.recent", href: recentPath, count: 0, current: recent, inApp: true, icon: <Clock /> },
-    { label: "nav.connect", href: "/connect", count: 0, icon: <Plug /> },
+    { label: "nav.connect", href: "/connect", count: 0, current: pathname === "/connect", icon: <Plug /> },
   ];
   return (
     <nav className="lib-nav" aria-label={t("nav.main")}>
@@ -38,7 +41,7 @@ export function Nav({ boot, artifacts }: { boot: Boot; artifacts: number }) {
       </button>
       <div id="lib-nav-links" className={open ? "lib-nav-list open" : "lib-nav-list"}>
         {items.map((item) => (
-          <a key={item.label} className="lib-nav-item" href={item.href} {...(item.current ? { "aria-current": "page" } : {})} onClick={item.inApp ? inApp(router, item.href) : undefined}>
+          <a key={item.label} className="lib-nav-item" href={item.href} {...(item.current ? { "aria-current": "page" } : {})} onClick={item.inApp && inLibraryApp ? inApp(router, item.href) : undefined}>
             {item.icon}
             <span className="lib-nav-label">{t(item.label)}</span>
             {item.count > 0 && <span className="count">{item.count}</span>}

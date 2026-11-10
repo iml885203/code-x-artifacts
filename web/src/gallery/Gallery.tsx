@@ -268,7 +268,7 @@ export function Gallery({ boot }: { boot: Boot }) {
             <Easel />
             <p>{t("gallery.empty")}</p>
             <a className="btn" href="/connect">
-              {t("gallery.createToken")}
+              {t("nav.connect")}
             </a>
           </div>
         )}

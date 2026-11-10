@@ -10,7 +10,6 @@
   "gallery.noMatch": "沒有符合的作品",
   "gallery.empty": "這裡還沒有作品。連接你的 agent 發佈作品，或用「新增」開始文件、設計或白板。",
   "gallery.loadFailed": "無法載入作品。請重新整理頁面再試一次。",
-  "gallery.createToken": "建立 token",
   "gallery.group": "分組",
   "gallery.group.none": "不分組（最後編輯）",
   "gallery.group.date": "編輯日期",

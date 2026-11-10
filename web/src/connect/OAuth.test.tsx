@@ -34,7 +34,17 @@ describe("browser authorization on Connect", () => {
     const manual = screen.getByText("Use a personal access token instead").closest("details");
     expect(manual).not.toHaveAttribute("open");
     const setup = screen.getByRole("heading", { name: "Connect with your browser" }).closest("section");
-    expect(setup).toHaveTextContent("codex mcp login codexartifacts");
+    if (!setup) throw new Error("missing OAuth setup");
+    expect(within(setup).getByRole("tabpanel")).toHaveTextContent("claude mcp add");
+    await user.click(within(setup).getByRole("tab", { name: "Codex" }));
+    expect(within(setup).getByRole("tabpanel")).toHaveTextContent("codex mcp login codexartifacts");
+    await user.keyboard("{End}");
+    expect(within(setup).getByRole("tab", { name: "Cursor & others" })).toHaveFocus();
+    await user.keyboard("{Home}");
+    expect(within(setup).getByRole("tab", { name: "Claude Code" })).toHaveFocus();
+    const nav = screen.getByRole("navigation", { name: "Library" });
+    expect(within(nav).getByRole("link", { name: "Connect your agent" })).toHaveAttribute("aria-current", "page");
+    expect(within(nav).getByRole("link", { name: "Artifacts" })).not.toHaveAttribute("aria-current");
     expect(setup).not.toHaveTextContent("Bearer");
     await user.click(screen.getByText("Use a personal access token instead"));
     expect(manual).toHaveAttribute("open");

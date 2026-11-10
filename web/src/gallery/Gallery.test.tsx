@@ -179,7 +179,7 @@ describe("the gallery", () => {
   it("shows how to publish, with no filters or search, when there is nothing yet", async () => {
     await openGallery([]);
     expect(await screen.findByText(/Nothing here yet/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Create a token" })).toHaveAttribute("href", "/connect");
+    expect(within(screen.getByRole("main")).getByRole("link", { name: "Connect your agent" })).toHaveAttribute("href", "/connect");
     expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
     expect(screen.queryByRole("radiogroup", { name: "Filter" })).not.toBeInTheDocument();
   });
