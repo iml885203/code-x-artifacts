@@ -251,7 +251,7 @@ func oidcGroups(raw any) ([]string, bool) {
 // beyond a small clock allowance in addition to its expiry/issuer/audience checks.
 func validOIDCIssuedAt(raw any) bool {
 	value, ok := raw.(float64)
-	return ok && value > 0 && value <= float64(time.Now().Add(time.Minute).Unix()) && value == float64(int64(value))
+	return ok && value > 0 && value <= float64(time.Now().Add(time.Minute).Unix())
 }
 
 func (o *OIDC) protocolFailure(before uint64, message string) error {

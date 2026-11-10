@@ -395,3 +395,15 @@ func TestOIDCProviderCredentialsNeverBecomeApplicationBearerCredentials(t *testi
 		}
 	}
 }
+
+func TestOIDCValidFractionalIssuedAtCreatesTheBoundAccount(t *testing.T) {
+	t.Parallel()
+	p := newOIDCProvider(t)
+	// RFC 7519 NumericDate permits fractional seconds, not just integers.
+	p.Claims = map[string]any{"iat": float64(time.Now().Unix()) - 0.5}
+	h := oidcHarness(t, p)
+	_, user := oidcBrowser(t, h, "/connect")
+	if !strings.HasPrefix(user, "oidc:") {
+		t.Fatal("valid fractional issued-at did not create the bound account")
+	}
+}
