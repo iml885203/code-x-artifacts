@@ -299,3 +299,84 @@ func touchConcurrentActivity(t *testing.T, st *Store, p TokenProvenance, at time
 		}
 	}
 }
+
+func TestOAuthActivityTreatsOnlyTheOwnersActiveGrantAsLive(t *testing.T) {
+	t.Parallel()
+	ctx := t.Context()
+	path := filepath.Join(t.TempDir(), "oauth-activity.db")
+	st := openStore(ctx, t, path)
+	at := time.Now().UTC().Truncate(time.Millisecond)
+	grant := OAuthGrant{ID: "oauth-alice", Owner: "alice", ClientID: "client-a", ClientName: "Codex OAuth", Resource: "https://example.test/api/mcp", CreatedAt: at}
+	if err := st.CreateOAuthGrant(ctx, grant); err != nil {
+		t.Fatal(err)
+	}
+	if err := st.CreateOAuthGrant(ctx, OAuthGrant{ID: "oauth-bob", Owner: "bob", ClientID: "client-b", ClientName: "Bob OAuth", CreatedAt: at}); err != nil {
+		t.Fatal(err)
+	}
+	p := TokenProvenance{Owner: "alice", TokenID: grant.ID, TokenLabel: grant.ClientName, Transport: "mcp", Client: "Codex"}
+	if err := st.RecordConnection(ctx, p, at); err != nil {
+		t.Fatal(err)
+	}
+	// History from a different owner must not be made live by Alice's grant ID.
+	other := p
+	other.Owner = "bob"
+	if err := st.RecordConnection(ctx, other, at); err != nil {
+		t.Fatal(err)
+	}
+	checkOAuthActiveActivity(t, st, grant, at)
+	if err := st.RevokeOAuthGrant(ctx, "alice", grant.ID); err != nil {
+		t.Fatal(err)
+	}
+	if err := st.Close(); err != nil {
+		t.Fatal(err)
+	}
+	st = openStore(ctx, t, path)
+	defer func() { _ = st.Close() }()
+	checkOAuthRevokedActivity(t, st, grant, at)
+}
+
+func checkOAuthActiveActivity(t *testing.T, st *Store, grant OAuthGrant, at time.Time) {
+	t.Helper()
+	rows := activityRows(t, st, "alice", ActivityFilter{Limit: 50}, at)
+	if len(rows) != 1 || rows[0].Revoked {
+		t.Fatalf("live OAuth history: %+v", rows)
+	}
+	bobRows := activityRows(t, st, "bob", ActivityFilter{Limit: 50}, at)
+	if len(bobRows) != 1 || !bobRows[0].Revoked {
+		t.Fatalf("foreign grant ID should not be live: %+v", bobRows)
+	}
+	checkOAuthActiveActivitySummaries(t, st, grant, at)
+}
+
+func checkOAuthActiveActivitySummaries(t *testing.T, st *Store, grant OAuthGrant, at time.Time) {
+	t.Helper()
+	list, err := st.ActivityTokens(t.Context(), "alice", at)
+	if err != nil || len(list) != 1 || list[0].ID != grant.ID || list[0].Name != grant.ClientName || list[0].Revoked || list[0].LastConnected == nil {
+		t.Fatalf("live grant summary: %+v %v", list, err)
+	}
+	bobList, err := st.ActivityTokens(t.Context(), "bob", at)
+	if err != nil || len(bobList) != 2 {
+		t.Fatalf("owner-scoped summaries: %+v %v", bobList, err)
+	}
+	for _, item := range bobList {
+		if item.ID == grant.ID && !item.Revoked {
+			t.Fatalf("foreign grant summary marked live: %+v", item)
+		}
+	}
+}
+
+func checkOAuthRevokedActivity(t *testing.T, st *Store, grant OAuthGrant, at time.Time) {
+	t.Helper()
+	rows := activityRows(t, st, "alice", ActivityFilter{Limit: 50}, at)
+	if len(rows) != 1 || !rows[0].Revoked {
+		t.Fatalf("revoked history after restart: %+v", rows)
+	}
+	list, err := st.ActivityTokens(t.Context(), "alice", at)
+	if err != nil || len(list) != 1 || !list[0].Revoked || list[0].Name != grant.ClientName {
+		t.Fatalf("revoked summary: %+v %v", list, err)
+	}
+	list, err = st.ActivityTokens(t.Context(), "alice", at.Add(31*24*time.Hour))
+	if err != nil || len(list) != 0 {
+		t.Fatalf("expired revoked summary: %+v %v", list, err)
+	}
+}

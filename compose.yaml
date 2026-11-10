@@ -6,6 +6,7 @@ services:
       PICTOR_ADDR: "0.0.0.0:8080"
       PICTOR_DB: /data/codexartifacts.db
       PICTOR_USERS_FILE: /data/users.json
+      PICTOR_OAUTH_ORIGIN: ${PICTOR_OAUTH_ORIGIN:-}
     ports:
       - "127.0.0.1:8080:8080"
     volumes:

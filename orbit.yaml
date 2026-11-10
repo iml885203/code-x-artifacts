@@ -4,7 +4,7 @@ tracing:
 services:
   app:
     kind: frontend
-    command: env PICTOR_ADDR=127.0.0.1:$PORT ./bin/codexartifacts
+    command: env PICTOR_ADDR=127.0.0.1:$PORT PICTOR_OAUTH_ORIGIN=http://localhost:$PORT ./bin/codexartifacts
     ports:
       http: 18081
     health_check:

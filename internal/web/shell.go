@@ -55,6 +55,7 @@ type shellBoot struct {
 	Artifact *artifactView `json:"artifact,omitempty"`
 	Login    *loginBoot    `json:"login,omitempty"`
 	Connect  *connectBoot  `json:"connect,omitempty"`
+	OAuth    *oauthBoot    `json:"oauth,omitempty"`
 	// Status is the HTTP status of the error page.
 	Status int `json:"status,omitempty"`
 }
@@ -72,8 +73,9 @@ type loginBoot struct {
 // commands it writes point at, and the person's tokens (without secrets). A new
 // token is made by POST /api/tokens and never travels in a page.
 type connectBoot struct {
-	BaseURL string        `json:"baseUrl"`
-	Tokens  []store.Token `json:"tokens"`
+	OAuthEnabled bool          `json:"oauthEnabled"`
+	BaseURL      string        `json:"baseUrl"`
+	Tokens       []store.Token `json:"tokens"`
 }
 
 // pageData is the part of a shell page that differs from page to page.
@@ -83,6 +85,7 @@ type pageData struct {
 	artifact *artifactView
 	login    *loginBoot
 	connect  *connectBoot
+	oauth    *oauthBoot
 }
 
 // descriptionKey is the catalogue entry that describes each page, for the meta
@@ -90,7 +93,7 @@ type pageData struct {
 // artifact: a description is what a stranger's link preview shows.
 var descriptionKey = map[string]string{
 	"login": "meta.description.login", "gallery": "meta.description.gallery", "viewer": "meta.description.viewer",
-	"connect": "meta.description.connect", "kit": "meta.description.kit", "error": "meta.description.error",
+	"oauth": "meta.description.connect", "connect": "meta.description.connect", "kit": "meta.description.kit", "error": "meta.description.error",
 }
 
 // renderShell serves the page the React app mounts on. The viewer may be
@@ -132,7 +135,7 @@ func (s *Server) renderShell(w http.ResponseWriter, r *http.Request, d pageData)
 		"Boot": shellBoot{
 			DisplayName: displayName, Page: d.page, Lang: lang.Tag, User: user, Initials: initials(user), Langs: s.langs.Tags(), Here: here, Strings: lang.Prefixed(""),
 			PublicLinks: s.publicLinks, FrameSandbox: strings.TrimPrefix(artifactSandbox, "sandbox "), Exports: exportOptions(),
-			Artifact: d.artifact, Login: d.login, Connect: d.connect, Status: d.status,
+			Artifact: d.artifact, Login: d.login, Connect: d.connect, OAuth: d.oauth, Status: d.status,
 		},
 	})
 }

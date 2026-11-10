@@ -18,10 +18,10 @@ home outside a conversation, where people and their preferred agents can continu
 
 ## Capabilities and Constraints
 HTML and React pages, Docs, Design, Board and Slides; shared authorization,
-versions, files, comments, live collaboration and a token-authenticated MCP API.
+versions, files, comments, live collaboration and an MCP API with personal tokens and optional browser OAuth.
 Web content remains in an opaque-origin sandbox. One replica owns in-memory rooms.
 Local accounts and optional explicitly configured LDAP support self-hosting.
-Native Cloudflare and a TypeScript backend are deferred. OAuth is not implemented.
+Native Cloudflare and a TypeScript backend are deferred. MCP OAuth is opt-in with a fixed public origin.
 
 ## Brand Commitments
 Exact name CodeXArtifacts. Owner-selected berry #AD4968, warm paper and charcoal,

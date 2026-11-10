@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useArtifacts } from "./artifacts";
 import type { Boot } from "./boot";
+import { OAuthConsent } from "./connect/OAuthConsent";
 import { Connect } from "./connect/Connect";
 import { ErrorPage } from "./ErrorPage";
 import { Gallery } from "./gallery/Gallery";
@@ -21,6 +22,8 @@ export function App({ boot }: { boot: Boot }) {
   switch (boot.page) {
     case "login":
       return <Login boot={page} />;
+    case "oauth":
+      return <OAuthConsent boot={page} />;
     case "connect":
       return <Connect boot={page} />;
     case "kit":

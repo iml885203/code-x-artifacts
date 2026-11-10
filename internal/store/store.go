@@ -183,7 +183,7 @@ func Open(ctx context.Context, path string) (*Store, error) {
 		return nil, err
 	}
 	db.SetMaxOpenConns(1)
-	if _, err := db.ExecContext(ctx, schema); err != nil {
+	if _, err := db.ExecContext(ctx, schema+oauthSchema); err != nil {
 		return nil, errors.Join(fmt.Errorf("apply schema: %w", err), db.Close())
 	}
 	if err := migrate(ctx, db); err != nil {

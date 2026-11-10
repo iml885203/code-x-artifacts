@@ -75,6 +75,8 @@ bundle 在 image build 時建好、`embed` 進 binary（`internal/web/bundle.go`
 - **作品庫帳號按鈕內的頭像固定為不收縮的 32px 正方形圓形；外層按鈕保留觸控目標。**
   Tests: web/src/shell/AccountMenu.test.tsx（keeps the rail avatar a non-shrinking square inside the account target）。
 
+- **OAuth 啟用時，Connect 優先顯示無靜態 token 的 MCP 網址與瀏覽器登入說明，PAT 設定留在可展開區塊；OAuth 授權清單只取 server 回傳的本人授權，載入失敗可重試，撤銷前確認、失敗保留該列。Consent 是原生 POST form，保留 server 驗證過的隱藏欄位與 consent token，明確顯示未驗證的 client 名稱、client ID、返回網址、既有帳號權限與持續連接行為；允許與拒絕由 server 決定。** Tests: web/src/connect/OAuth.test.tsx（OAuth-first/PAT fallback、list retry、revoke cancel/failure、bilingual consent fields and permissions）。
+
 ## 坑
 
 - 元件測試用真的目錄文字、假的 `fetch`，測使用者看到與做的事，不測實作細節；純邏輯另寫 table test。

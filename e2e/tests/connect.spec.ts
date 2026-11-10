@@ -1,3 +1,5 @@
+import { createServer } from "node:http";
+import { createHash, randomBytes } from "node:crypto";
 import { expect, signIn, test } from "./support";
 
 test.use({ permissions: ["clipboard-read", "clipboard-write"] });
@@ -9,8 +11,10 @@ test("Connect your agent: a token made in step 1 is filled into every client, co
   await expect(page).toHaveURL(/\/connect$/);
   await expect(page.getByRole("heading", { name: "Connect your agent" })).toBeVisible();
 
+  await page.getByText("Use a personal access token instead", { exact: true }).click();
+
   // Before a token exists the snippets carry a placeholder and this server's own address.
-  const claude = page.locator(".code pre", { hasText: "claude mcp add" });
+  const claude = page.locator("details .code pre", { hasText: "claude mcp add" });
   await expect(claude).toContainText(`${baseURL ?? ""}/api/mcp`);
   await expect(claude).toContainText("Bearer <YOUR_TOKEN>");
 
@@ -50,9 +54,10 @@ test("Connect your agent: a token made in step 1 is filled into every client, co
   // The secret is nowhere in the address, and a reload does not bring it back.
   expect(page.url()).not.toContain(token);
   await page.reload();
+  await page.getByText("Use a personal access token instead", { exact: true }).click();
   await expect(page.getByRole("textbox", { name: "Token name" })).toHaveValue("");
   await expect(page.locator("body")).not.toContainText(token);
-  await expect(page.locator(".code pre", { hasText: "claude mcp add" })).toContainText("<YOUR_TOKEN>");
+  await expect(page.locator("details .code pre", { hasText: "claude mcp add" })).toContainText("<YOUR_TOKEN>");
 
   // The token is listed, by name, in Your tokens: the link from step 1 goes there, and the list has no secret.
   await page.getByRole("link", { name: "Manage tokens" }).click();
@@ -79,6 +84,7 @@ test("Your tokens: a token made in step 1 appears at once, and the old /tokens a
   await page.goto("/tokens");
   await expect(page).toHaveURL(/\/connect#tokens$/);
   await expect(page.getByRole("heading", { name: "Your tokens" })).toBeVisible();
+  await page.getByText("Use a personal access token instead", { exact: true }).click();
   await page.getByRole("textbox", { name: "Token name" }).fill("ci runner");
   await page.getByRole("button", { name: "Create token" }).click();
   await expect(page.getByRole("row", { name: /ci runner/ })).toBeVisible();
@@ -107,4 +113,64 @@ test("Your tokens: a token made in step 1 appears at once, and the old /tokens a
   await expect(row).toBeVisible();
   await page.getByRole("button", { name: "Account" }).click();
   await expect(page.getByRole("menuitem", { name: "Tokens" })).toHaveCount(0);
+});
+
+
+test("OAuth browser consent connects two clients and revokes only the chosen client", async ({ page, request, baseURL }) => {
+  await signIn(page, "alice");
+  const resource = `${baseURL ?? ""}/api/mcp`;
+  const metadata = await (await request.get("/.well-known/oauth-authorization-server")).json() as { registration_endpoint: string; authorization_endpoint: string; token_endpoint: string };
+  const callbackServer = createServer((_req, res) => { res.setHeader("Content-Type", "text/html"); res.end("Connected. Return to your agent."); });
+  await new Promise<void>((resolve) => callbackServer.listen(0, "127.0.0.1", resolve));
+  const address = callbackServer.address();
+  if (!address || typeof address === "string") throw new Error("no callback listener");
+  const callback = `http://127.0.0.1:${String(address.port)}/callback`;
+  try {
+  async function authorize(name: string) {
+    const registration = await request.post(metadata.registration_endpoint, { data: { client_name: name, redirect_uris: [callback], token_endpoint_auth_method: "none", grant_types: ["authorization_code", "refresh_token"], response_types: ["code"] } });
+    expect(registration.status()).toBe(201);
+    const { client_id: clientId } = await registration.json() as { client_id: string };
+    const verifier = randomBytes(32).toString("base64url");
+    const state = randomBytes(16).toString("hex");
+    const query = new URLSearchParams({ response_type: "code", client_id: clientId, redirect_uri: callback, resource, state, code_challenge: createHash("sha256").update(verifier).digest("base64url"), code_challenge_method: "S256" });
+    if (name === "Browser OAuth first client") await page.context().clearCookies();
+    await page.goto(`${metadata.authorization_endpoint}?${query.toString()}`);
+    if (name === "Browser OAuth first client") {
+      await expect(page).toHaveURL(/\/login\?next=/);
+      await page.getByLabel("Username", { exact: true }).fill("alice");
+      await page.getByLabel("Password", { exact: true }).fill("pw-a");
+      await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    }
+    await expect(page.getByRole("heading", { name: `Connect ${name}?` })).toBeVisible();
+    await expect(page.getByText(clientId, { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Allow access", exact: true }).click();
+    await expect(page).toHaveURL((url) => url.origin + url.pathname === callback);
+    const returned = new URL(page.url());
+    expect(returned.searchParams.get("state")).toBe(state);
+    const exchanged = await request.post(metadata.token_endpoint, { form: { grant_type: "authorization_code", client_id: clientId, redirect_uri: callback, code: returned.searchParams.get("code") ?? "", code_verifier: verifier, resource } });
+    expect(exchanged.status()).toBe(200);
+    return await exchanged.json() as { access_token: string };
+  }
+  const first = await authorize("Browser OAuth first client");
+  const second = await authorize("Browser OAuth second client");
+  async function initialize(token: string) {
+    return (await request.post("/api/mcp", { headers: { Authorization: `Bearer ${token}`, Accept: "application/json, text/event-stream" }, data: { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "OAuth browser test", version: "1" } } } })).status();
+  }
+  expect(await initialize(first.access_token)).toBe(200);
+  expect(await initialize(second.access_token)).toBe(200);
+  await page.goto("/connect");
+  const grants = page.locator("#oauth-grants");
+  const row = grants.getByRole("row").filter({ hasText: "Browser OAuth first client" });
+  await row.getByRole("button", { name: "Revoke" }).click();
+  const dialog = page.getByRole("alertdialog");
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole("button", { name: "Revoke", exact: true }).click();
+  await expect(row).toHaveCount(0);
+  expect(await initialize(first.access_token)).toBe(401);
+  expect(await initialize(second.access_token)).toBe(200);
+  await page.reload();
+  await expect(grants.getByRole("row").filter({ hasText: "Browser OAuth second client" })).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  } finally { await new Promise<void>((resolve, reject) => callbackServer.close((err) => { if (err) reject(err); else resolve(); })); }
 });

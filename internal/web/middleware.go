@@ -127,7 +127,7 @@ func (s *Server) openAPI(h http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
-// mcpEndpoint serves agents. Only a personal token opens it: a cookie is
+// mcpEndpoint serves agents. A personal or resource-bound OAuth token opens it: a cookie is
 // ambient authority that any page in the browser could ride, and an agent has
 // no use for one.
 func (s *Server) mcpEndpoint() http.Handler {
@@ -135,13 +135,16 @@ func (s *Server) mcpEndpoint() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		bearer, ok := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer ")
 		if !ok {
-			w.Header().Set("WWW-Authenticate", `Bearer realm="pictor"`)
+			s.oauthChallenge(w, false)
 			jsonError(w, http.StatusUnauthorized, "send a personal token as Authorization: Bearer <token>; create one on the Tokens page")
 			return
 		}
 		p, err := s.store.AuthenticateToken(r.Context(), bearer)
+		if err != nil && strings.HasPrefix(bearer, "caa_") && s.oauth != nil && baseURL(r) == s.oauth.origin {
+			p, err = s.oauthAuthenticate(r.Context(), bearer)
+		}
 		if err != nil {
-			w.Header().Set("WWW-Authenticate", `Bearer realm="pictor", error="invalid_token"`)
+			s.oauthChallenge(w, true)
 			jsonError(w, http.StatusUnauthorized, "invalid token")
 			return
 		}

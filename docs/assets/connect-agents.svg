@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="480" viewBox="0 0 960 480" role="img" aria-labelledby="title desc">
   <title id="title">Multiple AI agents, one CodeXArtifacts workspace</title>
-  <desc id="desc">Claude Code, Codex, Cursor, OpenCode and other MCP clients each connect using their own personal token through the MCP endpoint to the same CodeXArtifacts workspace, with shared artifacts, files and versions subject to token permissions.</desc>
+  <desc id="desc">Claude Code, Codex, Cursor, OpenCode and other MCP clients each connect using their own OAuth authorization or personal token through the MCP endpoint to the same CodeXArtifacts workspace, with shared artifacts, files and versions subject to account permissions.</desc>
   <defs>
     <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#ad4968" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
   </defs>
@@ -30,7 +30,7 @@
     </g>
     <rect x="338" y="193" width="136" height="76" rx="14" fill="#f5e8ed" stroke="#ad4968"/>
     <text x="406" y="227" fill="#8e3451" font-size="25" font-weight="600">MCP</text>
-    <text x="406" y="250" fill="#6b4a56" font-size="14">HTTP + token</text>
+    <text x="406" y="250" fill="#6b4a56" font-size="14">HTTP + OAuth / PAT</text>
     <text x="406" y="302" fill="#625b60" font-family="monospace" font-size="15">/api/mcp</text>
   </g>
   <rect x="560" y="92" width="372" height="294" rx="18" fill="#fff" stroke="#d8d1d1"/>
@@ -51,6 +51,6 @@
       <text x="638" y="299">Web page</text><text x="726" y="299">Doc</text><text x="803.5" y="299">Slides</text>
       <text x="633" y="343">Design</text><text x="724.5" y="343">Board</text>
     </g>
-    <text x="480" y="455" text-anchor="middle" fill="#625b60" font-size="16">Separate client tokens. Shared work. Your existing permissions.</text>
+    <text x="480" y="455" text-anchor="middle" fill="#625b60" font-size="16">Separate client access. Shared work. Your existing permissions.</text>
   </g>
 </svg>
