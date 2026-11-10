@@ -25,6 +25,10 @@ Removing an account blocks new sign-ins; to revoke its existing sessions and
 personal tokens, stop the service and invalidate the account's sessions/tokens
 before exposing it again. Account removal alone is not immediate session revocation.
 
+For centrally managed identities, configure [OIDC browser sign-in](oidc.md), for
+example with Pocket ID. OIDC is an alternative authentication mode and does not
+automatically migrate existing accounts.
+
 ## Runtime settings
 
 | Variable | Default | Purpose |
@@ -33,7 +37,7 @@ before exposing it again. Account removal alone is not immediate session revocat
 | `PICTOR_DB` | `.local/codexartifacts.db` | SQLite database |
 | `PICTOR_ASSETS_DIR` | `assets` beside the database | Uploaded files |
 | `PICTOR_USERS_FILE` | `.local/users.json` | Private local account hashes |
-| `PICTOR_AUTH` | `local` | `local` or explicitly configured `ldap` |
+| `PICTOR_AUTH` | `local` | `local`, explicitly configured `ldap`, or [OIDC](oidc.md) |
 | `PICTOR_OAUTH_ORIGIN` | empty (off) | Fixed public origin enabling [MCP OAuth](mcp-oauth.md), e.g. `https://artifacts.example.org` |
 | `PICTOR_PUBLIC_LINKS` | `false` | Allow authors to publish public links |
 | `PICTOR_USAGE_READERS` | empty | Comma-separated accounts allowed to read usage |

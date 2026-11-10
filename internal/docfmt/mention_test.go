@@ -221,3 +221,33 @@ func TestMentionNamesKeepTheirLiteralCharactersThroughMarkdown(t *testing.T) {
 		}
 	}
 }
+
+func TestAssignedOIDCAccountsRemainMentionsAcrossBlocksAndMarkdown(t *testing.T) {
+	t.Parallel()
+	const user = "oidc:0123456789abcdef0123456789abcdef"
+	d := mustParse(t, one(`{"id":"p","type":"paragraph","content":[{"text":"Ask "},{"user":"`+user+`","name":"OIDC colleague"}]}`))
+	md := ToMarkdown(d)
+	if !strings.Contains(md, "(mention:"+user+")") {
+		t.Fatalf("external account lost in Markdown: %s", md)
+	}
+	roundTrip := fromMD(t, md, nil)
+	if err := mustValid(roundTrip); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(mentionsOf(roundTrip), mentionsOf(d)) {
+		t.Fatalf("identity changed in Markdown: %v vs %v", mentionsOf(roundTrip), mentionsOf(d))
+	}
+}
+
+func TestOtherColonIdentifiersCannotBecomeMentions(t *testing.T) {
+	t.Parallel()
+	for _, user := range []string{"oidc:short", "oidc:" + strings.Repeat("a", 31), "oidc:" + strings.Repeat("a", 33), "oidc:" + strings.Repeat("A", 32), "OIDC:" + strings.Repeat("a", 32), "other:" + strings.Repeat("a", 32), "javascript:alert"} {
+		body := one(`{"id":"p","type":"paragraph","content":[{"user":"` + user + `","name":"Colleague"}]}`)
+		if err := Validate(body); err == nil {
+			t.Errorf("accepted non-account %q in blocks", user)
+		}
+		if _, err := FromMarkdown("[@Colleague](mention:"+user+")", nil, counting()); err == nil {
+			t.Errorf("accepted non-account %q in Markdown", user)
+		}
+	}
+}

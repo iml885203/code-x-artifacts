@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/iml885203/code-x-artifacts/internal/auth"
 	"github.com/iml885203/code-x-artifacts/internal/kind"
@@ -12,11 +11,15 @@ import (
 )
 
 func (s *Server) loginPage(w http.ResponseWriter, r *http.Request) {
-	s.renderShell(w, r, pageData{page: "login", login: &loginBoot{Next: safeNext(r.URL.Query().Get("next"))}})
+	s.renderShell(w, r, s.oidcLogin(r.URL.Query().Get("next"), "", http.StatusOK))
 }
 
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	next := safeNext(r.FormValue("next"))
+	if s.oidc != nil || reservedOIDCAccount(r.FormValue("username")) {
+		s.renderShell(w, r, s.oidcLogin(next, "login.error.invalid", http.StatusUnauthorized))
+		return
+	}
 	signed, err := s.auth.Authenticate(r.Context(), r.FormValue("username"), r.FormValue("password"))
 	if err != nil {
 		msg := "login.error.invalid"
@@ -45,10 +48,7 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 		s.log.Error("record directory lookup", "err", err)
 	}
 	s.log.Info("login", "user", user.Username)
-	http.SetCookie(w, &http.Cookie{
-		Name: sessionCookie, Value: s.sessions.issue(user.Username, time.Now()), Path: "/",
-		HttpOnly: true, Secure: true, SameSite: http.SameSiteLaxMode, MaxAge: int(s.sessions.ttl.Seconds()),
-	})
+	s.issueBrowserSession(w, user.Username)
 	http.Redirect(w, r, next, http.StatusSeeOther) // safeNext reduces next to a path on this site (TestLoginOnlyRedirectsWithinTheSite)
 }
 

@@ -5,11 +5,11 @@ import { keepFocusWhereItWent } from "../menuFocus";
 import type { Boot } from "../boot";
 import { Brand } from "../Header";
 import { Warning } from "../icons/chrome";
-import { useT, type Key } from "../i18n";
+import { format, useT, type Key } from "../i18n";
 import { useDocumentTitle } from "../title";
 import "./login.css";
 
-/** A plain form post to /login: the server signs in, redirects, and answers a failed attempt with this page again. */
+/** Sign in with the configured mode; provider navigation begins only after an explicit action. */
 export function Login({ boot }: { boot: Boot }) {
   const t = useT();
   const login = boot.login;
@@ -30,26 +30,32 @@ export function Login({ boot }: { boot: Boot }) {
         </section>
         <div className="signin-account">
           <Brand link={false} />
-          <form className="signin-panel" method="post" action="/login" aria-labelledby="signin-title" aria-describedby="signin-help">
-            <input type="hidden" name="next" value={login.next} />
-            <h1 id="signin-title">{t("login.title")}</h1>
-            <div className="signin-field">
-              <label htmlFor="username">{t("login.username")}</label>
-              <input id="username" name="username" autoComplete="username" defaultValue={login.username} autoFocus={!failed} required {...invalid} />
-            </div>
-            <div className="signin-field">
-              <label htmlFor="password">{t("login.password")}</label>
-              <input id="password" name="password" type="password" autoComplete="current-password" autoFocus={failed} required {...invalid} />
-              {failed && (
-                <p id="login-error" className="field-error" role="alert">
-                  <Warning />
-                  {t(login.error as Key)}
-                </p>
-              )}
-            </div>
-            <button className="primary" type="submit">{t("login.submit")}</button>
-            <p id="signin-help" className="signin-help">{t("login.help")}</p>
-          </form>
+          {login.oidc ? (
+            <section className="signin-panel" aria-labelledby="signin-title" aria-describedby="signin-help">
+              <h1 id="signin-title">{t("login.title")}</h1>
+              <p id="signin-help" className="signin-help">{t("login.oidc.help")}</p>
+              {failed && <LoginError error={login.error} />}
+              <a className="btn primary signin-provider" href={login.oidc.startUrl} aria-describedby={failed ? "login-error" : undefined}>
+                {format(t(failed ? "login.oidc.retry" : "login.oidc.continue"), { provider: login.oidc.providerName })}
+              </a>
+            </section>
+          ) : (
+            <form className="signin-panel" method="post" action="/login" aria-labelledby="signin-title" aria-describedby="signin-help">
+              <input type="hidden" name="next" value={login.next} />
+              <h1 id="signin-title">{t("login.title")}</h1>
+              <div className="signin-field">
+                <label htmlFor="username">{t("login.username")}</label>
+                <input id="username" name="username" autoComplete="username" defaultValue={login.username} autoFocus={!failed} required {...invalid} />
+              </div>
+              <div className="signin-field">
+                <label htmlFor="password">{t("login.password")}</label>
+                <input id="password" name="password" type="password" autoComplete="current-password" autoFocus={failed} required {...invalid} />
+                {failed && <LoginError error={login.error} />}
+              </div>
+              <button className="primary" type="submit">{t("login.submit")}</button>
+              <p id="signin-help" className="signin-help">{t("login.help")}</p>
+            </form>
+          )}
         </div>
       </div>
       <form id="signin-language" className="signin-foot" method="post" action="/lang">
@@ -76,4 +82,10 @@ export function Login({ boot }: { boot: Boot }) {
       </form>
     </div>
   );
+}
+
+
+function LoginError({ error }: { error: string }) {
+  const t = useT();
+  return <p id="login-error" className="field-error" role="alert"><Warning />{t(error as Key)}</p>;
 }

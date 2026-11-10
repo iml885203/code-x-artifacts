@@ -5,6 +5,7 @@ Start with the [quick start](../README.md#quick-start) and
 
 ## Product and agent contracts
 
+- [OIDC browser sign-in and identity-provider setup](oidc.md)
 - [MCP OAuth setup, permissions and client compatibility](mcp-oauth.md)
 
 - [Artifact formats and limitations](artifact-types.md)

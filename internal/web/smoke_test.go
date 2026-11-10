@@ -59,6 +59,12 @@ func TestServeForBrowserSmoke(t *testing.T) { //nolint:paralleltest // reads PIC
 	ctx, stop := context.WithCancel(t.Context())
 	defer stop()
 	go s.Run(ctx)
-	srv := &http.Server{Addr: addr, Handler: s.Handler(), ReadHeaderTimeout: 10 * time.Second}
+	oidcBrowser := newOIDCBrowserSmoke(t)
+	browserMux := http.NewServeMux()
+	browserMux.HandleFunc("GET /test/oidc-context", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(w, http.StatusOK, map[string]string{"appUrl": oidcBrowser.URL})
+	})
+	browserMux.Handle("/", s.Handler())
+	srv := &http.Server{Addr: addr, Handler: browserMux, ReadHeaderTimeout: 10 * time.Second}
 	t.Fatal(srv.ListenAndServe())
 }

@@ -204,7 +204,7 @@ const draw: Record<string, Partial<NodeSpec>> = {
 function mentionOf(dom: HTMLElement): { user: string; name: string } | false {
   const user = dom.getAttribute("data-user") ?? "";
   const name = dom.textContent.replace(/^@/, "");
-  const ok = /^[A-Za-z0-9._-]{1,64}$/.test(user) && name.trim() !== "" && Array.from(name).length <= 100 && !/\p{Cc}/u.test(name);
+  const ok = /^(?:[A-Za-z0-9._-]{1,64}|oidc:[0-9a-f]{32})$/.test(user) && name.trim() !== "" && Array.from(name).length <= 100 && !/\p{Cc}/u.test(name);
   return ok ? { user, name } : false;
 }
 

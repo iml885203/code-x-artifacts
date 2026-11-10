@@ -1,4 +1,4 @@
 # The most e2e tests (`test(` in e2e/tests/*.spec.ts) the repo may hold; checked by
 # scripts/verify-e2e-budget.sh. Raising it needs the three conditions in docs/test-strategy.md
 # and a justification in review. Lowering it is always welcome.
-101
+102

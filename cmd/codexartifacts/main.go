@@ -18,7 +18,6 @@ import (
 
 	"github.com/iml885203/code-x-artifacts/internal/artifactguard"
 	"github.com/iml885203/code-x-artifacts/internal/assets"
-	"github.com/iml885203/code-x-artifacts/internal/auth"
 	"github.com/iml885203/code-x-artifacts/internal/store"
 	"github.com/iml885203/code-x-artifacts/internal/web"
 )
@@ -61,27 +60,20 @@ func run(log *slog.Logger) error {
 		return err
 	}
 
-	var authenticator auth.Authenticator
 	authMode := cmp.Or(os.Getenv("PICTOR_AUTH"), "local")
-	switch authMode {
-	case "local":
-		authenticator, err = auth.LoadLocal(cmp.Or(os.Getenv("PICTOR_USERS_FILE"), ".local/users.json"))
-		if err != nil {
-			return fmt.Errorf("%w; run codexartifacts init first, or set PICTOR_USERS_FILE", err)
-		}
-	case "ldap":
-		if os.Getenv("LDAP_URL") == "" || os.Getenv("LDAP_DOMAIN") == "" || os.Getenv("LDAP_BASE_DN") == "" {
-			return fmt.Errorf("LDAP_URL, LDAP_DOMAIN and LDAP_BASE_DN are required for LDAP authentication")
-		}
-		authenticator = &auth.LDAP{URL: os.Getenv("LDAP_URL"), Domain: os.Getenv("LDAP_DOMAIN"), BaseDN: os.Getenv("LDAP_BASE_DN"), AllowedGroups: splitList(os.Getenv("LDAP_ALLOWED_GROUPS"))}
-	default:
-		return fmt.Errorf("PICTOR_AUTH must be local or ldap")
+	authenticator, oidcLogin, err := configuredLogin(ctx, authMode)
+	if err != nil {
+		return err
 	}
+
 	publicLinks, err := parseBool("PICTOR_PUBLIC_LINKS")
 	if err != nil {
 		return err
 	}
 	oauthOrigin := os.Getenv("PICTOR_OAUTH_ORIGIN")
+	if oidcLogin != nil && oauthOrigin != "" && oidcLogin.Origin() != oauthOrigin {
+		return fmt.Errorf("OIDC_ORIGIN and PICTOR_OAUTH_ORIGIN must match when both are enabled")
+	}
 	if err := web.ValidateOAuthOrigin(oauthOrigin); err != nil {
 		return fmt.Errorf("PICTOR_OAUTH_ORIGIN: %w", err)
 	}
@@ -89,6 +81,7 @@ func run(log *slog.Logger) error {
 		Admission:     &artifactguard.Registry{},
 		Store:         st,
 		Authenticator: authenticator,
+		OIDC:          oidcLogin,
 		SessionKey:    key,
 		Assets:        files,
 		Logger:        log,

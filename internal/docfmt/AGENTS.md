@@ -15,3 +15,6 @@
 
 - **Date 是只有 `date` 的行內 run，值為有效的 YYYY-MM-DD（0001–9999）；不與其他 run 欄位混用。靜態頁面、Markdown 與 Word 只輸出日期值，blocks 保留可編輯欄位。**
   Tests: `TestADateIsAValidCalendarDayAndHasNoOtherRunFields`, `TestADateExportsOnlyItsVisibleValueAndContributesToTheTitle`, `TestFieldsAreEditedAndRefusedTheSameOverHTTPAndMCPAndSurviveSQLiteReopening`, `TestWordExportsFieldValuesAsTextWhereverRunsAreAllowed`.
+
+- **Mention accounts accept the original directory-account alphabet or the exact assigned `oidc:[0-9a-f]{32}` namespace. Markdown and blocks retain the same identity; arbitrary colon identifiers remain refused.**
+  Tests: `TestAssignedOIDCAccountsRemainMentionsAcrossBlocksAndMarkdown`, `TestOtherColonIdentifiersCannotBecomeMentions`.

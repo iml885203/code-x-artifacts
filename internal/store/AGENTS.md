@@ -18,3 +18,9 @@ Own-comment deletion requires artifact access and author ownership; it clears th
 
 - **OAuth protocol records retain only caller-scrubbed metadata under hashed credential keys. Expired records cannot be read or consumed, and authorization-code/refresh consumption is atomic across SQLite connections. Refresh consumption and its replay tombstone share a transaction so concurrent reuse cannot lose its grant reference. Nonsecret client grants survive restart; owner-scoped revocation is durable and never changes another owner's grants.**
   Tests: `TestOAuthRecordsSurviveRestartExpireAndStayInTheirNamespace`, `TestOAuthCredentialConsumptionIsAtomicAcrossConnections`, `TestOAuthGrantsKeepOwnersAndRevocationAcrossRestart`, `TestOAuthRefreshConsumptionRemembersTheGrantBeforeAnyReplay`, `TestOAuthReplayTombstoneCanOutliveTheCode`.
+
+- **OIDC identities resolve only by the exact issuer/subject pair to a durable reserved `oidc:` account. Provider usernames/email never link local accounts. Mapping and profile writes are atomic across connections; a profile rename preserves artifact ownership, and concurrent first logins leave one account. Password login must refuse the reserved namespace.**
+  Tests: `TestOIDCIdentitySurvivesRestartAndProfileRenamesWithoutChangingOwnership`, `TestOIDCProfilesCannotLinkLocalAccountsOrOtherIssuerSubjects`, `TestConcurrentOIDCFirstSignInsResolveOneDurableAccount`, `TestEmptyOrOversizedOIDCIdentitiesCannotCreateAccounts`.
+
+- **People search includes bounded results for OIDC profiles that have already signed in, without importing unknown provider accounts or claiming a complete provider directory. LDAP/local snapshot validation remains unchanged.**
+  Tests: `TestKnownOIDCProfilesCanBeFoundWithoutInventingACompleteProviderDirectory`.

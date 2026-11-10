@@ -39,6 +39,7 @@ type Server struct {
 	svc      *service.Service
 	mcp      *mcptools.Endpoint
 	auth     auth.Authenticator
+	oidc     *auth.OIDC
 	sessions sessions
 	// shell is the page the React app mounts on; every page of the site is the
 	// same shell with a different boot block. bundle is the build it loads, or
@@ -66,8 +67,10 @@ type Config struct {
 	Admission     artifactguard.Admission
 	Store         *store.Store
 	Authenticator auth.Authenticator
-	SessionKey    []byte
-	Logger        *slog.Logger
+	// OIDC selects externally authenticated browser login.
+	OIDC       *auth.OIDC
+	SessionKey []byte
+	Logger     *slog.Logger
 	// Assets holds the bytes of the files artifacts reference; required.
 	Assets *assets.Disk
 	// PublicLinks lets authors share an artifact with anyone who has the link.
@@ -110,6 +113,7 @@ func New(cfg Config) *Server {
 		store:    cfg.Store,
 		svc:      newService(cfg),
 		auth:     cfg.Authenticator,
+		oidc:     cfg.OIDC,
 		sessions: sessions{key: cfg.SessionKey, ttl: 7 * 24 * time.Hour},
 		langs:    langs,
 		log:      cfg.Logger,
@@ -144,6 +148,7 @@ func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
 	s.routesStatic(mux)
 	s.routesPages(mux)
+	s.routesOIDC(mux)
 	s.routesRaw(mux)
 	mux.Handle("/api/mcp", s.mcpEndpoint())
 	s.routesAgentActivity(mux)
