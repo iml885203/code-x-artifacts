@@ -32,3 +32,12 @@ export function codexConfig(baseUrl: string): string {
 export function mcpJson(baseUrl: string, token: string): string {
   return JSON.stringify({ mcpServers: { pictor: { url: `${baseUrl}/api/mcp`, headers: { Authorization: `Bearer ${token}` } } } }, null, 2);
 }
+
+/** OAuth-capable clients discover authorization from this URL; no static secret. */
+export function oauthClaudeCommand(baseUrl: string): string {
+  return `claude mcp add --transport http codexartifacts ${baseUrl}/api/mcp`;
+}
+
+export function oauthCodexCommand(baseUrl: string): string {
+  return `codex mcp add codexartifacts --url ${baseUrl}/api/mcp\ncodex mcp login codexartifacts`;
+}

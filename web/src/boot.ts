@@ -31,7 +31,9 @@ export interface Boot {
   /** Only the sign-in page: where signing in leads, what went wrong (a catalogue key) and what was typed. */
   login?: { next: string; error: string; username: string };
   /** Only the connect page: the address its commands point at, and the person's tokens (no secrets). */
-  connect?: { baseUrl: string; tokens: TokenItem[] };
+  connect?: { baseUrl: string; tokens: TokenItem[]; oauthEnabled?: boolean };
+  /** Validated browser authorization request; fields include its consent-bound CSRF token. */
+  oauth?: { clientName: string; clientId: string; scope: string; action: string; fields: Record<string, string> };
   /** Only the error page: its HTTP status. */
   status?: number;
 }

@@ -20,6 +20,8 @@ func pageTitle(lang *i18n.Lang, d pageData) string {
 	switch d.page {
 	case "login":
 		name = lang.T("login.title")
+	case "oauth":
+		name = lang.T("oauth.title")
 	case "connect":
 		name = lang.T("connect.title")
 	case "kit":

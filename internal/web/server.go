@@ -34,6 +34,7 @@ var staticFS embed.FS
 
 // Server holds the handlers' dependencies.
 type Server struct {
+	oauth    *oauthServer
 	store    *store.Store
 	svc      *service.Service
 	mcp      *mcptools.Endpoint
@@ -57,6 +58,8 @@ type Server struct {
 
 // Config is what New needs to build a Server.
 type Config struct {
+	// OAuthOrigin is the canonical public origin. Empty disables OAuth.
+	OAuthOrigin string
 	// SourceReadBases optionally supplies the pre-use source snapshot registry.
 	SourceReadBases *designsourceedit.ReadBases
 	// Admission is one process registry, shared by service, joins and peer messages.
@@ -113,6 +116,7 @@ func New(cfg Config) *Server {
 
 		publicLinks: cfg.PublicLinks,
 	}
+	s.oauth = newOAuthServer(cfg.OAuthOrigin, s.store)
 	if cfg.FileLimits != nil {
 		s.svc.SetFileLimits(*cfg.FileLimits)
 	}
@@ -144,6 +148,7 @@ func (s *Server) Handler() http.Handler {
 	mux.Handle("/api/mcp", s.mcpEndpoint())
 	s.routesAgentActivity(mux)
 	s.routesTokens(mux)
+	s.routesOAuth(mux)
 	s.routesArtifacts(mux)
 	s.routesPublishSessions(mux)
 	s.routesVersions(mux)

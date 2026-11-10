@@ -81,6 +81,10 @@ func run(log *slog.Logger) error {
 	if err != nil {
 		return err
 	}
+	oauthOrigin := os.Getenv("PICTOR_OAUTH_ORIGIN")
+	if err := web.ValidateOAuthOrigin(oauthOrigin); err != nil {
+		return fmt.Errorf("PICTOR_OAUTH_ORIGIN: %w", err)
+	}
 	app := web.New(web.Config{
 		Admission:     &artifactguard.Registry{},
 		Store:         st,
@@ -89,6 +93,7 @@ func run(log *slog.Logger) error {
 		Assets:        files,
 		Logger:        log,
 		PublicLinks:   publicLinks,
+		OAuthOrigin:   oauthOrigin,
 		UsageReaders:  splitList(os.Getenv("PICTOR_USAGE_READERS")),
 	})
 	go app.Maintain(ctx, 24*time.Hour)

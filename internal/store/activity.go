@@ -71,7 +71,7 @@ type ActivityFilter struct {
 
 // Activity lists an owner's bounded history. The service validates limits and hides inaccessible targets.
 func (s *Store) Activity(ctx context.Context, owner string, f ActivityFilter, now time.Time) ([]ActivityEntry, error) {
-	query := `SELECT a.id,a.token_id,a.token_label,NOT EXISTS(SELECT 1 FROM tokens t WHERE t.id=a.token_id AND t.username=a.owner),a.transport,a.client,a.client_version,a.occurred_at,a.operation,a.artifact_id,a.version FROM agent_activity a WHERE a.owner=? AND a.occurred_at>=?`
+	query := `SELECT a.id,a.token_id,a.token_label,NOT EXISTS(SELECT 1 FROM tokens t WHERE t.id=a.token_id AND t.username=a.owner) AND NOT EXISTS(SELECT 1 FROM oauth_grants g WHERE g.id=a.token_id AND g.owner=a.owner AND g.revoked=0),a.transport,a.client,a.client_version,a.occurred_at,a.operation,a.artifact_id,a.version FROM agent_activity a WHERE a.owner=? AND a.occurred_at>=?`
 	args := []any{owner, now.Add(-30 * 24 * time.Hour).UnixMilli()}
 	if f.TokenID != "" {
 		query += ` AND a.token_id=?`
@@ -112,8 +112,18 @@ type ActivityToken struct {
 
 // ActivityTokens includes only owned live or retained revoked credential references.
 func (s *Store) ActivityTokens(ctx context.Context, owner string, now time.Time) ([]ActivityToken, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT t.id,t.name,0,u.last_used,u.last_connected FROM tokens t LEFT JOIN agent_token_usage u ON u.owner=t.username AND u.token_id=t.id AND u.last_used>=? WHERE t.username=?
- UNION ALL SELECT u.token_id,u.token_label,1,u.last_used,u.last_connected FROM agent_token_usage u WHERE u.owner=? AND u.last_used>=? AND NOT EXISTS(SELECT 1 FROM tokens t WHERE t.id=u.token_id AND t.username=u.owner) ORDER BY 2,1 LIMIT 1000`, now.Add(-30*24*time.Hour).UnixMilli(), owner, owner, now.Add(-30*24*time.Hour).UnixMilli())
+	rows, err := s.db.QueryContext(ctx, `WITH live_credentials AS (
+ SELECT id,name FROM tokens WHERE username=?1
+ UNION ALL
+ SELECT g.id,g.client_name FROM oauth_grants g WHERE g.owner=?1 AND g.revoked=0
+ AND NOT EXISTS(SELECT 1 FROM tokens t WHERE t.username=g.owner AND t.id=g.id)
+ )
+ SELECT c.id,c.name,0,u.last_used,u.last_connected FROM live_credentials c
+ LEFT JOIN agent_token_usage u ON u.owner=?1 AND u.token_id=c.id AND u.last_used>=?2
+ UNION ALL
+ SELECT u.token_id,u.token_label,1,u.last_used,u.last_connected FROM agent_token_usage u
+ WHERE u.owner=?1 AND u.last_used>=?2 AND NOT EXISTS(SELECT 1 FROM live_credentials c WHERE c.id=u.token_id)
+ ORDER BY 2,1 LIMIT 1000`, owner, now.Add(-30*24*time.Hour).UnixMilli())
 	if err != nil {
 		return nil, err
 	}

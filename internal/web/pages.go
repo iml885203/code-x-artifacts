@@ -127,7 +127,7 @@ func (s *Server) connectPage(w http.ResponseWriter, r *http.Request) {
 		s.serverError(w, err)
 		return
 	}
-	s.renderShell(w, r, pageData{page: "connect", connect: &connectBoot{BaseURL: baseURL(r), Tokens: list}})
+	s.renderShell(w, r, pageData{page: "connect", connect: &connectBoot{BaseURL: baseURL(r), Tokens: list, OAuthEnabled: s.oauth != nil}})
 }
 
 // asksForAPage reports whether a request is a person opening an address, so a

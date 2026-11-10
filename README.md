@@ -49,11 +49,12 @@ Prefer containers? Follow the [Docker Compose instructions](docs/deployment.md#d
 
 ![Claude Code, Codex, Cursor, OpenCode and other MCP clients connect through MCP to the same CodeXArtifacts workspace](docs/assets/connect-agents.svg)
 
-Connect multiple agents to the same artifacts. Give each client its own personal
-token so you can name, track and revoke its access independently.
+Connect multiple agents to the same artifacts. With [OAuth enabled](docs/mcp-oauth.md),
+add the MCP URL to your client, sign in and approve access in your browser.
+Each client has its own authorization, which you can revoke independently.
 
-1. Open **Connect your agent** in the app and create a token for your first client.
-2. Copy the generated settings into that client. For another client, create a separate token.
+1. Open **Connect your agent** in the app and copy the MCP URL into your client.
+2. Complete browser authorization. For clients without OAuth, use a separate personal token.
 3. Ask the first agent to create an artifact:
 
    > Publish a one-page project overview to CodeXArtifacts.
@@ -63,7 +64,7 @@ token so you can name, track and revoke its access independently.
    > Open the project overview in CodeXArtifacts and add a next-steps section.
 
 Both agents work in the same workspace; you can inspect the result in the browser.
-Each client connects independently with its token owner's artifact permissions.
+Each client connects independently with the authorizing account's artifact permissions.
 
 <details>
 <summary>Manual connection settings</summary>
@@ -77,7 +78,8 @@ Each client connects independently with its token owner's artifact permissions.
 For a remote workspace, use its HTTPS address instead of `localhost`.
 Use your client's remote MCP configuration format; the app provides ready-to-copy
 settings for Claude Code and Codex, plus a generic JSON example for other clients.
-Browser OAuth is not supported.
+OAuth-capable clients can use the URL without a manually copied token when the
+operator has enabled OAuth. See [OAuth setup and compatibility](docs/mcp-oauth.md).
 
 </details>
 

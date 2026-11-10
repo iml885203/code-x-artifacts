@@ -6,6 +6,8 @@ import {
   type SyntheticEvent,
   type KeyboardEvent,
 } from "react";
+import { OAuthSetup } from "./OAuthSetup";
+import { OAuthGrants } from "./OAuthGrants";
 import { RecentActivity } from "./RecentActivity";
 import { createToken, listTokens, revokeToken } from "../api";
 import { Code } from "../Code";
@@ -67,7 +69,10 @@ export function Connect({ boot }: { boot: Boot }) {
       <Header boot={boot} />
       <main className="page connect">
         <h1>{t("connect.title")}</h1>
-        <p className="lead">{t("connect.intro")}</p>
+        <p className="lead">{t(data.oauthEnabled ? "connect.oauth.intro" : "connect.intro")}</p>
+        {data.oauthEnabled && <OAuthSetup baseUrl={data.baseUrl} />}
+        <details className="connect-manual" open={!data.oauthEnabled}>
+          <summary>{t("connect.oauth.manual")}</summary>
         <section className="step" aria-labelledby="step-1">
           <h2 id="step-1">
             <span className="num mono">1</span>
@@ -89,6 +94,8 @@ export function Connect({ boot }: { boot: Boot }) {
           )}
           <ClientTabs baseUrl={data.baseUrl} token={token} />
         </section>
+        </details>
+        {data.oauthEnabled && <OAuthGrants />}
         <section className="step" aria-labelledby="step-try">
           <h2 id="step-try">{t("connect.try.title")}</h2>
           <Code text={t("connect.try.prompt")} />

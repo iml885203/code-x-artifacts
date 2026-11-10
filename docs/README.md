@@ -5,6 +5,8 @@ Start with the [quick start](../README.md#quick-start) and
 
 ## Product and agent contracts
 
+- [MCP OAuth setup, permissions and client compatibility](mcp-oauth.md)
+
 - [Artifact formats and limitations](artifact-types.md)
 - [Multi-file web artifacts](multi-file.md), [large publishing](large-publish.md)
 - [Docs format](doc-format.md), [agent editing](doc-edit.md), [browser editor](editor.md)

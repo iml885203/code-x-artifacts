@@ -34,6 +34,7 @@ before exposing it again. Account removal alone is not immediate session revocat
 | `PICTOR_ASSETS_DIR` | `assets` beside the database | Uploaded files |
 | `PICTOR_USERS_FILE` | `.local/users.json` | Private local account hashes |
 | `PICTOR_AUTH` | `local` | `local` or explicitly configured `ldap` |
+| `PICTOR_OAUTH_ORIGIN` | empty (off) | Fixed public origin enabling [MCP OAuth](mcp-oauth.md), e.g. `https://artifacts.example.org` |
 | `PICTOR_PUBLIC_LINKS` | `false` | Allow authors to publish public links |
 | `PICTOR_USAGE_READERS` | empty | Comma-separated accounts allowed to read usage |
 
