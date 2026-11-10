@@ -5,8 +5,8 @@ import { App } from "../App";
 import { bootFor, renderIn } from "../test-support";
 
 const grant = { id: "g1", clientId: "client-one", clientName: "My agent", createdAt: "2026-10-01T08:00:00Z" };
-function open(lang: "en" | "zh-Hant" = "en") {
-  return renderIn(<App boot={bootFor(lang, { page: "connect", here: "/connect", connect: { baseUrl: "https://workspace.example", tokens: [], oauthEnabled: true } })} />, lang, "/connect");
+function open(lang: "en" | "zh-Hant" = "en", tokens: { id: string; name: string; createdAt: string }[] = []) {
+  return renderIn(<App boot={bootFor(lang, { page: "connect", here: "/connect", connect: { baseUrl: "https://workspace.example", tokens, oauthEnabled: true } })} />, lang, "/connect");
 }
 function mockApi({ loadFails = false, revokeFails = false, grants = [grant] } = {}) {
   let failed = loadFails;
@@ -25,31 +25,48 @@ function mockApi({ loadFails = false, revokeFails = false, grants = [grant] } = 
 afterEach(() => { vi.unstubAllGlobals(); });
 
 describe("browser authorization on Connect", () => {
-  it("starts with a URL and secret-free client commands, while PAT setup is optional", async () => {
+  it("starts with selected client commands and keeps PAT setup and empty tokens optional", async () => {
     mockApi({ grants: [] });
     const user = userEvent.setup();
     open();
-    expect(screen.getByRole("heading", { name: "Connect with your browser" })).toBeInTheDocument();
-    expect(screen.getByText("https://workspace.example/api/mcp")).toBeInTheDocument();
-    const manual = screen.getByText("Use a personal access token instead").closest("details");
+    expect(screen.getByRole("heading", { name: "Choose your agent" })).toBeInTheDocument();
+    expect(screen.queryByText("https://workspace.example/api/mcp", { exact: true })).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Your tokens" })).not.toBeVisible();
+    const manual = screen.getByText("Other connection methods").closest("details");
     expect(manual).not.toHaveAttribute("open");
-    const setup = screen.getByRole("heading", { name: "Connect with your browser" }).closest("section");
+    const setup = screen.getByRole("heading", { name: "Choose your agent" }).closest("section");
     if (!setup) throw new Error("missing OAuth setup");
     expect(within(setup).getByRole("tabpanel")).toHaveTextContent("claude mcp add");
     await user.click(within(setup).getByRole("tab", { name: "Codex" }));
     expect(within(setup).getByRole("tabpanel")).toHaveTextContent("codex mcp login codexartifacts");
     await user.keyboard("{End}");
     expect(within(setup).getByRole("tab", { name: "Cursor & others" })).toHaveFocus();
+    expect(within(setup).getByRole("tabpanel")).toHaveTextContent("https://workspace.example/api/mcp");
     await user.keyboard("{Home}");
     expect(within(setup).getByRole("tab", { name: "Claude Code" })).toHaveFocus();
     const nav = screen.getByRole("navigation", { name: "Library" });
     expect(within(nav).getByRole("link", { name: "Connect your agent" })).toHaveAttribute("aria-current", "page");
     expect(within(nav).getByRole("link", { name: "Artifacts" })).not.toHaveAttribute("aria-current");
     expect(setup).not.toHaveTextContent("Bearer");
-    await user.click(screen.getByText("Use a personal access token instead"));
+    await user.click(screen.getByText("Other connection methods"));
     expect(manual).toHaveAttribute("open");
     expect(screen.getByRole("button", { name: "Create token" })).toBeInTheDocument();
-    expect(await screen.findByText("No authorized clients yet. Connect your agent using the server URL above.")).toBeInTheDocument();
+    expect(await screen.findByText("No authorizations yet. Follow the connection instructions above, then refresh this list.")).toBeInTheDocument();
+  });
+
+  it("keeps existing PAT management discoverable and places the trial before access management", async () => {
+    mockApi();
+    const user = userEvent.setup();
+    open("en", [{ id: "pat-one", name: "Build script", createdAt: "2026-10-01T08:00:00Z" }]);
+    expect(screen.getByText("Personal tokens: 1")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Revoke Build script" })).not.toBeVisible();
+    const trial = screen.getByRole("heading", { name: "Then try it" });
+    const management = screen.getByRole("heading", { name: "Access and activity" });
+    expect(trial.compareDocumentPosition(management) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await user.click(screen.getByText("Other connection methods"));
+    expect(screen.getByRole("button", { name: "Revoke Build script" })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Token name" })).toBeInTheDocument();
+    expect(await screen.findByLabelText("Access")).toBeInTheDocument();
   });
 
   it("shows loading, retries a failed list and asks before revoking exactly one grant", async () => {
@@ -88,8 +105,8 @@ describe("browser authorization on Connect", () => {
   it("explains browser connection in Traditional Chinese", async () => {
     mockApi({ grants: [] });
     open("zh-Hant");
-    expect(screen.getByRole("heading", { name: "透過瀏覽器連接" })).toBeInTheDocument();
-    expect(await screen.findByText("尚無已授權的 client，請使用上方的 server 網址連接 agent。")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "選擇你的 agent" })).toBeInTheDocument();
+    expect(await screen.findByText("尚無授權。請依照上方步驟連接 agent，再更新這份清單。")).toBeInTheDocument();
   });
 });
 

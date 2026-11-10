@@ -283,3 +283,5 @@ footers align type icons to the first title line; titles occupy only their actua
 height (clamped at two lines), with the time and author directly below at an 8px gap.
 
 Library author labels and initials use the persisted display name, falling back to the account identifier. Owner headings use the same name in grid and list layouts. Identity-based grouping and ownership remain tied to the account, even when names match.
+
+Connect follows agent selection → client-specific setup → a trial prompt → access and activity. OAuth commands are primary for CLI clients; URL setup belongs to the other-client tab. PAT setup and management share a secondary disclosure with an existing-token count, while OAuth-disabled deployments keep PAT setup directly available. Authorization refresh reports saved grants, never inferred live connectivity.
