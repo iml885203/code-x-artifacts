@@ -190,5 +190,8 @@ Back-channel logout was separately verified with official Pocket ID 2.19.1 on
 isolated loopback HTTP origins using Chrome and a CDP virtual passkey: actual
 OIDC login, local logout, rejection of a retained cookie, re-login and an
 administrative account-disable notification followed by private API rejection
-passed. This is synthetic-account interoperability evidence, not proof of a
-physical passkey or remote HTTPS rollout.
+passed. A second run used a public HTTPS application/callback/notification
+origin behind Cloudflare Tunnel with the same isolated loopback HTTP provider;
+login and notification-driven rejection passed there too. This is synthetic-account
+interoperability evidence, not proof of a physical passkey or a remote HTTPS
+identity-provider deployment.
