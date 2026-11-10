@@ -92,7 +92,7 @@ func (f ListFilter) keeps(v Viewer, a store.Artifact) bool {
 	case f.Scope == ScopeShared && a.Author == v.Username:
 		return false
 	default:
-		return query == "" || strings.Contains(strings.ToLower(a.Title), query) || strings.Contains(strings.ToLower(a.Author), query)
+		return query == "" || strings.Contains(strings.ToLower(a.Title), query) || strings.Contains(strings.ToLower(a.Author), query) || strings.Contains(strings.ToLower(a.AuthorDisplayName), query)
 	}
 }
 

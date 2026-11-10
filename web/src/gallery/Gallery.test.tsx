@@ -44,6 +44,14 @@ afterEach(() => {
 });
 
 describe("the gallery", () => {
+  it("shows the saved author name and initials while keeping missing names readable", async () => {
+    await openGallery([artifact({ title: "Named work", author: "oidc:opaque", authorDisplayName: "Example Person" }), artifact({ title: "Fallback work", author: "fallback", authorDisplayName: "   " })]);
+    expect(within(nth(0)).getByText("Example Person")).toBeInTheDocument();
+    expect(nth(0).querySelector(".card-face")).toHaveTextContent("E");
+    expect(within(nth(0)).queryByText("oidc:opaque")).not.toBeInTheDocument();
+    expect(within(nth(1)).getByText("fallback")).toBeInTheDocument();
+  });
+
   it("reads the artifacts from the JSON API with the cookie and the bridge header", async () => {
     const fetchMock = serve(200, [mine]);
     renderIn(<Gallery boot={bootFor()} />);

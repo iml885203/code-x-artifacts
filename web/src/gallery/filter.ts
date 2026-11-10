@@ -1,4 +1,5 @@
 import type { Artifact } from "../api";
+import { authorName } from "./author";
 
 export type Filter = "all" | "mine" | "shared" | "pinned";
 
@@ -45,7 +46,7 @@ export function recentlyOpened(list: readonly Artifact[], query: string): Artifa
 }
 
 function matches(a: Artifact, query: string): boolean {
-  return `${a.title} ${a.author}`.toLowerCase().includes(query.trim().toLowerCase());
+  return `${a.title} ${a.author} ${authorName(a)}`.toLowerCase().includes(query.trim().toLowerCase());
 }
 
 /** How many artifacts each filter holds, whatever is typed in the search. */

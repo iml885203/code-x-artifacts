@@ -12,3 +12,6 @@
   Tests: Gallery.test.tsx (gives a row the same menu…, runs an action from its letter…); artifactActionList.test.ts; e2e/tests/gallery-cards.spec.ts.
 - "Recently opened" (`/recent`, `isRecentPath`) is the same wall over the artifacts the person opened in the viewer, newest open first (`recentlyOpened`, the order of `GET /api/artifacts?order=opened`): the same cards, rows, menus, search and grid/list choice, without the filter tabs or grouping. The viewer records each opening once (`viewer/useRecordOpen.ts`), also for a signed-out reader of a public link, which only counts in the usage (docs/usage.md); for a signed-in person it puts the answer into the shared list.
   Tests: Recent.test.tsx (opens from the rail item…, says what will show up…); viewer/RecordOpen.test.tsx; e2e/tests/gallery-cards.spec.ts (…finds bob's page first under Recently opened once she opened it).
+
+- Author labels, initials and owner-group headings use `authorDisplayName` with account fallback. Search accepts both names and account IDs; ownership filters and group membership keep stable account identity. Identical display names never merge accounts. List rows keep their existing content.
+  Tests: Gallery.test.tsx, filter.test.ts, group.test.ts; HTTP profile/ownership integration coverage.

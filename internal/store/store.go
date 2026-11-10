@@ -81,9 +81,12 @@ type Artifact struct {
 	// Version is the number of the newest saved version, counted from 1; every
 	// publish and every restore adds one. Title, Format and Content are those
 	// of that version.
-	Version    int        `json:"version"`
-	Author     string     `json:"author"`
-	Visibility Visibility `json:"visibility"`
+	Version int    `json:"version"`
+	Author  string `json:"author"`
+	// AuthorDisplayName is the current saved profile label, falling back to Author.
+	// It is presentation only; ownership and authorization always use Author.
+	AuthorDisplayName string     `json:"authorDisplayName"`
+	Visibility        Visibility `json:"visibility"`
 	// Editors are the accounts the author named to publish new versions; the
 	// author is not in the list. Never null in JSON.
 	Editors []string `json:"editors"`
@@ -278,6 +281,10 @@ func (s *Store) CreateArtifactFrom(ctx context.Context, in NewArtifact) (Artifac
 			a.ID, a.Title, a.Kind, a.Format, a.Content, a.Author, a.Visibility, a.Version, now.Unix(), now.Unix()); err != nil {
 			return err
 		}
+		if err := tx.QueryRowContext(ctx, `SELECT COALESCE((SELECT display_name FROM users WHERE username = ?), '')`, a.Author).Scan(&a.AuthorDisplayName); err != nil {
+			return err
+		}
+		a.AuthorDisplayName = authorLabel(a.Author, a.AuthorDisplayName)
 		return insertVersion(ctx, tx, a.ID, a.Version, Revision{Title: in.Title, Format: in.Format, Content: in.Content, Author: in.Author, Files: in.Files}, in.Kind, now)
 	})
 	return a, err
@@ -426,62 +433,6 @@ func (s *Store) editors(ctx context.Context, id string) (map[string][]string, er
 func (s *Store) DeleteArtifact(ctx context.Context, id string) error {
 	res, err := s.db.ExecContext(ctx, `DELETE FROM artifacts WHERE id = ?`, id)
 	return requireRow(res, err)
-}
-
-// Artifact returns one page with its content.
-func (s *Store) Artifact(ctx context.Context, id string) (Artifact, error) {
-	a := Artifact{ID: id}
-	var created, updated int64
-	var source Source
-	err := s.db.QueryRowContext(ctx, `SELECT title, kind, format, html, author, visibility, organisation_edit, version, copied_from, copied_from_title, created_at, updated_at FROM artifacts WHERE id = ?`, id).
-		Scan(&a.Title, &a.Kind, &a.Format, &a.Content, &a.Author, &a.Visibility, &a.OrganisationEdit, &a.Version, &source.ID, &source.Title, &created, &updated)
-	if errors.Is(err, sql.ErrNoRows) {
-		return Artifact{}, ErrNotFound
-	}
-	if err != nil {
-		return Artifact{}, err
-	}
-	editors, err := s.editors(ctx, id)
-	if err != nil {
-		return Artifact{}, err
-	}
-	a.Editors = append([]string{}, editors[id]...)
-	if source.ID != "" {
-		a.CopiedFrom = &source
-	}
-	a.CreatedAt, a.UpdatedAt = time.Unix(created, 0).UTC(), time.Unix(updated, 0).UTC()
-	return a, nil
-}
-
-// Artifacts lists every page without content, most recently updated first,
-// It does not filter by viewer: the web layer's access rules decide who sees what.
-func (s *Store) Artifacts(ctx context.Context) ([]Artifact, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, title, kind, format, author, visibility, organisation_edit, version, created_at, updated_at FROM artifacts ORDER BY updated_at DESC`)
-	if err != nil {
-		return nil, err
-	}
-	defer closeRows(rows)
-	list := []Artifact{}
-	for rows.Next() {
-		var a Artifact
-		var created, updated int64
-		if err := rows.Scan(&a.ID, &a.Title, &a.Kind, &a.Format, &a.Author, &a.Visibility, &a.OrganisationEdit, &a.Version, &created, &updated); err != nil {
-			return nil, err
-		}
-		a.CreatedAt, a.UpdatedAt = time.Unix(created, 0).UTC(), time.Unix(updated, 0).UTC()
-		list = append(list, a)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	editors, err := s.editors(ctx, "")
-	if err != nil {
-		return nil, err
-	}
-	for i := range list {
-		list[i].Editors = append([]string{}, editors[list[i].ID]...)
-	}
-	return list, nil
 }
 
 // CreateToken returns the plaintext token once; only its hash is kept.

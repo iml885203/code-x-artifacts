@@ -115,3 +115,8 @@ describe("the choices a person keeps", () => {
     }).not.toThrow();
   });
 });
+
+it("keeps people with identical display names in separate owner groups", () => {
+  const list = [item("one", { author: "oidc:one", authorDisplayName: "Same Name" }), item("two", { author: "oidc:two", authorDisplayName: "Same Name" })];
+  expect(titles(groupArtifacts(list, "owner", now, "oidc:two"))).toEqual([["owner:oidc:two", ["two"]], ["owner:oidc:one", ["one"]]]);
+});

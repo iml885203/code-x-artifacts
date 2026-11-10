@@ -27,3 +27,6 @@ Own-comment deletion requires artifact access and author ownership; it clears th
 
 - **Browser session indexes contain no bearer cookies. Session creation and subject revocation serialize before cutoff reads, including across SQLite connections. Revocation, unknown-subject cutoff and jti replay records commit atomically; active protection is never evicted on capacity exhaustion.**
   Tests: `TestBrowserRevocationSurvivesReopenSerializesCallbacksAndExpiresSafely`, `TestBrowserStorageCapacityFailsClosedAndCleanupRestoresCapacity`.
+
+- **Artifact reads attach the author's current saved profile display name (trimmed, falling back to the stable author account), using a join rather than per-artifact profile reads. Creation responses resolve the same label inside the creation transaction. This label never replaces the author ID or changes ownership.**
+  Tests: `TestTheLibraryUsesCurrentAuthorNamesWithoutChangingIdentityOrAccess`, `TestLibraryAuthorNamesFallBackForMissingOrBlankProfilesAndKeepLocalNames`, `TestNewArtifactsImmediatelyCarryTheAuthorsDisplayName` (internal/web).

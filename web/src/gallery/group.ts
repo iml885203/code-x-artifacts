@@ -2,6 +2,7 @@
 // "group by" choice, and the two choices a person keeps (how to group, grid or
 // list). Pure rules apart from the storage, which tolerates being unavailable.
 import type { Artifact } from "../api";
+import { authorName } from "./author";
 import { displayedKinds, displayOf, reservedKinds, type DisplayedKind } from "../kinds/kinds";
 
 export type GroupBy = "none" | "date" | "owner" | "kind";
@@ -66,7 +67,8 @@ export function groupArtifacts(list: readonly Artifact[], by: GroupBy, now: Date
         return items.length === 0 ? [] : [{ by, key, items: pinnedFirst(items) }];
       });
     case "owner": {
-      const owners = [...new Set(list.map((a) => a.author))].sort((a, b) => Number(b === user) - Number(a === user) || a.localeCompare(b));
+      const names = new Map(list.map((a) => [a.author, authorName(a)]));
+      const owners = [...names.keys()].sort((a, b) => Number(b === user) - Number(a === user) || (names.get(a) ?? a).localeCompare(names.get(b) ?? b) || a.localeCompare(b));
       return owners.map((owner) => ({ by, key: `owner:${owner}`, owner, items: pinnedFirst(list.filter((a) => a.author === owner)) }));
     }
   }
