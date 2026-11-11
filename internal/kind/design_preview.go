@@ -42,7 +42,7 @@ func previewPage(m designfmt.Manifest) Page {
 	if frames := m.Frames(); len(frames) > 0 {
 		f := frames[0].Frame
 		fmt.Fprintf(&b, "<div class=\"thumb\" style=\"aspect-ratio: %d / %d\">", f.W, f.H)
-		fmt.Fprintf(&b, "<iframe src=\"%s\" title=\"%s\" sandbox=\"allow-scripts\" tabindex=\"-1\" style=\"width: %dpx; height: %dpx; transform: scale(tan(atan2(100cqw, %dpx)))\"></iframe></div>\n", esc(f.File), esc(f.Name), f.W, f.H, f.W)
+		fmt.Fprintf(&b, "<iframe src=\"%s\" title=\"%s\" sandbox=\"allow-scripts\" tabindex=\"-1\" style=\"width: %dpx; height: %dpx; transform: scale(tan(atan2(100cqw, %dpx)))\"></iframe></div>\n", esc(f.File+"?preview"), esc(f.Name), f.W, f.H, f.W)
 	}
 	b.WriteString("</body>\n</html>\n")
 	return Page{HTML: b.String(), titleAt: titleAt}

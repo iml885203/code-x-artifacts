@@ -53,6 +53,10 @@ func (s *Server) writeFrame(w http.ResponseWriter, r *http.Request, a store.Arti
 		s.serverError(w, err)
 		return
 	}
+	if isPreview(r) {
+		page.HTML = inject(page.HTML, previewCaptureJS)
+		page.InlineScripts = append(page.InlineScripts, previewCaptureJS)
+	}
 	h := w.Header()
 	h.Set("Content-Type", "text/html; charset=utf-8")
 	h.Set("Content-Security-Policy", frameCSP(baseURL(r), a.ID, page.InlineScripts))

@@ -32,7 +32,7 @@ export function Card({ artifact: a, beforePin }: Props) {
 
   const body = (
     <>
-      <Preview id={a.id} />
+      <Preview id={a.id} version={a.version} />
       <div className="card-meta">
         <KindMark kind={a.kind} />
         <div className="card-text">
