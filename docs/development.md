@@ -90,22 +90,39 @@ Review the card before publishing; use demonstration content only.
 Metadata and crawl files improve how the site is described; search engines and
 sharing platforms choose when to refresh their cached copies.
 
-## Library preview cache
+## Library image thumbnails
 
-The first visible preview runs in the existing opaque-origin sandbox. A bounded
-preview-only capture records a settled DOM representation (including canvas images,
-current form state, styles and nested supported frames). Later visits/reloads can
-reuse that frozen representation without running the artifact’s original scripts.
-This is not a bitmap screenshot or a retained live session; the browser still
-performs layout. CSS animation is frozen at capture time. Content that is busy,
-unsupported (for example video, shadow DOM or ephemeral blob resources), too large
-or cannot be captured safely keeps its live preview.
+Gallery and Recently opened cards use account-scoped JPEG thumbnails at a fixed
+1120×720 image size (a 560×360 CSS viewport, rendered at 2×). A cold card queues an invisible opaque-origin preview in the
+viewer's browser (at most two at once). The preview uses bundled html-to-image to
+rasterize settled content, including canvas and supported nested Design frames;
+it never gets the viewer's API bridge or session credentials. Successful uploads
+are decoded and reencoded as JPEG by Go, then the temporary iframe is removed.
+A warm card loads only an image, without running the artifact or loading its fonts.
+No server browser, Node runtime or external screenshot service is required.
 
-Snapshots stay in server memory, per account: at most 128 entries, 32 MiB total,
-2 MiB per entry, expiring at the next hour boundary to avoid stale embedded grants.
-Restart or eviction creates a normal cold miss. Saved version, asset hashes,
-visibility, viewport/browser preferences and request origin participate in identity.
-Metadata, upload and delivery recheck current access; cached content is never a
-substitute for authorization and is not stored in a public CDN or browser storage.
-Warm responses are `no-store`, inert sandboxed documents with scripts disabled.
-Only previews suppress scrollbar UI; opened artifacts keep ordinary scrolling.
+Images persist in `thumbnails/` next to `PICTOR_DB`. The cache is disposable:
+200 MiB by default (`PICTOR_THUMBNAIL_CACHE_MB=1..4096`), at most 10,000 files and
+1 MiB per uploaded image. Least-recently-used files are evicted to maintain bounds;
+old revisions are replaced for each account/artifact/theme/language variant.
+There are at most four variants (light/dark × English/Traditional Chinese), with
+no viewport or device-pixel-ratio variants. Capture times out after 20 seconds,
+and the outer queue releases/removes a stuck document after 30 seconds.
+
+Saved version, relevant asset hashes, visibility, render script and frontend build,
+request origin, account and theme/language participate in identity. Hour boundaries
+and expired embedded grants do not invalidate pixels. Generation/upload/delivery
+recheck current access; image responses are `no-store`, not public CDN objects.
+Already delivered pixels cannot be recalled. Persisted thumbnails contain no live
+resource URLs. A cache miss or failure shows the card's lightweight placeholder;
+opening the full artifact still works and retains normal scrolling/interactivity.
+Video, shadow DOM, scrolled internal containers, oversized nested frames (>2000px),
+busy or excessively complex content may be unsupported. Font/image CORS or browser
+SVG/canvas restrictions can also prevent capture; failed captures are not saved.
+Focus retries a missing preview after a one-minute cooldown; a reload retries too.
+
+The previous process-local inert HTML preview endpoints remain available for older
+clients, with their existing 128-entry / 32 MiB / next-hour expiry limits. Current
+cards do not use them. Changes to server-only rendering that do not affect the
+capture script or frontend must bump the thumbnail renderer namespace in
+`thumbnail_routes.go` so persisted images are regenerated.

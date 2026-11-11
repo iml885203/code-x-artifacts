@@ -54,12 +54,16 @@ func (s *Server) writeFrame(w http.ResponseWriter, r *http.Request, a store.Arti
 		return
 	}
 	if isPreview(r) {
-		page.HTML = inject(page.HTML, previewCaptureJS)
-		page.InlineScripts = append(page.InlineScripts, previewCaptureJS)
+		page.HTML = inject(page.HTML, s.thumbnailScript)
+		page.InlineScripts = append(page.InlineScripts, s.thumbnailScript)
 	}
 	h := w.Header()
 	h.Set("Content-Type", "text/html; charset=utf-8")
-	h.Set("Content-Security-Policy", frameCSP(baseURL(r), a.ID, page.InlineScripts))
+	policy := frameCSP(baseURL(r), a.ID, page.InlineScripts)
+	if isPreview(r) {
+		policy += "; connect-src " + baseURL(r) + "/static/fonts/ " + baseURL(r) + assets.PathPrefix(a.ID)
+	}
+	h.Set("Content-Security-Policy", policy)
 	h.Set("X-Content-Type-Options", "nosniff")
 	h.Set("X-Robots-Tag", "noindex")
 	h.Set("Cache-Control", "no-store")

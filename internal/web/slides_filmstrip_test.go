@@ -29,7 +29,7 @@ func TestADeckPreviewIsTheDeckWithoutItsPlayerAndAllowsNoScriptButThePreviewStub
 		t.Errorf("preview sandbox %q differs from the page's", sandboxOf(csp))
 	}
 	m := regexp.MustCompile(`script-src ([^;]*)`).FindStringSubmatch(csp)
-	if m == nil || strings.TrimSpace(m[1]) != scriptHash(previewJS) {
+	if m == nil || strings.TrimSpace(m[1]) != scriptHash(previewStubJS+"\n"+testThumbnailScript(t)) {
 		t.Errorf("preview csp %q: want a script-src that allows the preview stub alone", csp)
 	}
 	if strings.Contains(body, bridgeJS) || !strings.Contains(body, previewCaptureJS) || strings.Contains(body, `id="bar"`) {

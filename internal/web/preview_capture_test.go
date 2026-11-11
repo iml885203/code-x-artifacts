@@ -18,11 +18,14 @@ func TestOnlyDesignPreviewFramesReceiveTheCaptureProtocolAndItsHash(t *testing.T
 	if full.StatusCode != http.StatusOK || preview.StatusCode != http.StatusOK {
 		t.Fatal("frame not served")
 	}
-	if strings.Contains(fullBody, previewCaptureJS) || strings.Contains(full.Header.Get("Content-Security-Policy"), scriptHash(previewCaptureJS)) {
+	if strings.Contains(fullBody, previewCaptureJS) || strings.Contains(full.Header.Get("Content-Security-Policy"), scriptHash(testThumbnailScript(t))) {
 		t.Fatal("full design frame was changed")
 	}
-	if !strings.Contains(previewBody, previewCaptureJS) || !strings.Contains(preview.Header.Get("Content-Security-Policy"), scriptHash(previewCaptureJS)) {
+	if !strings.Contains(previewBody, previewCaptureJS) || !strings.Contains(preview.Header.Get("Content-Security-Policy"), scriptHash(testThumbnailScript(t))) {
 		t.Fatal("preview capture not installed and pinned")
+	}
+	if strings.Contains(full.Header.Get("Content-Security-Policy"), "connect-src") || !strings.Contains(preview.Header.Get("Content-Security-Policy"), "connect-src ") {
+		t.Fatal("capture resource reads changed full frame policy or were not scoped to previews")
 	}
 	if strings.Contains(previewBody, bridgeJS) || strings.Contains(previewBody, previewStubJS) || strings.Contains(preview.Header.Get("Content-Security-Policy"), "allow-same-origin") {
 		t.Fatal("preview frame acquired API bridge or same-origin authority")

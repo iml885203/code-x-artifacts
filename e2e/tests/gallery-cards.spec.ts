@@ -207,104 +207,70 @@ test("carol does not see bob's pin, groups the library by owner as a list, and f
   await other.close();
 });
 
-test("every card of the overview shows its page, a script-drawn one too, and logs no console error", async ({ page }) => {
+test("gallery cards reuse image thumbnails across formats without loading artifact documents", async ({ page, expectConsoleErrors }) => {
   await signIn(page, "alice");
   const ids: string[] = [];
-  const own: string[] = [];
-  const cached = new Set<string>();
-  const rawDocuments: string[] = [];
-  const unsafeSnapshots: string[] = [];
-  page.on("response", (response) => {
-    if (new URL(response.url()).pathname.startsWith("/preview/") && response.status() === 200) {
-      void response.text().then((html) => { if (/<script\b|\son[a-z]+=/i.test(html)) unsafeSnapshots.push(response.url()); }).catch(() => undefined);
-    }
-    const match = /^\/api\/artifacts\/([^/]+)\/preview$/.exec(new URL(response.url()).pathname);
-    if (match?.[1] && response.request().method() === "POST" && response.status() === 204) cached.add(match[1]);
-  });
-  page.on("request", (request) => {
-    if (request.resourceType() === "document" && ids.some((id) => new URL(request.url()).pathname.startsWith(`/raw/${id}`))) rawDocuments.push(request.url());
-  });
-  page.on("console", (m) => {
-    if (m.type() === "error" && ids.some((id) => m.location().url.includes(id))) own.push(m.text());
-  });
   const made = async (body: Parameters<typeof publish>[1]) => ids.push((await publish(page, body)).id);
-  await made({ title: "Plain html", content: '<!doctype html><style>body{width:1400px} .scroller{width:150px;height:80px;overflow:scroll;scrollbar-width:auto!important}</style><h1>Html on a card</h1><div class="scroller"><div style="width:800px;height:800px">Scrollable content</div></div>' });
-  // A page that asks for its data on load: in a preview nothing answers, and it must not throw.
-  await made({
-    title: "Asks for data",
-    content: "<!doctype html><h1 id=t>Waiting</h1><canvas id=c width=40 height=40></canvas><script>pictor.db.list('rows').then(() => { document.getElementById('t').textContent = 'Answered'; }); document.body.append('Drawn by script'); const ctx=document.getElementById('c').getContext('2d'); ctx.fillStyle='red'; ctx.fillRect(0,0,40,40);</script>",
-  });
-  await made({ title: "A doc", kind: "doc", content: "# Doc on a card\n\nBody.\n" });
-  await made({ title: "A chart", kind: "react", content: 'export default function App() { return <><h1>React on a card</h1><p>{matchMedia("(prefers-color-scheme: dark)").matches ? "Dark branch" : "Light branch"}</p></>; }\n' });
-  // A design of eight frames: its card loads the first frame only.
-  const frames = Array.from({ length: 8 }, (_, i) => ({ id: `f${i + 1}`, name: `Frame ${i + 1}`, file: `frames/f${i + 1}.html`, w: 400, h: 300 }));
-  await made({
-    title: "Eight frames",
-    kind: "design",
-    content: JSON.stringify({ version: 1, pages: [{ id: "p", name: "Page", rows: [frames] }] }),
-    files: Object.fromEntries(frames.map((f) => [f.file, `<!doctype html><body><h1>Text of ${f.name}</h1></body>`])),
-  });
-  await made({ title: "A board", kind: "board", content: JSON.stringify({ version: 1, elements: [{ id: "box", type: "rectangle", x: 0, y: 0, label: "Board on a card" }] }) });
-  await made({ title: "A deck", kind: "slides", content: JSON.stringify({ version: 1, slides: [{ layout: "title", title: "Slides on a card" }] }) });
-  const frameRequests: string[] = [];
-  page.on("request", (r) => {
-    if (/\/frames\/f\d\.html$/.test(new URL(r.url()).pathname)) frameRequests.push(new URL(r.url()).pathname.split("/").pop() ?? "");
-  });
+  await made({ title: "Image HTML", content: '<!doctype html><style>body{background:#ffe0e8}.scroller{width:150px;height:80px;overflow:scroll;scrollbar-width:auto!important}</style><h1>HTML thumbnail</h1><div class="scroller"><div style="height:800px">Scroll content</div></div>' });
+  await made({ title: "Image canvas", content: '<!doctype html><h1>Canvas thumbnail</h1><canvas id=c width=160 height=100></canvas><script>const ctx=document.getElementById("c").getContext("2d");ctx.fillStyle="red";ctx.fillRect(0,0,160,100)</script>' });
+  await made({ title: "Image doc", kind: "doc", content: "# Document 縮圖\n\nA paragraph.\n" });
+  await made({ title: "Image React", kind: "react", content: 'export default function App(){const dark=matchMedia("(prefers-color-scheme: dark)").matches;return <div style={{height:"720px",background:navigator.language!=="en"?"rgb(0,255,0)":dark?"rgb(0,0,255)":"rgb(255,0,0)"}}><h1>{dark?"Dark thumbnail":"Light thumbnail"}</h1></div>}' });
+  await made({ title: "Image design", kind: "design", content: JSON.stringify({version:1,pages:[{id:"p",name:"Page",rows:[[{id:"f",name:"Frame",file:"frames/f.html",w:400,h:300}]]}]}), files:{"frames/f.html":"<!doctype html><body><h1>Design thumbnail</h1></body>"} });
+  await made({ title: "Image board", kind: "board", content: JSON.stringify({version:1,elements:[{id:"box",type:"rectangle",x:0,y:0,label:"Board thumbnail"}]}) });
+  await made({ title: "Image slides", kind: "slides", content: JSON.stringify({version:1,slides:[{layout:"title",title:"Slides thumbnail"}]}) });
+  const card=(index:number)=>page.locator(`li.card[data-artifact-id="${ids[index]}"]`);
   await page.goto("/");
-  const card = (index: number) => page.locator("li.card").filter({ has: page.locator(`a[href="/a/${ids[index] ?? ""}"]`) });
-  const previews = [
-    ["Plain html", "Html on a card"],
-    ["Asks for data", "Drawn by script"],
-    ["A doc", "Doc on a card"],
-    ["A chart", "React on a card"],
-  ] as const;
-  for (const [index, [title, text]] of previews.entries()) {
-    await expect(card(index).getByRole("heading", { name: title, exact: true })).toBeVisible();
-    await expect(card(index).frameLocator("iframe").getByText(text)).toBeVisible();
+  for (let i=0;i<ids.length;i++) {
+    await card(i).scrollIntoViewIfNeeded();
+    await expect(card(i).locator(".thumb-screen > img")).toBeVisible({timeout:25000});
+    await expect(card(i).locator(".thumb-screen")).toHaveClass(/loaded/);
+    await expect(card(i).locator("iframe")).toHaveCount(0);
+    const image=card(i).locator(".thumb-screen > img");
+    expect(await image.evaluate((node)=>{const img=node as HTMLImageElement;return img.naturalWidth===1120&&img.naturalHeight===720;})).toBe(true);
   }
-  for (const [index, text] of [[5, "Board on a card"], [6, "Slides on a card"]] as const) {
-    await expect(card(index).frameLocator("iframe").getByText(text)).toBeVisible();
-  }
-  // The page that asked is still waiting: the preview has no bridge behind it.
-  await expect(card(1).frameLocator("iframe").locator("#t")).toHaveText("Waiting");
-  expect(own, "console errors of the cards' own frames").toEqual([]);
-  await expect(card(4).frameLocator("iframe").frameLocator("iframe").getByText("Text of Frame 1")).toBeVisible();
-  expect(frameRequests, "frame documents the wall asked for").toEqual(["f1.html"]);
-  const nested = card(0).frameLocator("iframe").locator(".scroller");
-  await expect(nested).toHaveCSS("scrollbar-width", "none");
-  await expect(card(0).frameLocator("iframe").locator("html")).toHaveCSS("scrollbar-width", "none");
-  await expect.poll(() => ids.filter((id) => cached.has(id)).length, { timeout: 25_000 }).toBe(ids.length);
-  const coldRequests = rawDocuments.length;
+  const reactPixel=async()=>card(3).locator(".thumb-screen > img").evaluate((node)=>{const canvas=document.createElement("canvas");canvas.width=1120;canvas.height=720;const context=canvas.getContext("2d");if(!context)throw Error("no canvas");context.drawImage(node as HTMLImageElement,0,0);return [...context.getImageData(1000,500,1,1).data];});
+  expect(await reactPixel()).toEqual([254,0,0,255]);
+  const warmRequests:string[]=[];
+  page.on("request",request=>{const path=new URL(request.url()).pathname;if(request.resourceType()==="document"&&ids.some((id)=>path===`/raw/${id}`||path.startsWith(`/raw/${id}/`)||path===`/preview/${id}`))warmRequests.push(path);});
   await page.reload();
-  for (const [index, [, text]] of previews.entries()) {
-    await expect(card(index).frameLocator("iframe").getByText(text)).toBeVisible();
-    await expect(card(index).locator("iframe")).toHaveAttribute("src", /^\/preview\//);
-  }
-  await expect(card(4).frameLocator("iframe").frameLocator("iframe").getByText("Text of Frame 1")).toBeVisible();
-  for (const [index, text] of [[5, "Board on a card"], [6, "Slides on a card"]] as const) {
-    await expect(card(index).frameLocator("iframe").getByText(text)).toBeVisible();
-    await expect(card(index).locator("iframe")).toHaveAttribute("src", /^\/preview\//);
-  }
-  await expect(card(1).frameLocator("iframe").locator("img#c")).toHaveAttribute("src", /^data:image\/png/);
-  expect(rawDocuments.length, "warm previews do not download or initialize raw artifact documents").toBe(coldRequests);
-  expect(unsafeSnapshots, "ready snapshots contain no script elements or event handlers").toEqual([]);
-  await expect(card(0).frameLocator("iframe").locator(".scroller")).toHaveCSS("scrollbar-width", "none");
-  // Full pages retain ordinary root/nested scrolling; only thumbnails suppress bars.
-  await card(0).getByRole("link", { name: "Plain html" }).first().click();
-  const fullScroller = page.frameLocator("iframe[data-artifact-frame]").locator(".scroller");
-  await expect(fullScroller).toHaveCSS("scrollbar-width", "auto");
-  expect(await fullScroller.evaluate((element) => { element.scrollTop = 40; return element.scrollTop; })).toBe(40);
-  await page.getByRole("link", { name: "Back to artifacts" }).click();
-  await expect(card(0).locator("iframe")).toHaveAttribute("src", /^\/preview\//);
-  await republish(page, ids[0] ?? "", { title: "Plain html", content: "<!doctype html><h1>Version two on a card</h1>", baseVersion: 1 });
+  for(let i=0;i<ids.length;i++){await card(i).scrollIntoViewIfNeeded();await expect(card(i).locator(".thumb-screen.loaded > img")).toBeVisible();}
+  expect(warmRequests).toEqual([]);
+  // Only opened artifacts have interactive scrolling.
+  await card(0).getByRole("link").first().click();
+  const scroller=page.frameLocator("iframe[data-artifact-frame]").locator(".scroller");
+  await expect(scroller).toHaveCSS("scrollbar-width","auto");
+  expect(await scroller.evaluate((node)=>{node.scrollTop=40;return node.scrollTop;})).toBe(40);
+  await page.goto("/");
+  await card(0).scrollIntoViewIfNeeded();
+  await expect(card(0).locator(".thumb-screen.loaded > img")).toBeVisible();
+  const previous=await card(0).locator(".thumb-screen > img").getAttribute("src");
+  await republish(page,ids[0]??"",{title:"Image HTML",content:"<!doctype html><h1>Updated thumbnail</h1>",baseVersion:1});
+  await page.reload();await card(0).scrollIntoViewIfNeeded();
+  await expect(card(0).locator(".thumb-screen.loaded > img")).toBeVisible({timeout:25000});
+  expect(await card(0).locator(".thumb-screen > img").getAttribute("src")).not.toBe(previous);
+  await page.emulateMedia({colorScheme:"dark"});await card(3).scrollIntoViewIfNeeded();
+  await expect(card(3).locator(".thumb-screen.loaded > img")).toHaveAttribute("src",/scheme=dark/,{timeout:25000});
+  expect(await reactPixel()).toEqual([0,0,254,255]);
+  await page.evaluate(()=>{localStorage.setItem("pictor-theme","light");});
+  await page.reload();await card(3).scrollIntoViewIfNeeded();
+  await expect(card(3).locator(".thumb-screen.loaded > img")).toHaveAttribute("src",/scheme=light/,{timeout:25000});
+  expect(await reactPixel()).toEqual([254,0,0,255]);
+  await page.evaluate(()=>{localStorage.removeItem("pictor-theme");});
+  await page.emulateMedia({colorScheme:"light"});
+  await expect(card(3).locator(".thumb-screen.loaded > img")).toHaveAttribute("src",/scheme=light/,{timeout:25000});
+  // A loaded CSS image that cannot be embedded must not become a permanent incomplete thumbnail.
+  expectConsoleErrors(/capture-background\.png/);
+  await page.route("**/capture-background.png", async (route) => {
+    if (route.request().resourceType() === "fetch") { await route.abort("failed"); return; }
+    await route.fulfill({contentType:"image/png",body:Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a0xkAAAAASUVORK5CYII=","base64")});
+  });
+  const origin = new URL(page.url()).origin;
+  const failed=await publish(page,{title:"Unembeddable background",content:`<!doctype html><body style="background-image:url('${origin}/capture-background.png')"><h1>Background must be included</h1>`});
   await page.reload();
-  await expect(card(0).frameLocator("iframe").getByText("Version two on a card")).toBeVisible();
-  await page.emulateMedia({ colorScheme: "dark" });
-  await expect(card(3).frameLocator("iframe").getByText("Dark branch")).toBeVisible();
-  await page.emulateMedia({ colorScheme: "light" });
-  await expect(card(3).frameLocator("iframe").getByText("Light branch")).toBeVisible();
-  // The same design opens normally, with every frame.
-  await card(4).getByRole("link", { name: "Eight frames" }).first().click();
-  await expect(page).toHaveURL(new RegExp(`/a/${ids[4]}$`));
-  await expect.poll(() => frameRequests.filter((f) => f === "f8.html").length).toBeGreaterThan(0);
+  const failedCard=page.locator(`li.card[data-artifact-id="${failed.id}"]`);await failedCard.scrollIntoViewIfNeeded();
+  await expect(failedCard.locator("iframe")).toHaveCount(1);
+  await expect(failedCard.locator("iframe")).toHaveCount(0,{timeout:25000});
+  await expect(failedCard.locator(".thumb-screen > img")).toHaveCount(0);
+  await expect(failedCard.getByRole("link").first()).toHaveAttribute("href",`/a/${failed.id}`);
+
 });

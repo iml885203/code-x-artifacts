@@ -1,5 +1,15 @@
 (() => {
   // Preview-only, deliberately separate from the viewer's privileged bridge.
+  let validLocale = true;
+  const locale = new URL(location.href).searchParams.get("lang");
+  if (locale === "en" || locale === "zh-TW") {
+    try {
+      Object.defineProperty(navigator, "language", { value: locale });
+      Object.defineProperty(navigator, "languages", { value: Object.freeze([locale]) });
+      document.documentElement.lang = locale;
+    } catch { validLocale = false; }
+  }
+  const rasterize = globalThis.htmlToImage?.toSvg;
   const maxBytes = 2 << 20;
   const scrollbarCSS = "*,*::before,*::after{scrollbar-width:none!important}*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}";
   const hideBars = document.createElement("style");
@@ -149,13 +159,123 @@
     return html;
   }
 
+  async function embeddedFonts() {
+    const rules = [];
+    const seen = new Set();
+    async function readSheet(sheet, base, depth = 0) {
+      if (depth > 4) throw Error("too many font imports");
+      let list;
+      try { list = [...sheet.cssRules]; }
+      catch {
+        if (!sheet.href || seen.has(sheet.href)) return;
+        seen.add(sheet.href);
+        const response = await fetch(sheet.href, { credentials: "omit" });
+        if (!response.ok) throw Error("stylesheet unavailable");
+        const text = await response.text();
+        if (text.length > 2 << 20) throw Error("stylesheet too large");
+        const parsed = new CSSStyleSheet(); parsed.replaceSync(text); list = [...parsed.cssRules]; base = sheet.href;
+      }
+      for (const rule of list) {
+        if (rule.type === CSSRule.FONT_FACE_RULE) rules.push([rule, base]);
+        else if (rule.type === CSSRule.IMPORT_RULE) await readSheet(rule.styleSheet || { href: rule.href }, rule.href, depth + 1);
+      }
+    }
+    for (const sheet of document.styleSheets) await readSheet(sheet, sheet.href || document.baseURI);
+    const families = new Set([...document.querySelectorAll("*")].flatMap((node) => getComputedStyle(node).fontFamily.toLowerCase().split(",").map((s) => s.trim().replace(/["']/g, ""))));
+    const points = [...new Set([...(document.body.textContent || "")].map((c) => c.codePointAt(0)))];
+    const usedRange = (range) => !range || range.split(",").some((part) => {
+      const value = part.trim().replace(/^U\+/i, ""); const [lo, hi] = value.split("-");
+      const low = parseInt(lo.replace(/\?/g, "0"),16); const high = parseInt((hi || lo).replace(/\?/g,"F"),16);
+      return points.some((point) => point >= low && point <= high);
+    });
+    let bytes = 0; let count = 0; const output = [];
+    for (const [rule, base] of rules) {
+      if (!families.has(rule.style.fontFamily.toLowerCase().replace(/["']/g,"")) || !usedRange(rule.style.getPropertyValue("unicode-range"))) continue;
+      let css = rule.cssText;
+      for (const match of [...css.matchAll(/url\(["']?([^"')]+)["']?\)/g)]) {
+        if (match[1].startsWith("data:")) continue;
+        if (++count > 96) throw Error("too many fonts");
+        const response = await fetch(new URL(match[1],base), { credentials: "omit" });
+        if (!response.ok) throw Error("font unavailable");
+        const blob = await response.blob(); bytes += blob.size;
+        if (bytes > 16 << 20) throw Error("fonts too large");
+        const data = await new Promise((resolve,reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(blob); });
+        css = css.replace(match[0], 'url("' + data + '")');
+      }
+      output.push(css);
+    }
+    return output.join("\n");
+  }
+
+  // Rasterization stays inside the same opaque origin, without a privileged bridge.
+  async function bitmap(width, height, outputWidth = width, outputHeight = height) {
+    if (!validLocale || !rasterize || ![width,height,outputWidth,outputHeight].every((value) => Number.isInteger(value) && value >= 1 && value <= 2000)) throw Error("unsupported capture");
+    await settled();
+    const nodes = [...document.querySelectorAll("*")];
+    if (nodes.length > 20000 || nodes.some((node) => node.shadowRoot || node.matches("video,object,embed") || (node.scrollTop || 0) !== 0 || (node.scrollLeft || 0) !== 0)) throw Error("unsupported content");
+    const frames = [...document.querySelectorAll("iframe")];
+    if (frames.length > 16) throw Error("too many frames");
+    const replacements = [];
+    try {
+      for (const frame of frames) {
+        const image = await new Promise((resolve, reject) => {
+          const source = frame.contentWindow;
+          const request = crypto.randomUUID();
+          const done = (event) => {
+            if (event.source !== source || event.origin !== "null" || event.data?.pictorPreview !== "thumbnail" || event.data.request !== request) return;
+            clearTimeout(timer); removeEventListener("message", done);
+            if (typeof event.data.image !== "string" || !event.data.image.startsWith("data:image/jpeg;base64,") || event.data.image.length > maxBytes) reject(Error("frame capture failed"));
+            else resolve(event.data.image);
+          };
+          const timer = setTimeout(() => { removeEventListener("message", done); reject(Error("frame timeout")); }, 12000);
+          addEventListener("message", done);
+          source.postMessage({ pictorPreview: "thumbnail-capture", request, width: frame.clientWidth, height: frame.clientHeight }, "*");
+        });
+        const replacement = document.createElement("img");
+        for (const attr of frame.attributes) if (attr.name !== "src" && attr.name !== "srcdoc" && attr.name !== "sandbox") replacement.setAttribute(attr.name, attr.value);
+        const computed = getComputedStyle(frame);
+        for (const property of computed) replacement.style.setProperty(property, computed.getPropertyValue(property));
+        replacement.src = image;
+        replacement.style.width = frame.offsetWidth + "px"; replacement.style.height = frame.offsetHeight + "px";
+        replacements.push([frame, replacement]); frame.replaceWith(replacement);
+        await replacement.decode();
+      }
+      for (const original of document.querySelectorAll("canvas")) {
+        const image = document.createElement("img");
+        for (const attr of original.attributes) image.setAttribute(attr.name, attr.value);
+        const computed = getComputedStyle(original);
+        for (const property of computed) image.style.setProperty(property, computed.getPropertyValue(property));
+        image.src = original.toDataURL(); image.style.width = original.clientWidth + "px"; image.style.height = original.clientHeight + "px";
+        replacements.push([original, image]); original.replaceWith(image); await image.decode();
+      }
+      const missingResource = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a0xkAAAAASUVORK5CYII=#pictor-thumbnail-missing";
+      const svg = await rasterize(document.documentElement, {
+        width, height, canvasWidth: width, canvasHeight: height, pixelRatio: 1,
+        backgroundColor: getComputedStyle(document.documentElement).backgroundColor === "rgba(0, 0, 0, 0)" ? "#ffffff" : getComputedStyle(document.documentElement).backgroundColor,
+        imagePlaceholder: missingResource, includeQueryParams: true, fontEmbedCSS: await embeddedFonts(), preferredFontFormat: "woff2", fetchRequestInit: { credentials: "omit" },
+        filter: (node) => !["SCRIPT", "NOSCRIPT", "HEAD"].includes(node.nodeName),
+      });
+      const markup = decodeURIComponent(svg).replace(/&quot;/g, '"');
+      if (markup.includes(missingResource) || /url\(\s*["']?(?:https?:|blob:)/i.test(markup)) throw Error("resource embedding failed");
+      const image = new Image(); image.src = svg; await image.decode();
+      const canvas = document.createElement("canvas"); canvas.width = outputWidth; canvas.height = outputHeight;
+      const ctx = canvas.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0,0,outputWidth,outputHeight); ctx.drawImage(image,0,0,outputWidth,outputHeight);
+      return canvas.toDataURL("image/jpeg", 0.82);
+    } finally { for (const [frame, replacement] of replacements) replacement.replaceWith(frame); }
+  }
+
   let capturing = false;
   addEventListener("message", async (event) => {
     const data = event.data;
-    if (event.source !== parent || data?.pictorPreview !== "capture" || typeof data.request !== "string" || data.request.length > 128 || capturing) return;
+    if (event.source !== parent || !["capture", "thumbnail-capture"].includes(data?.pictorPreview) || typeof data.request !== "string" || data.request.length > 128 || capturing) return;
     capturing = true;
-    try { parent.postMessage({ pictorPreview: "snapshot", request: data.request, html: await snapshot() }, "*"); }
-    catch { parent.postMessage({ pictorPreview: "snapshot", request: data.request, failed: true }, "*"); }
+    const thumbnail = data.pictorPreview === "thumbnail-capture";
+    try {
+      if (thumbnail) {
+        const image = await bounded(bitmap(data.width, data.height, data.outputWidth, data.outputHeight), 20000);
+        parent.postMessage({ pictorPreview: "thumbnail", request: data.request, image }, "*");
+      } else parent.postMessage({ pictorPreview: "snapshot", request: data.request, html: await snapshot() }, "*");
+    } catch { parent.postMessage({ pictorPreview: thumbnail ? "thumbnail" : "snapshot", request: data.request, failed: true }, "*"); }
     finally { capturing = false; }
   });
 })();

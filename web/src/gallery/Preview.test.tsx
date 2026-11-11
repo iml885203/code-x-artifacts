@@ -1,160 +1,87 @@
 import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Preview } from "./Preview";
-
 const key = "a".repeat(64);
-const cached = `/preview/example?w=640&h=400&key=${key}`;
+const url = `/thumbnail/example?key=${key}&scheme=light&lang=en`;
 const response = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
-const frameOf = () => {
-  const frame = document.querySelector("iframe");
-  if (!frame) throw new Error("missing preview iframe");
-  return frame;
-};
-async function ready(src: string) {
-  await waitFor(() => { expect(frameOf()).toHaveAttribute("src", src); });
-  return frameOf();
-}
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
-
-describe("version-aware library previews", () => {
-  it("uses a validated ready snapshot and keeps it hidden until it loads", async () => {
-    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(response({ key, version: 1, url: cached }))));
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+describe("image thumbnails", () => {
+  it("shows a warm image without creating an artifact frame, and keeps it after focus", async () => {
+    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(response({ key, url }))));
     render(<Preview id="example" version={1} />);
-    const frame = await ready(cached);
-    expect(frame).toHaveAttribute("sandbox", "allow-scripts");
-    expect(frame).toHaveAttribute("loading", "lazy");
-    expect(frame.closest(".thumb-screen")).not.toHaveClass("loaded");
-    fireEvent.load(frame);
-    expect(frame.closest(".thumb-screen")).toHaveClass("loaded");
-    expect(document.querySelector('iframe[src^="/raw/"]')).toBeNull();
+    await waitFor(() => expect(document.querySelector("img")).toHaveAttribute("src", url));
+    const img = document.querySelector("img");
+    expect(document.querySelector("iframe")).toBeNull();
+    expect(img).toHaveAttribute("alt", "");
+    if (!img) throw new Error("missing image");
+    fireEvent.load(img);
+    expect(img.closest(".thumb-screen")).toHaveClass("loaded");
+    fireEvent.focus(window);
+    expect(document.querySelector("img")).toBe(img);
   });
-
-  it("keeps an already-loaded snapshot visible after unchanged focus revalidation", async () => {
-    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(response({ key, version: 1, url: cached }))));
-    render(<Preview id="example" version={1} />);
-    const frame = await ready(cached);
-    fireEvent.load(frame);
-    expect(frame.closest(".thumb-screen")).toHaveClass("loaded");
-    await act(async () => { fireEvent.focus(window); await Promise.resolve(); });
-    expect(frameOf()).toBe(frame);
-    expect(frameOf().closest(".thumb-screen")).toHaveClass("loaded");
+  it.each([401,403,404,503])("keeps only the placeholder on a %s response", async (status) => {
+    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(response({},status))));
+    await act(async () => { render(<Preview id="example" version={1} />);  await Promise.resolve(); });
+    expect(document.querySelector("img,iframe")).toBeNull();
   });
-
-  it("accepts a pending cold capture after unchanged focus revalidation", async () => {
-    const uploads: string[] = [];
-    vi.stubGlobal("fetch", vi.fn((_url: string, init?: RequestInit) => {
-      if (init?.method === "POST") {
-        if (typeof init.body !== "string") throw new Error("snapshot upload must be JSON");
-        uploads.push(init.body);
-        return Promise.resolve(new Response(null, { status: 204 }));
-      }
-      return Promise.resolve(response({ key, version: 1 }));
-    }));
-    render(<Preview id="example" version={1} />);
-    const frame = await ready("/raw/example?preview");
-    const target = frame.contentWindow;
-    if (!target) throw new Error("missing preview window");
-    const sent = vi.spyOn(target, "postMessage").mockImplementation(() => undefined);
-    fireEvent.load(frame);
-    const message = sent.mock.calls[0]?.[0] as { request: string } | undefined;
-    if (!message) throw new Error("missing capture request");
-    await act(async () => { fireEvent.focus(window); await Promise.resolve(); });
-    expect(frameOf()).toBe(frame);
-    expect(frameOf().closest(".thumb-screen")).toHaveClass("loaded");
-    const html = "<!doctype html><p>Still ready</p>";
-    window.dispatchEvent(new MessageEvent("message", { source: target, origin: "null", data: { pictorPreview: "snapshot", request: message.request, html } }));
-    await waitFor(() => { expect(uploads.map((body) => JSON.parse(body) as unknown)).toEqual([{ key, html }]); });
-  });
-
-  it("loads the live preview after a miss and revalidates a changed artifact version", async () => {
-    let version = 1;
-    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(response({ key, version, ...(version === 1 ? { url: cached } : {}) }))));
-    const view = render(<Preview id="example" version={1} />);
-    const previous = await ready(cached);
-    version = 2;
-    view.rerender(<Preview id="example" version={2} />);
-    const current = await ready("/raw/example?preview");
-    expect(current).not.toBe(previous);
-    expect(current.closest(".thumb-screen")).not.toHaveClass("loaded");
-  });
-
-  it.each([401, 403, 404])("does not fall back to private content after an authorization response of %s", async (status) => {
-    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(response({ error: "refused" }, status))));
-    await act(async () => { render(<Preview id="example" version={1} />); await Promise.resolve(); });
-    expect(frameOf()).not.toHaveAttribute("src");
-    expect(frameOf().closest(".thumb-screen")).not.toHaveClass("loaded");
-  });
-
-  it("keeps a live fallback usable when the cache service fails", async () => {
-    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(response({ error: "unavailable" }, 503))));
-    render(<Preview id="example" version={1} />);
-    expect(await ready("/raw/example?preview")).toHaveAttribute("sandbox", "allow-scripts");
-  });
-
-  it("admits only the requested snapshot from its own opaque preview window", async () => {
-    const uploads: { key: string; html: string }[] = [];
-    vi.stubGlobal("fetch", vi.fn((_url: string, init?: RequestInit) => {
-      if (init?.method === "POST") {
-        if (typeof init.body !== "string") throw new Error("snapshot upload must be JSON");
-        uploads.push(JSON.parse(init.body) as { key: string; html: string });
-        return Promise.resolve(new Response(null, { status: 204 }));
-      }
-      return Promise.resolve(response({ key, version: 1 }));
-    }));
-    render(<Preview id="example" version={1} />);
-    const frame = await ready("/raw/example?preview");
-    const target = frame.contentWindow;
-    if (!target) throw new Error("missing preview window");
-    const sent = vi.spyOn(target, "postMessage").mockImplementation(() => undefined);
-    fireEvent.load(frame);
-    const message = sent.mock.calls[0]?.[0] as { request: string } | undefined;
-    if (!message) throw new Error("missing capture request");
-    const data = { pictorPreview: "snapshot", request: message.request, html: "<!doctype html><p>Ready</p>" };
-    const deliver = (source: Window, origin: string, payload: unknown) => window.dispatchEvent(new MessageEvent("message", { source, origin, data: payload }));
-    deliver(window, "null", data);
-    deliver(target, "https://another.example", data);
-    deliver(target, "null", { ...data, request: "a different preview" });
-    expect(uploads).toEqual([]);
-    deliver(target, "null", data);
-    await waitFor(() => { expect(uploads).toEqual([{ key, html: data.html }]); });
-    deliver(target, "null", data);
-    expect(uploads).toHaveLength(1);
-  });
-
-  it("does not upload oversized or no-longer-mounted preview snapshots", async () => {
-    const uploads: unknown[] = [];
-    vi.stubGlobal("fetch", vi.fn((_url: string, init?: RequestInit) => {
-      if (init?.method === "POST") uploads.push(init.body);
-      return Promise.resolve(response({ key, version: 1 }));
-    }));
-    const view = render(<Preview id="example" version={1} />);
-    const frame = await ready("/raw/example?preview");
-    const target = frame.contentWindow;
-    if (!target) throw new Error("missing preview window");
-    const sent = vi.spyOn(target, "postMessage").mockImplementation(() => undefined);
-    fireEvent.load(frame);
-    const message = sent.mock.calls[0]?.[0] as { request: string } | undefined;
-    if (!message) throw new Error("missing capture request");
-    const deliver = (html: string) => window.dispatchEvent(new MessageEvent("message", { source: target, origin: "null", data: { pictorPreview: "snapshot", request: message.request, html } }));
-    deliver("x".repeat((2 << 20) + 1));
-    view.unmount();
-    deliver("<p>Late snapshot</p>");
-    expect(uploads).toEqual([]);
-  });
-
-  it("defers offscreen previews until the card approaches the viewport", async () => {
-    let reveal: () => void = () => { throw new Error("observer not attached"); };
-    vi.stubGlobal("IntersectionObserver", class {
-      constructor(callback: IntersectionObserverCallback) {
-        reveal = () => { callback([{ isIntersecting: true } as IntersectionObserverEntry], this as unknown as IntersectionObserver); };
-      }
-      observe() { return undefined; }
-      disconnect() { return undefined; }
+  it("ignores forged captures and accepts only its opaque frame's matching JPEG", async () => {
+    let stored = false;
+    const fetchMock = vi.fn((_url: string, init?: RequestInit) => {
+      if (init?.method === "POST") { stored = true; return Promise.resolve(new Response(null,{status:204})); }
+      return Promise.resolve(response({ key, ...(stored ? {url} : {source:"/raw/example?preview&scheme=light&lang=en"}) }));
     });
-    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(response({ key, version: 1 }))));
-    await act(async () => { render(<Preview id="example" version={1} />); await Promise.resolve(); });
-    expect(frameOf()).not.toHaveAttribute("src");
-    act(reveal);
-    await ready("/raw/example?preview");
+    vi.stubGlobal("fetch",fetchMock);
+    render(<Preview id="example" version={1} />);
+    await waitFor(() => { expect(document.querySelector("iframe")).not.toBeNull(); });
+    const frame = document.querySelector("iframe");
+    if (!frame?.contentWindow) throw new Error("missing frame");
+    expect(frame).toHaveAttribute("sandbox","allow-scripts");
+    expect(frame).toHaveAttribute("aria-hidden","true");
+    const sent = vi.spyOn(frame.contentWindow,"postMessage").mockImplementation(() => undefined);
+    fireEvent.load(frame);
+    const request = (sent.mock.calls[0]?.[0] as {request:string}).request;
+    const data = {pictorPreview:"thumbnail",request,image:"data:image/jpeg;base64,YWJj"};
+    await act(async () => {
+      window.dispatchEvent(new MessageEvent("message",{source:window,origin:"null",data}));
+      window.dispatchEvent(new MessageEvent("message",{source:frame.contentWindow,origin:location.origin,data}));
+      window.dispatchEvent(new MessageEvent("message",{source:frame.contentWindow,origin:"null",data:{...data,request:"forged"}}));
+     await Promise.resolve(); });
+    expect(stored).toBe(false);
+    await act(async () => { window.dispatchEvent(new MessageEvent("message",{source:frame.contentWindow,origin:"null",data}));  await Promise.resolve(); });
+    await waitFor(() => expect(document.querySelector("img")).toHaveAttribute("src",url));
+    expect(document.querySelector("iframe")).toBeNull();
   });
+  it("removes a failed cold capture without showing a broken image or live preview", async () => {
+    vi.stubGlobal("fetch",vi.fn(() => Promise.resolve(response({key,source:"/raw/example?preview&scheme=light&lang=en"}))));
+    render(<Preview id="example" version={1} />);
+    await waitFor(() => { expect(document.querySelector("iframe")).not.toBeNull(); });
+    const frame=document.querySelector("iframe");
+    if (!frame?.contentWindow) throw new Error("missing frame");
+    const sent=vi.spyOn(frame.contentWindow,"postMessage").mockImplementation(()=>undefined);fireEvent.load(frame);
+    await act(async () => {window.dispatchEvent(new MessageEvent("message",{source:frame.contentWindow,origin:"null",data:{pictorPreview:"thumbnail",request:(sent.mock.calls[0]?.[0] as {request:string}).request,failed:true}})); await Promise.resolve(); });
+    expect(document.querySelector("img,iframe")).toBeNull();
+  });
+  it("does not render an image from an old artifact version while its replacement loads", async () => {
+    vi.stubGlobal("fetch",vi.fn(()=>Promise.resolve(response({key,url}))));
+    const view=render(<Preview id="example" version={1} />);
+    await waitFor(()=> { expect(document.querySelector("img")).not.toBeNull(); });
+    vi.stubGlobal("fetch",vi.fn(()=>new Promise(()=>undefined)));
+    view.rerender(<Preview id="example" version={2} />);
+    expect(document.querySelector("img,iframe")).toBeNull();
+  });
+});
+
+it("keeps the newest system-theme result when an older metadata request finishes later", async () => {
+  const media=Object.assign(new EventTarget(),{matches:false});
+  vi.stubGlobal("matchMedia",()=>media);
+  let finish: ((value:Response)=>void) | undefined;
+  let calls=0;
+  const dark=`/thumbnail/example?key=${key}&scheme=dark&lang=en`;
+  vi.stubGlobal("fetch",vi.fn(()=>{calls++;return calls===1?new Promise<Response>((resolve)=>{finish=resolve;}):Promise.resolve(response({key,url:dark}));}));
+  render(<Preview id="example" version={1} />);
+  await waitFor(()=>{expect(calls).toBe(1);});
+  await act(async()=>{media.matches=true;media.dispatchEvent(new Event("change"));await Promise.resolve();});
+  await waitFor(()=>{expect(document.querySelector("img")).toHaveAttribute("src",dark);});
+  await act(async()=>{finish?.(response({key,url}));await Promise.resolve();});
+  expect(document.querySelector("img")).toHaveAttribute("src",dark);
 });

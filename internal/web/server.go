@@ -35,14 +35,16 @@ var staticFS embed.FS
 
 // Server holds the handlers' dependencies.
 type Server struct {
-	previews *previewCache
-	oauth    *oauthServer
-	store    *store.Store
-	svc      *service.Service
-	mcp      *mcptools.Endpoint
-	auth     auth.Authenticator
-	oidc     *auth.OIDC
-	sessions sessions
+	previews        *previewCache
+	thumbnails      *thumbnailCache
+	thumbnailScript string
+	oauth           *oauthServer
+	store           *store.Store
+	svc             *service.Service
+	mcp             *mcptools.Endpoint
+	auth            auth.Authenticator
+	oidc            *auth.OIDC
+	sessions        sessions
 	// browserAdmission serializes browser socket validation/Join with revocation.
 	browserAdmission sync.RWMutex
 	// shell is the page the React app mounts on; every page of the site is the
@@ -65,6 +67,9 @@ type Server struct {
 type Config struct {
 	// OAuthOrigin is the canonical public origin. Empty disables OAuth.
 	OAuthOrigin string
+	// ThumbnailDir is disposable image storage on the local data volume.
+	ThumbnailDir        string
+	ThumbnailCacheBytes int64
 	// SourceReadBases optionally supplies the pre-use source snapshot registry.
 	SourceReadBases *designsourceedit.ReadBases
 	// Admission is one process registry, shared by service, joins and peer messages.
@@ -129,6 +134,10 @@ func New(cfg Config) *Server {
 		previewNow = cfg.Clock.Now
 	}
 	s.previews = newPreviewCache(previewNow)
+	s.thumbnails, err = openThumbnailCache(cfg.ThumbnailDir, cfg.ThumbnailCacheBytes)
+	if err != nil {
+		cfg.Logger.Warn("thumbnail cache unavailable", "err", err)
+	}
 	s.oauth = newOAuthServer(cfg.OAuthOrigin, s.store)
 	if cfg.FileLimits != nil {
 		s.svc.SetFileLimits(*cfg.FileLimits)
@@ -143,6 +152,8 @@ func New(cfg Config) *Server {
 	if s.assets == nil {
 		s.assets = embeddedBundle()
 	}
+	vendor, _ := fs.ReadFile(s.assets, "thumbnail-vendor.js")
+	s.thumbnailScript = string(vendor) + "\n" + previewCaptureJS
 	s.bundle, s.bundleErr = loadBundle(s.assets)
 	if s.bundleErr != nil {
 		cfg.Logger.Error("the front end is not built into this binary; pages the React app serves will fail", "err", s.bundleErr)
@@ -160,6 +171,7 @@ func (s *Server) Handler() http.Handler {
 	s.routesOIDC(mux)
 	s.routesRaw(mux)
 	s.routesPreviews(mux)
+	s.routesThumbnails(mux)
 	mux.Handle("/api/mcp", s.mcpEndpoint())
 	s.routesAgentActivity(mux)
 	s.routesTokens(mux)

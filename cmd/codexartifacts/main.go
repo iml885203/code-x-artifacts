@@ -77,7 +77,12 @@ func run(log *slog.Logger) error {
 	if err := web.ValidateOAuthOrigin(oauthOrigin); err != nil {
 		return fmt.Errorf("PICTOR_OAUTH_ORIGIN: %w", err)
 	}
+	thumbnailBudget, err := thumbnailCacheBudget(os.Getenv("PICTOR_THUMBNAIL_CACHE_MB"))
+	if err != nil {
+		return err
+	}
 	app := web.New(web.Config{
+		ThumbnailDir: filepath.Join(filepath.Dir(dbPath), "thumbnails"), ThumbnailCacheBytes: thumbnailBudget,
 		Admission:     &artifactguard.Registry{},
 		Store:         st,
 		Authenticator: authenticator,
@@ -148,4 +153,15 @@ func splitList(s string) []string {
 		}
 	}
 	return out
+}
+
+func thumbnailCacheBudget(value string) (int64, error) {
+	if value == "" {
+		return 200 << 20, nil
+	}
+	mb, err := strconv.ParseInt(value, 10, 32)
+	if err != nil || mb < 1 || mb > 4096 {
+		return 0, fmt.Errorf("PICTOR_THUMBNAIL_CACHE_MB must be 1..4096")
+	}
+	return mb << 20, nil
 }

@@ -1,5 +1,5 @@
 import react from "@vitejs/plugin-react";
-import { cpSync, mkdirSync } from "node:fs";
+import { cpSync, mkdirSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { defineConfig, type Plugin } from "vitest/config";
@@ -15,6 +15,7 @@ function keepPlaceholder(): Plugin {
   return {
     name: "keep-placeholder",
     generateBundle() {
+ this.emitFile({ type: "asset", fileName: "thumbnail-vendor.js", source: readFileSync("node_modules/html-to-image/dist/html-to-image.js", "utf8") });
       this.emitFile({ type: "asset", fileName: ".gitkeep", source: "" });
     },
   };
@@ -119,7 +120,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "^/(api|raw|static|login|logout|lang|tokens|a|healthz)(/|$)": { target: pictor, changeOrigin: false },
+      "^/(api|raw|thumbnail|static|login|logout|lang|tokens|a|healthz)(/|$)": { target: pictor, changeOrigin: false },
     },
   },
   test: {

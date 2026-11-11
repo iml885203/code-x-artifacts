@@ -18,10 +18,16 @@ function isOverviewPreview(text: string, resource: string, page: string, wasOnOv
   const resourcePath = new URL(resource || page).pathname;
   // The overview's own list request, cut off by the navigation away from it, is logged as ERR_FAILED the same way.
   const lateOverview = wasOnOverview && (resourcePath.startsWith("/raw/") || resourcePath === "/api/artifacts");
+  // Other tests can delete an uploaded picture while a visible gallery preview is loading it.
+  if (["/", "/recent"].includes(new URL(page).pathname) && /^\/files\/[^/]+\//.test(resourcePath) && /^Failed to load resource: the server responded with a status of 404\b/.test(text)) return true;
+  const thumbnail = /^\/(?:api\/artifacts\/[^/]+\/thumbnail|thumbnail\/[^/]+)$/.test(resourcePath);
+  // A version/access change can race metadata, upload or image fetch while another test shares the gallery.
+  if (thumbnail && wasOnOverview && /^Failed to load resource: the server responded with a status of (?:404|409)\b/.test(text)) return true;
   if (new URL(page).pathname !== "/" && !lateOverview) return false;
   // A card runs the artifact's own script, so what that script logs (a page that fetches the API from its opaque origin is refused by CORS) is its author's,
   // not the site's. The test that is about the cards reads their frames itself.
-  if (/\/raw\/[^/?]+\?preview$/.test(new URL(resource || page).pathname + new URL(resource || page).search)) return true;
+  const preview = new URL(resource || page);
+  if (/^\/raw\/[^/]+(?:\/[^/]+\/)?$/.test(preview.pathname) && preview.searchParams.has("preview")) return true;
   // The browser's second line for that refusal names the refused address, not the frame.
   if (text.startsWith("Failed to load resource: net::ERR_FAILED") && new URL(resource || page).pathname.startsWith("/api/")) return true;
   return text.startsWith("Failed to load resource: the server responded with a status of 404") && /\/raw\/[^/]+$/.test(new URL(resource || page).pathname);
