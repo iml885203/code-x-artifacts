@@ -33,11 +33,9 @@ func TestAPreviewIsTheSamePageInTheSameSandboxAndCannotReachTheBridge(t *testing
 	if !strings.Contains(fullBody, "postMessage") {
 		t.Fatal("the opened page has lost its bridge")
 	}
-	// Nothing in a preview talks to the parent, so no page in a card can ask the viewer for anything.
-	for _, bridge := range []string{"postMessage", "parent", "addEventListener"} {
-		if strings.Contains(cardBody, bridge) {
-			t.Errorf("a preview carries %q of the bridge: %.300s", bridge, cardBody)
-		}
+	// Preview capture speaks only its own protocol; it never installs the viewer's API bridge.
+	if strings.Contains(cardBody, bridgeJS) || !strings.Contains(cardBody, previewCaptureJS) {
+		t.Error("preview capture replaced or exposed the viewer bridge")
 	}
 	if !strings.Contains(cardBody, "window.pictor") {
 		t.Error("a page that reads window.pictor throws in a preview")
@@ -65,7 +63,7 @@ func TestAPreviewShowsAPageDrawnByScriptsUnderTheSandboxOfThePageAndNeverTheBrid
 	if strings.Contains(scriptSrc, scriptHash(bridgeJS)) || !strings.Contains(scriptSrc, scriptHash(previewJS)) || strings.Contains(scriptSrc, "'self'") {
 		t.Errorf("preview script-src: %q", csp)
 	}
-	if strings.Contains(body, "postMessage") {
+	if strings.Contains(body, bridgeJS) {
 		t.Error("a preview of a react page carries the bridge")
 	}
 }
@@ -95,7 +93,7 @@ func TestAPreviewOfAPageWithFilesKeepsBeingAPreviewAcrossTheGrantRedirect(t *tes
 		t.Fatalf("redirect: %d %q", res.StatusCode, to)
 	}
 	granted, body := h.do(bob, "GET", to, "", nil)
-	if granted.StatusCode != http.StatusOK || !strings.Contains(body, "on the card") || strings.Contains(body, "postMessage") {
+	if granted.StatusCode != http.StatusOK || !strings.Contains(body, "on the card") || strings.Contains(body, bridgeJS) {
 		t.Errorf("the granted preview: %d %.300s", granted.StatusCode, body)
 	}
 }

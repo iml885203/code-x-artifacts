@@ -96,6 +96,7 @@ describe("the gallery", () => {
 
   it("previews each artifact in a sandboxed iframe that runs the page's script but gets no bridge", async () => {
     await openGallery([mine]);
+    await waitFor(() => { expect(document.querySelector("iframe")).toHaveAttribute("src", `/raw/${mine.id}?preview`); });
     const frame = document.querySelector("iframe");
     expect(frame).toHaveAttribute("src", `/raw/${mine.id}?preview`);
     // Script only: no same-origin, no forms, no popups.
@@ -105,6 +106,7 @@ describe("the gallery", () => {
 
   it("keeps a preview hidden until its page has loaded, out of the tab order and out of the accessibility tree", async () => {
     await openGallery([mine]);
+    await waitFor(() => { expect(document.querySelector("iframe")).toHaveAttribute("src", `/raw/${mine.id}?preview`); });
     const frame = document.querySelector("iframe");
     if (!frame) throw new Error("no preview frame");
     const screenBox = frame.closest(".thumb-screen");

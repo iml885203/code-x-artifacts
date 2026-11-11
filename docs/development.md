@@ -89,3 +89,23 @@ The renderer also records the asset source in `website/social/og.png.json`.
 Review the card before publishing; use demonstration content only.
 Metadata and crawl files improve how the site is described; search engines and
 sharing platforms choose when to refresh their cached copies.
+
+## Library preview cache
+
+The first visible preview runs in the existing opaque-origin sandbox. A bounded
+preview-only capture records a settled DOM representation (including canvas images,
+current form state, styles and nested supported frames). Later visits/reloads can
+reuse that frozen representation without running the artifact’s original scripts.
+This is not a bitmap screenshot or a retained live session; the browser still
+performs layout. CSS animation is frozen at capture time. Content that is busy,
+unsupported (for example video, shadow DOM or ephemeral blob resources), too large
+or cannot be captured safely keeps its live preview.
+
+Snapshots stay in server memory, per account: at most 128 entries, 32 MiB total,
+2 MiB per entry, expiring at the next hour boundary to avoid stale embedded grants.
+Restart or eviction creates a normal cold miss. Saved version, asset hashes,
+visibility, viewport/browser preferences and request origin participate in identity.
+Metadata, upload and delivery recheck current access; cached content is never a
+substitute for authorization and is not stored in a public CDN or browser storage.
+Warm responses are `no-store`, inert sandboxed documents with scripts disabled.
+Only previews suppress scrollbar UI; opened artifacts keep ordinary scrolling.

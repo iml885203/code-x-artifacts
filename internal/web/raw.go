@@ -27,7 +27,12 @@ var bridgeJS string
 // with nothing behind it (bridge_preview.js).
 //
 //go:embed bridge_preview.js
-var previewJS string
+var previewStubJS string
+
+//go:embed preview_capture.js
+var previewCaptureJS string
+
+var previewJS = previewStubJS + "\n" + previewCaptureJS
 
 // isPreview says the request is for a card of the overview: the page as it
 // looks, with no way to reach the viewer's bridge.

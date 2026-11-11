@@ -39,11 +39,11 @@ func TestADesignCardLoadsOneFrameWhileTheOpenedPageKeepsAllEightWithTheSameGuard
 	if n := strings.Count(fullBody, "<iframe"); n != 8 {
 		t.Errorf("the opened overview has %d frames, want 8", n)
 	}
-	if n := strings.Count(cardBody, "<iframe"); n != 1 || !strings.Contains(cardBody, `src="frames/f1.html"`) {
+	if n := strings.Count(cardBody, "<iframe"); n != 1 || !strings.Contains(cardBody, `src="frames/f1.html?preview"`) {
 		t.Errorf("the card has %d frames, want frames/f1.html only: %.400s", n, cardBody)
 	}
-	if strings.Contains(cardBody, "postMessage") {
-		t.Error("the card carries the bridge")
+	if strings.Contains(cardBody, bridgeJS) || !strings.Contains(cardBody, previewCaptureJS) {
+		t.Error("the card must carry preview capture only, never the viewer API bridge")
 	}
 	if got, want := sandboxOf(card.Header.Get("Content-Security-Policy")), sandboxOf(full.Header.Get("Content-Security-Policy")); got != want {
 		t.Errorf("card sandbox %q, page %q", got, want)
@@ -55,7 +55,7 @@ func TestADesignCardLoadsOneFrameWhileTheOpenedPageKeepsAllEightWithTheSameGuard
 	}
 	// The frame the card names is served under the same grant as ever.
 	loc := h.pageAddress(bob, a.ID, "?preview")
-	if res, _ := h.do(nil, "GET", strings.TrimSuffix(loc, "?preview")+"frames/f1.html", "", nil); res.StatusCode != http.StatusOK {
+	if res, _ := h.do(nil, "GET", strings.TrimSuffix(loc, "?preview")+"frames/f1.html?preview", "", nil); res.StatusCode != http.StatusOK {
 		t.Errorf("the card's frame: %d", res.StatusCode)
 	}
 }
@@ -72,11 +72,11 @@ func TestADesignCardOfAnOlderVersionShowsThatVersionsFirstFrameAndIsRefusedLikeT
 		t.Fatalf("publish v2: %d %s", res.StatusCode, out)
 	}
 	_, v1 := h.do(alice, "GET", h.pageAddress(alice, a.ID, "?version=1&preview"), "", nil)
-	if strings.Count(v1, "<iframe") != 1 || !strings.Contains(v1, `src="frames/f1.html"`) {
+	if strings.Count(v1, "<iframe") != 1 || !strings.Contains(v1, `src="frames/f1.html?preview"`) {
 		t.Errorf("version 1 card: %.300s", v1)
 	}
 	_, latest := h.do(alice, "GET", h.pageAddress(alice, a.ID, "?preview"), "", nil)
-	if strings.Count(latest, "<iframe") != 1 || !strings.Contains(latest, `src="frames/new.html"`) {
+	if strings.Count(latest, "<iframe") != 1 || !strings.Contains(latest, `src="frames/new.html?preview"`) {
 		t.Errorf("latest card: %.300s", latest)
 	}
 	// Someone who may not read it, and history for someone who may not read history, get what the page gets.

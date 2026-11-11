@@ -27,6 +27,27 @@ function isOverviewPreview(text: string, resource: string, page: string, wasOnOv
   return text.startsWith("Failed to load resource: the server responded with a status of 404") && /\/raw\/[^/]+$/.test(new URL(resource || page).pathname);
 }
 
+// Issue #15: Playwright's trace snapshotter injects scripts into every frame.
+// A scriptless <h1> under CSP sandbox produces this warning only with tracing
+// snapshots enabled (the same document without tracing produces none).
+function isInertPreviewTraceWarning(text: string, page: Page, enabled: boolean): boolean {
+  if (!enabled) return false;
+  const match = /^Blocked script execution in '([^']+)' because the document's frame is sandboxed and the 'allow-scripts' permission is not set\.$/.exec(text);
+  if (!match?.[1]) return false;
+  const cached = (url: string) => {
+    try { const parsed = new URL(url); return parsed.origin === new URL(page.url()).origin && /^\/preview\/[^/?#]+$/.test(parsed.pathname); }
+    catch { return false; }
+  };
+  if (cached(match[1])) return true;
+  if (match[1] !== "about:srcdoc") return false;
+  // Never suppress unrelated editor/raw srcdoc failures.
+  return page.frames().some((frame) => {
+    if (frame.url() !== "about:srcdoc") return false;
+    for (let parent = frame.parentFrame(); parent; parent = parent.parentFrame()) if (cached(parent.url())) return true;
+    return false;
+  });
+}
+
 interface Fixtures {
   /** A test that provokes a refusal on purpose says so: the browser logs the refused request as a console error. */
   expectConsoleErrors: (pattern: RegExp) => void;
@@ -45,7 +66,9 @@ interface Collector {
 }
 
 export const test = base.extend<Fixtures & { consoleErrors: Collector; consoleRule: void }>({
-  consoleErrors: async ({}, use) => {
+  consoleErrors: async ({}, use, testInfo) => {
+    const trace = testInfo.project.use.trace;
+    const tracing = typeof trace === "string" ? trace !== "off" : trace !== undefined && trace.mode !== "off" && trace.snapshots !== false;
     const seen: string[] = [];
     await use({
       seen,
@@ -58,7 +81,7 @@ export const test = base.extend<Fixtures & { consoleErrors: Collector; consoleRu
         page.on("console", (m) => {
           if (m.type() !== "error") return;
           const resource = m.location().url;
-          if (!isOverviewPreview(m.text(), resource, page.url(), wasOnOverview || new URL(page.url()).pathname === "/")) seen.push(resource ? `${m.text()} (${resource})` : m.text());
+          if (!isInertPreviewTraceWarning(m.text(), page, tracing) && !isOverviewPreview(m.text(), resource, page.url(), wasOnOverview || new URL(page.url()).pathname === "/")) seen.push(resource ? `${m.text()} (${resource})` : m.text());
         });
         page.on("pageerror", (e) => {
           seen.push(`uncaught: ${e.message}`);

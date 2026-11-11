@@ -32,8 +32,8 @@ func TestADeckPreviewIsTheDeckWithoutItsPlayerAndAllowsNoScriptButThePreviewStub
 	if m == nil || strings.TrimSpace(m[1]) != scriptHash(previewJS) {
 		t.Errorf("preview csp %q: want a script-src that allows the preview stub alone", csp)
 	}
-	if strings.Contains(body, "postMessage") || strings.Contains(body, `id="bar"`) {
-		t.Error("a deck preview carries the bridge or the player's controls")
+	if strings.Contains(body, bridgeJS) || !strings.Contains(body, previewCaptureJS) || strings.Contains(body, `id="bar"`) {
+		t.Error("a deck preview lost capture or carries the API bridge or player controls")
 	}
 	if !strings.Contains(body, `id="slide-3"`) {
 		t.Error("a deck preview does not hold the slide a thumbnail's address names")

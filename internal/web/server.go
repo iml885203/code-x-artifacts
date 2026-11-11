@@ -35,6 +35,7 @@ var staticFS embed.FS
 
 // Server holds the handlers' dependencies.
 type Server struct {
+	previews *previewCache
 	oauth    *oauthServer
 	store    *store.Store
 	svc      *service.Service
@@ -123,6 +124,11 @@ func New(cfg Config) *Server {
 
 		publicLinks: cfg.PublicLinks,
 	}
+	var previewNow func() time.Time
+	if cfg.Clock != nil {
+		previewNow = cfg.Clock.Now
+	}
+	s.previews = newPreviewCache(previewNow)
 	s.oauth = newOAuthServer(cfg.OAuthOrigin, s.store)
 	if cfg.FileLimits != nil {
 		s.svc.SetFileLimits(*cfg.FileLimits)
@@ -153,6 +159,7 @@ func (s *Server) Handler() http.Handler {
 	s.routesPages(mux)
 	s.routesOIDC(mux)
 	s.routesRaw(mux)
+	s.routesPreviews(mux)
 	mux.Handle("/api/mcp", s.mcpEndpoint())
 	s.routesAgentActivity(mux)
 	s.routesTokens(mux)

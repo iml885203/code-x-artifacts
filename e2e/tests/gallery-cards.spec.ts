@@ -1,4 +1,4 @@
-import { expect, publish, signIn, test } from "./support";
+import { expect, publish, republish, signIn, test } from "./support";
 
 test("a card's time moves from now to a minute ago without a reload", async ({ page }) => {
   await signIn(page, "alice");
@@ -211,18 +211,31 @@ test("every card of the overview shows its page, a script-drawn one too, and log
   await signIn(page, "alice");
   const ids: string[] = [];
   const own: string[] = [];
+  const cached = new Set<string>();
+  const rawDocuments: string[] = [];
+  const unsafeSnapshots: string[] = [];
+  page.on("response", (response) => {
+    if (new URL(response.url()).pathname.startsWith("/preview/") && response.status() === 200) {
+      void response.text().then((html) => { if (/<script\b|\son[a-z]+=/i.test(html)) unsafeSnapshots.push(response.url()); }).catch(() => undefined);
+    }
+    const match = /^\/api\/artifacts\/([^/]+)\/preview$/.exec(new URL(response.url()).pathname);
+    if (match?.[1] && response.request().method() === "POST" && response.status() === 204) cached.add(match[1]);
+  });
+  page.on("request", (request) => {
+    if (request.resourceType() === "document" && ids.some((id) => new URL(request.url()).pathname.startsWith(`/raw/${id}`))) rawDocuments.push(request.url());
+  });
   page.on("console", (m) => {
     if (m.type() === "error" && ids.some((id) => m.location().url.includes(id))) own.push(m.text());
   });
   const made = async (body: Parameters<typeof publish>[1]) => ids.push((await publish(page, body)).id);
-  await made({ title: "Plain html", content: "<!doctype html><h1>Html on a card</h1>" });
+  await made({ title: "Plain html", content: '<!doctype html><style>body{width:1400px} .scroller{width:150px;height:80px;overflow:scroll;scrollbar-width:auto!important}</style><h1>Html on a card</h1><div class="scroller"><div style="width:800px;height:800px">Scrollable content</div></div>' });
   // A page that asks for its data on load: in a preview nothing answers, and it must not throw.
   await made({
     title: "Asks for data",
-    content: "<!doctype html><h1 id=t>Waiting</h1><script>pictor.db.list('rows').then(() => { document.getElementById('t').textContent = 'Answered'; }); document.body.append('Drawn by script');</script>",
+    content: "<!doctype html><h1 id=t>Waiting</h1><canvas id=c width=40 height=40></canvas><script>pictor.db.list('rows').then(() => { document.getElementById('t').textContent = 'Answered'; }); document.body.append('Drawn by script'); const ctx=document.getElementById('c').getContext('2d'); ctx.fillStyle='red'; ctx.fillRect(0,0,40,40);</script>",
   });
   await made({ title: "A doc", kind: "doc", content: "# Doc on a card\n\nBody.\n" });
-  await made({ title: "A chart", kind: "react", content: "export default function App() { return <h1>React on a card</h1>; }\n" });
+  await made({ title: "A chart", kind: "react", content: 'export default function App() { return <><h1>React on a card</h1><p>{matchMedia("(prefers-color-scheme: dark)").matches ? "Dark branch" : "Light branch"}</p></>; }\n' });
   // A design of eight frames: its card loads the first frame only.
   const frames = Array.from({ length: 8 }, (_, i) => ({ id: `f${i + 1}`, name: `Frame ${i + 1}`, file: `frames/f${i + 1}.html`, w: 400, h: 300 }));
   await made({
@@ -231,6 +244,8 @@ test("every card of the overview shows its page, a script-drawn one too, and log
     content: JSON.stringify({ version: 1, pages: [{ id: "p", name: "Page", rows: [frames] }] }),
     files: Object.fromEntries(frames.map((f) => [f.file, `<!doctype html><body><h1>Text of ${f.name}</h1></body>`])),
   });
+  await made({ title: "A board", kind: "board", content: JSON.stringify({ version: 1, elements: [{ id: "box", type: "rectangle", x: 0, y: 0, label: "Board on a card" }] }) });
+  await made({ title: "A deck", kind: "slides", content: JSON.stringify({ version: 1, slides: [{ layout: "title", title: "Slides on a card" }] }) });
   const frameRequests: string[] = [];
   page.on("request", (r) => {
     if (/\/frames\/f\d\.html$/.test(new URL(r.url()).pathname)) frameRequests.push(new URL(r.url()).pathname.split("/").pop() ?? "");
@@ -247,11 +262,47 @@ test("every card of the overview shows its page, a script-drawn one too, and log
     await expect(card(index).getByRole("heading", { name: title, exact: true })).toBeVisible();
     await expect(card(index).frameLocator("iframe").getByText(text)).toBeVisible();
   }
+  for (const [index, text] of [[5, "Board on a card"], [6, "Slides on a card"]] as const) {
+    await expect(card(index).frameLocator("iframe").getByText(text)).toBeVisible();
+  }
   // The page that asked is still waiting: the preview has no bridge behind it.
   await expect(card(1).frameLocator("iframe").locator("#t")).toHaveText("Waiting");
   expect(own, "console errors of the cards' own frames").toEqual([]);
   await expect(card(4).frameLocator("iframe").frameLocator("iframe").getByText("Text of Frame 1")).toBeVisible();
   expect(frameRequests, "frame documents the wall asked for").toEqual(["f1.html"]);
+  const nested = card(0).frameLocator("iframe").locator(".scroller");
+  await expect(nested).toHaveCSS("scrollbar-width", "none");
+  await expect(card(0).frameLocator("iframe").locator("html")).toHaveCSS("scrollbar-width", "none");
+  await expect.poll(() => ids.filter((id) => cached.has(id)).length, { timeout: 25_000 }).toBe(ids.length);
+  const coldRequests = rawDocuments.length;
+  await page.reload();
+  for (const [index, [, text]] of previews.entries()) {
+    await expect(card(index).frameLocator("iframe").getByText(text)).toBeVisible();
+    await expect(card(index).locator("iframe")).toHaveAttribute("src", /^\/preview\//);
+  }
+  await expect(card(4).frameLocator("iframe").frameLocator("iframe").getByText("Text of Frame 1")).toBeVisible();
+  for (const [index, text] of [[5, "Board on a card"], [6, "Slides on a card"]] as const) {
+    await expect(card(index).frameLocator("iframe").getByText(text)).toBeVisible();
+    await expect(card(index).locator("iframe")).toHaveAttribute("src", /^\/preview\//);
+  }
+  await expect(card(1).frameLocator("iframe").locator("img#c")).toHaveAttribute("src", /^data:image\/png/);
+  expect(rawDocuments.length, "warm previews do not download or initialize raw artifact documents").toBe(coldRequests);
+  expect(unsafeSnapshots, "ready snapshots contain no script elements or event handlers").toEqual([]);
+  await expect(card(0).frameLocator("iframe").locator(".scroller")).toHaveCSS("scrollbar-width", "none");
+  // Full pages retain ordinary root/nested scrolling; only thumbnails suppress bars.
+  await card(0).getByRole("link", { name: "Plain html" }).first().click();
+  const fullScroller = page.frameLocator("iframe[data-artifact-frame]").locator(".scroller");
+  await expect(fullScroller).toHaveCSS("scrollbar-width", "auto");
+  expect(await fullScroller.evaluate((element) => { element.scrollTop = 40; return element.scrollTop; })).toBe(40);
+  await page.getByRole("link", { name: "Back to artifacts" }).click();
+  await expect(card(0).locator("iframe")).toHaveAttribute("src", /^\/preview\//);
+  await republish(page, ids[0] ?? "", { title: "Plain html", content: "<!doctype html><h1>Version two on a card</h1>", baseVersion: 1 });
+  await page.reload();
+  await expect(card(0).frameLocator("iframe").getByText("Version two on a card")).toBeVisible();
+  await page.emulateMedia({ colorScheme: "dark" });
+  await expect(card(3).frameLocator("iframe").getByText("Dark branch")).toBeVisible();
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect(card(3).frameLocator("iframe").getByText("Light branch")).toBeVisible();
   // The same design opens normally, with every frame.
   await card(4).getByRole("link", { name: "Eight frames" }).first().click();
   await expect(page).toHaveURL(new RegExp(`/a/${ids[4]}$`));
