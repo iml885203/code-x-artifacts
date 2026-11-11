@@ -45,7 +45,7 @@ test("OIDC signs in explicitly, returns to MCP consent and logs out of the appli
   const retainedCookies = (await page.context().cookies(origin)).filter((cookie) => cookie.name === "pictor_session");
   expect(retainedCookies).toHaveLength(1);
   const retainedCookie = retainedCookies.map((cookie) => `${cookie.name}=${cookie.value}`).join("; ");
-  await page.getByRole("button", { name: "Account", exact: true }).click();
+  await page.getByRole("button", { name: "Account: Alice OIDC", exact: true }).click();
   await page.getByRole("menuitem", { name: "Sign out", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/login`);
   await expect(provider).toBeVisible();

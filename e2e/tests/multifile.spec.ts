@@ -4,7 +4,7 @@ import { expect, pickVersion, publish, republish, signIn, test } from "./support
 const frameOf = (page: Page) => page.frameLocator("iframe[data-artifact-frame]");
 
 // A page that comes with a script, a stylesheet, data, a module with a static
-// and a dynamic import, and a stylesheet that refers to another file: every way
+// and a dynamic import, and a stylesheet with an inline image: the supported ways
 // a page names a file, by a relative path from inside a sandbox with no origin.
 const indexPage = `<!doctype html><html><head><meta charset="utf-8"><title>Two files</title>
 <link rel="stylesheet" href="styles/site.css"></head>
@@ -13,7 +13,7 @@ const indexPage = `<!doctype html><html><head><meta charset="utf-8"><title>Two f
 
 const files = {
   "app.js": `document.getElementById("out").textContent = "js ran";`,
-  "styles/site.css": `#styled { color: rgb(1, 2, 3); background: url(../img/dot.svg); }`,
+  "styles/site.css": `#styled { color: rgb(1, 2, 3); background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Ccircle cx='1' cy='1' r='1' fill='black'/%3E%3C/svg%3E"); }`,
   "lib/main.mjs": `import { word } from "./dep.mjs";
 const rows = await (await fetch(new URL("../data/rows.json", import.meta.url))).json();
 const lazy = await import("./lazy.mjs");

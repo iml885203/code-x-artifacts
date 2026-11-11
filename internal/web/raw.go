@@ -7,7 +7,9 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
+	"net/url"
 	"regexp"
 	"slices"
 	"strconv"
@@ -32,7 +34,12 @@ var previewStubJS string
 //go:embed preview_capture.js
 var previewCaptureJS string
 
-var previewJS = previewStubJS + "\n" + previewCaptureJS
+var previewJS = previewStubJS + "\n" + defaultThumbnailScript()
+
+func defaultThumbnailScript() string {
+	vendor, _ := fs.ReadFile(embeddedBundle(), "thumbnail-vendor.js")
+	return string(vendor) + "\n" + previewCaptureJS
+}
 
 // isPreview says the request is for a card of the overview: the page as it
 // looks, with no way to reach the viewer's bridge.
@@ -79,6 +86,11 @@ func (s *Server) raw(w http.ResponseWriter, r *http.Request) {
 		to := pagePath(a.ID, s.sessions.pageGrant(a.ID, a.Visibility, shown.Number, time.Now()), "")
 		if isPreview(r) {
 			to += "?preview"
+			for _, hint := range []string{"scheme", "lang"} {
+				if value := r.URL.Query().Get(hint); value != "" {
+					to += "&" + hint + "=" + url.QueryEscape(value)
+				}
+			}
 		}
 		http.Redirect(w, r, to, http.StatusFound)
 		return
@@ -123,6 +135,9 @@ func (s *Server) servePage(w http.ResponseWriter, r *http.Request, a store.Artif
 	if shown.Kind == "doc" {
 		page = s.withoutMissingPictures(r.Context(), a.ID, page)
 	}
+	if isPreview(r) && shown.Kind == "design" {
+		page = previewChildrenWithHints(page, r)
+	}
 	grants := s.assetGrants(a)
 	page = grants.Replace(page)
 	if scripts != nil {
@@ -143,7 +158,7 @@ func (s *Server) writeDocument(w http.ResponseWriter, r *http.Request, page stri
 	// The sandbox is the same for a preview; only what is injected differs.
 	injected := bridgeJS
 	if isPreview(r) {
-		injected = previewJS
+		injected = previewStubJS + "\n" + s.thumbnailScript
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Content-Security-Policy", artifactCSPWith(baseURL(r), scripts, scriptPaths, injected))
@@ -327,4 +342,19 @@ func (s *Server) routesRaw(mux *http.ServeMux) {
 	// A page that comes with files is served here, where the grant in the path
 	// is the only credential: its own requests cannot carry the cookie.
 	mux.HandleFunc("GET /raw/{id}/{grant}/{path...}", s.rawGranted)
+}
+
+// Preview child hints are bounded and HTML-escaped before entering generated frame URLs.
+func previewChildrenWithHints(page string, r *http.Request) string {
+	hints := url.Values{}
+	if value := r.URL.Query().Get("lang"); value == "en" || value == "zh-TW" {
+		hints.Set("lang", value)
+	}
+	if value := r.URL.Query().Get("scheme"); value == "light" || value == "dark" {
+		hints.Set("scheme", value)
+	}
+	if len(hints) > 0 {
+		page = strings.ReplaceAll(page, "?preview\"", "?preview&amp;"+strings.ReplaceAll(hints.Encode(), "&", "&amp;")+"\"")
+	}
+	return page
 }

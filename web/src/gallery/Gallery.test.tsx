@@ -2,7 +2,7 @@ import { expectHint } from "../test-tooltip";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { cleanup, fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Artifact } from "../api";
@@ -94,27 +94,10 @@ describe("the gallery", () => {
     expect(time.getAttribute("aria-label")).toMatch(/^2 週前編輯, 2026-10-02 /);
   });
 
-  it("previews each artifact in a sandboxed iframe that runs the page's script but gets no bridge", async () => {
+  it("keeps gallery cards usable when no thumbnail is available", async () => {
     await openGallery([mine]);
-    await waitFor(() => { expect(document.querySelector("iframe")).toHaveAttribute("src", `/raw/${mine.id}?preview`); });
-    const frame = document.querySelector("iframe");
-    expect(frame).toHaveAttribute("src", `/raw/${mine.id}?preview`);
-    // Script only: no same-origin, no forms, no popups.
-    expect(frame?.getAttribute("sandbox")).toBe("allow-scripts");
-    expect(frame).toHaveAttribute("loading", "lazy");
-  });
-
-  it("keeps a preview hidden until its page has loaded, out of the tab order and out of the accessibility tree", async () => {
-    await openGallery([mine]);
-    await waitFor(() => { expect(document.querySelector("iframe")).toHaveAttribute("src", `/raw/${mine.id}?preview`); });
-    const frame = document.querySelector("iframe");
-    if (!frame) throw new Error("no preview frame");
-    const screenBox = frame.closest(".thumb-screen");
-    expect(screenBox).not.toHaveClass("loaded");
-    expect(frame).toHaveAttribute("aria-hidden", "true");
-    expect(frame).toHaveAttribute("tabindex", "-1");
-    fireEvent.load(frame);
-    expect(screenBox).toHaveClass("loaded");
+    expect(within(nth(0)).getByRole("link", { name: new RegExp(mine.title) })).toHaveAttribute("href", `/a/${mine.id}`);
+    expect(nth(0).querySelector("iframe,img")).toBeNull();
   });
 
   it("draws a quiet half-size preview whose fade reaches the footer without an unused lower band", () => {
@@ -125,7 +108,7 @@ describe("the gallery", () => {
     expect(Number(screenRule?.[1])).toBeLessThanOrEqual(20);
     expect(Number(screenRule?.[2])).toBe(100);
     // Half size: a third or less would put a dozen lines of small print on each card.
-    expect(css).toMatch(/\.thumb iframe \{[^}]*width: 200%; height: 200%;[^}]*transform: scale\(0\.5\)/);
+    expect(css).toMatch(/\.thumb-screen > img \{[^}]*object-fit: cover;[^}]*object-position: top left/);
     // A touch screen has no hover, so nothing about the glimpse depends on it.
     expect(css).not.toMatch(/\.thumb[^{]*:hover/);
   });

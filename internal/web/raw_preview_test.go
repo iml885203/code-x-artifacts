@@ -60,7 +60,7 @@ func TestAPreviewShowsAPageDrawnByScriptsUnderTheSandboxOfThePageAndNeverTheBrid
 	}
 	// Scripts are allowed by hash and by path, as in the page, and the bridge's hash is not among them.
 	scriptSrc := regexp.MustCompile(`script-src ([^;]*)`).FindStringSubmatch(csp)[1]
-	if strings.Contains(scriptSrc, scriptHash(bridgeJS)) || !strings.Contains(scriptSrc, scriptHash(previewJS)) || strings.Contains(scriptSrc, "'self'") {
+	if strings.Contains(scriptSrc, scriptHash(bridgeJS)) || !strings.Contains(scriptSrc, scriptHash(previewStubJS+"\n"+testThumbnailScript(t))) || strings.Contains(scriptSrc, "'self'") {
 		t.Errorf("preview script-src: %q", csp)
 	}
 	if strings.Contains(body, bridgeJS) {

@@ -286,4 +286,9 @@ Library author labels and initials use the persisted display name, falling back 
 
 Connect follows agent selection → client-specific setup → a trial prompt → access and activity. OAuth commands are primary for CLI clients; URL setup belongs to the other-client tab. PAT setup and management share a secondary disclosure with an existing-token count, while OAuth-disabled deployments keep PAT setup directly available. Authorization refresh reports saved grants, never inferred live connectivity.
 
-Library previews retain their existing inset framing. A cold preview is live; a warm preview reuses a frozen DOM snapshot, avoiding original script initialization. Scrollbar chrome is suppressed only inside previews, including nested Design frames. Current permissions and render dependencies are checked before reuse; failed or unsupported captures keep the live preview.
+Library previews retain their inset framing and fade. Warm cards display fixed-size
+image thumbnails; a bounded hidden opaque-origin preview generates a missing image.
+Cards remain usable with a lightweight placeholder when capture fails. No gallery
+scrollbar, progress overlay, or live preview remains after generation. Opened
+artifacts retain normal interactivity and scrolling. Cache identity and every image
+request enforce current account/artifact access and rendering dependencies.

@@ -55,7 +55,7 @@ func TestServeForBrowserSmoke(t *testing.T) { //nolint:paralleltest // reads PIC
 	}
 	directory := newFakeDirectory()
 	directory.accounts["dana"] = &fakeAccount{password: "unused-test-password", groups: []string{"SE"}}
-	s := New(Config{Store: st, Assets: files, Authenticator: directory, SessionKey: []byte("smoke"), Logger: slog.Default(), PublicLinks: true, RoomQuiet: quiet, ViewerStays: viewerStays, OAuthOrigin: "http://" + addr})
+	s := New(Config{ThumbnailDir: filepath.Join(dbDir, "thumbnails"), Store: st, Assets: files, Authenticator: directory, SessionKey: []byte("smoke"), Logger: slog.Default(), PublicLinks: true, RoomQuiet: quiet, ViewerStays: viewerStays, OAuthOrigin: "http://" + addr})
 	ctx, stop := context.WithCancel(t.Context())
 	defer stop()
 	go s.Run(ctx)

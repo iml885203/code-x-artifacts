@@ -45,6 +45,7 @@ func newHarnessOn(t *testing.T, st *store.Store, options ...func(*Config)) *harn
 		t.Fatal(err)
 	}
 	cfg := Config{
+		ThumbnailDir:  t.TempDir(),
 		Store:         st,
 		Assets:        files,
 		Authenticator: dir,

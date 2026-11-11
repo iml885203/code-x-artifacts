@@ -337,20 +337,18 @@ test("the gallery card of a design shows its frames as a thumbnail, scaled to th
   await page.goto("/");
   const card = page.locator(`[data-artifact-id="${a.id}"]`);
   await expect(card).toBeVisible();
-  // The card's frames load when they come near the screen (loading="lazy", twice over): a card further down the
-  // overview than the first screen has to be brought into view before there is anything to read.
   await card.scrollIntoViewIfNeeded();
-  const preview = card.frameLocator("[data-thumb] iframe");
-  await expect(preview.locator(".thumb iframe").first()).toBeAttached();
-  // The first frame is drawn inside the preview, at the width of its cell and not at its own size.
-  await expect(preview.frameLocator("iframe").first().locator("#title")).toHaveText("Hero");
-  const host = card.locator("[data-thumb] iframe");
-  const cell = await onScreen(host, preview.locator(".thumb").first());
-  const drawn = await onScreen(host, preview.locator(".thumb iframe").first());
-  const slot = await card.locator("[data-thumb]").boundingBox(); // page-level
-  if (!slot) throw new Error("the card has no thumbnail");
-  expect(drawn.width).toBeLessThanOrEqual(slot.width + 1);
-  expect(drawn.width).toBeCloseTo(cell.width, -1);
+  const image=card.locator(".thumb-screen.loaded > img");
+  await expect(image).toBeVisible({timeout:25000});
+  await expect(card.locator("iframe")).toHaveCount(0);
+  expect(await image.evaluate((node)=>{const img=node as HTMLImageElement;return [img.naturalWidth,img.naturalHeight];})).toEqual([1120,720]);
+  const drawn=await image.boundingBox(); // page-level
+  const slot=await card.locator("[data-thumb]").boundingBox(); // page-level
+  if(!drawn||!slot)throw Error("no image thumbnail box");
+  expect(drawn.width).toBeLessThanOrEqual(slot.width+1);
+  expect(drawn.width).toBeGreaterThan(slot.width*0.7);
+  expect(drawn.x).toBeGreaterThanOrEqual(slot.x);
+
 });
 
 test("a frame is drawn the same on screen after publish as the page it was written as", async ({ page }) => {
