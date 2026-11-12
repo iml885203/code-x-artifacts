@@ -1,10 +1,11 @@
 import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Preview } from "./Preview";
 const key = "a".repeat(64);
 const url = `/thumbnail/example?key=${key}&scheme=light&lang=en`;
 const response = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+beforeEach(() => { vi.stubGlobal("innerWidth", 1440); });
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); });
 describe("image thumbnails", () => {
   it("shows a warm image without creating an artifact frame, and keeps it after focus", async () => {
     vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(response({ key, url }))));
@@ -28,7 +29,7 @@ describe("image thumbnails", () => {
     let stored = false;
     const fetchMock = vi.fn((_url: string, init?: RequestInit) => {
       if (init?.method === "POST") { stored = true; return Promise.resolve(new Response(null,{status:204})); }
-      return Promise.resolve(response({ key, ...(stored ? {url} : {source:"/raw/example?preview&scheme=light&lang=en"}) }));
+      return Promise.resolve(response({ key, ...(stored ? {url} : {source:"/raw/example?preview&scheme=light&lang=en&viewport=desktop"}) }));
     });
     vi.stubGlobal("fetch",fetchMock);
     render(<Preview id="example" version={1} />);
@@ -49,10 +50,14 @@ describe("image thumbnails", () => {
     expect(stored).toBe(false);
     await act(async () => { window.dispatchEvent(new MessageEvent("message",{source:frame.contentWindow,origin:"null",data}));  await Promise.resolve(); });
     await waitFor(() => expect(document.querySelector("img")).toHaveAttribute("src",url));
+    const pendingImage=document.querySelector("img");
+    if (!pendingImage) throw Error("no pending thumbnail");
+    expect(document.querySelector("iframe")).toBe(frame);
+    fireEvent.load(pendingImage);
     expect(document.querySelector("iframe")).toBeNull();
   });
   it("removes a failed cold capture without showing a broken image or live preview", async () => {
-    vi.stubGlobal("fetch",vi.fn(() => Promise.resolve(response({key,source:"/raw/example?preview&scheme=light&lang=en"}))));
+    vi.stubGlobal("fetch",vi.fn(() => Promise.resolve(response({key,source:"/raw/example?preview&scheme=light&lang=en&viewport=desktop"}))));
     render(<Preview id="example" version={1} />);
     await waitFor(() => { expect(document.querySelector("iframe")).not.toBeNull(); });
     const frame=document.querySelector("iframe");
@@ -60,6 +65,18 @@ describe("image thumbnails", () => {
     const sent=vi.spyOn(frame.contentWindow,"postMessage").mockImplementation(()=>undefined);fireEvent.load(frame);
     await act(async () => {window.dispatchEvent(new MessageEvent("message",{source:frame.contentWindow,origin:"null",data:{pictorPreview:"thumbnail",request:(sent.mock.calls[0]?.[0] as {request:string}).request,failed:true}})); await Promise.resolve(); });
     expect(document.querySelector("img,iframe")).toBeNull();
+  });
+  it("shows a cold document before image generation or upload finishes", async () => {
+    vi.stubGlobal("fetch",vi.fn(()=>Promise.resolve(response({key,source:"/raw/example?preview&scheme=light&lang=en&viewport=desktop"}))));
+    render(<Preview id="example" version={1} />);
+    await waitFor(()=>{expect(document.querySelector("iframe")).not.toBeNull();});
+    const frame=document.querySelector("iframe");if(!frame?.contentWindow)throw Error("no frame");
+    vi.spyOn(frame.contentWindow,"postMessage").mockImplementation(()=>undefined);
+    expect(frame.closest(".thumb-screen")).not.toHaveClass("loaded");
+    fireEvent.load(frame);
+    expect(frame.closest(".thumb-screen")).toHaveClass("loaded");
+    expect(document.querySelector("img")).toBeNull();
+    expect(frame).toHaveAttribute("data-thumbnail-viewport","desktop");
   });
   it("does not render an image from an old artifact version while its replacement loads", async () => {
     vi.stubGlobal("fetch",vi.fn(()=>Promise.resolve(response({key,url}))));
@@ -84,4 +101,28 @@ it("keeps the newest system-theme result when an older metadata request finishes
   await waitFor(()=>{expect(document.querySelector("img")).toHaveAttribute("src",dark);});
   await act(async()=>{finish?.(response({key,url}));await Promise.resolve();});
   expect(document.querySelector("img")).toHaveAttribute("src",dark);
+});
+
+it("gives all six cold previews their full capture time after waiting for a slot", async () => {
+  vi.useFakeTimers();
+  const saved=new Set<string>();
+  vi.stubGlobal("fetch",vi.fn((path:string,init?:RequestInit)=>{
+    const id=path.split("/")[3]??"";
+    if(init?.method==="POST"){saved.add(id);return Promise.resolve(new Response(null,{status:204}));}
+    return Promise.resolve(response({key,...(saved.has(id)?{url:`/thumbnail/${id}?key=${key}`}:{source:`/raw/${id}?preview&scheme=light&lang=en&viewport=desktop`})}));
+  }));
+  await act(async()=>{render(<>{Array.from({length:6},(_,i)=><Preview key={i} id={`card-${String(i)}`} version={1}/>)}</>);await Promise.resolve();});
+  const frames=[...document.querySelectorAll("iframe")];expect(frames).toHaveLength(6);
+  for(const frame of frames){
+    const source=frame.contentWindow;if(!source)throw Error("missing frame");
+    vi.spyOn(source,"postMessage").mockImplementation((message: {request:string})=>{
+      window.setTimeout(()=>{window.dispatchEvent(new MessageEvent("message",{source,origin:"null",data:{pictorPreview:"thumbnail",request:message.request,image:"data:image/jpeg;base64,YWJj"}}));},12000);
+    });
+  }
+  await act(async()=>{frames.forEach((frame)=>{fireEvent.load(frame);});await Promise.resolve();});
+  for(let pair=0;pair<3;pair++){
+    await act(async()=>{await vi.advanceTimersByTimeAsync(12000);});
+    await act(async()=>{document.querySelectorAll("img").forEach((image)=>{fireEvent.load(image);});await Promise.resolve();});
+  }
+  expect(saved.size).toBe(6);expect(document.querySelectorAll("img")).toHaveLength(6);expect(document.querySelector("iframe")).toBeNull();
 });

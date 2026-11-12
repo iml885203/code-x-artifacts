@@ -93,28 +93,34 @@ sharing platforms choose when to refresh their cached copies.
 ## Library image thumbnails
 
 Gallery and Recently opened cards use account-scoped JPEG thumbnails at a fixed
-1120×720 image size (a 560×360 CSS viewport, rendered at 2×). A cold card queues an invisible opaque-origin preview in the
-viewer's browser (at most two at once). The preview uses bundled html-to-image to
+1120×720 image size. A cold card queues an opaque-origin preview in the viewer's browser (at most six at once),
+showing it as soon as its document loads while at most two bitmap captures run. The preview uses bundled html-to-image to
 rasterize settled content, including canvas and supported nested Design frames;
 it never gets the viewer's API bridge or session credentials. Successful uploads
-are decoded and reencoded as JPEG by Go, then the temporary iframe is removed.
+are decoded and reencoded as JPEG by Go, then the temporary iframe is removed only once the image has loaded.
 A warm card loads only an image, without running the artifact or loading its fonts.
 No server browser, Node runtime or external screenshot service is required.
 
 Images persist in `thumbnails/` next to `PICTOR_DB`. The cache is disposable:
 200 MiB by default (`PICTOR_THUMBNAIL_CACHE_MB=1..4096`), at most 10,000 files and
 1 MiB per uploaded image. Least-recently-used files are evicted to maintain bounds;
-old revisions are replaced for each account/artifact/theme/language variant.
-There are at most four variants (light/dark × English/Traditional Chinese), with
-no viewport or device-pixel-ratio variants. Capture times out after 20 seconds,
-and the outer queue releases/removes a stuck document after 30 seconds.
+old revisions are replaced for each account/artifact/theme/language/device variant.
+There are at most twelve normal variants (light/dark × English/Traditional Chinese
+× mobile/tablet/desktop), with no per-pixel-width or device-pixel-ratio variants.
+Screen widths up to 640 select 420×270 capture, up to 1024 select 980×630, and
+larger screens select 1400×900. Crossing a breakpoint revalidates the appropriate
+cached image; old clients without the viewport hint retain a separate legacy identity. Capture times out after 20 seconds,
+with a separate 15-second document-load deadline, 60-second bounded capture queue
+wait, and 30 seconds from capture admission for generation/upload/image handover.
 
 Saved version, relevant asset hashes, visibility, render script and frontend build,
-request origin, account and theme/language participate in identity. Hour boundaries
+request origin, account, theme/language and device mode participate in identity. Hour boundaries
 and expired embedded grants do not invalidate pixels. Generation/upload/delivery
 recheck current access; image responses are `no-store`, not public CDN objects.
 Already delivered pixels cannot be recalled. Persisted thumbnails contain no live
-resource URLs. A cache miss or failure shows the card's lightweight placeholder;
+resource URLs. A cache miss initially shows a lightweight placeholder, followed
+by the loaded live preview while its image is generated. Failed captures return
+to the placeholder;
 opening the full artifact still works and retains normal scrolling/interactivity.
 Video, shadow DOM, scrolled internal containers, oversized nested frames (>2000px),
 busy or excessively complex content may be unsupported. Font/image CORS or browser

@@ -219,3 +219,35 @@ func assertThumbnailImage(t *testing.T, r response, b string) {
 		t.Fatalf("image %+v %v", cfg, err)
 	}
 }
+
+func TestThumbnailViewportsNeverShareImagesAndRejectUnboundedVariants(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t)
+	a := h.publishShared(h.token("alice"), "Responsive thumbnail", page)
+	c := h.browser("alice", "pw-a")
+	keys := map[string]bool{}
+	for _, viewport := range []string{"desktop", "tablet", "mobile"} {
+		path := "/api/artifacts/" + a.ID + "/thumbnail?scheme=light&lang=en&viewport=" + viewport
+		r, b := h.do(c, "GET", path, "", bridgeHeaders(h))
+		if r.StatusCode != 200 {
+			t.Fatal(r.StatusCode)
+		}
+		identity := decode[thumbnailIdentity](t, b)
+		if keys[identity.Key] || identity.URL != "" {
+			t.Fatal("another viewport's cached image was reused")
+		}
+		keys[identity.Key] = true
+		r, b = h.do(c, "POST", path+"&key="+identity.Key, thumbnailJPEG(t), bridgeHeaders(h))
+		if r.StatusCode != 204 {
+			t.Fatalf("save %d %s", r.StatusCode, b)
+		}
+		r, b = h.do(c, "GET", path, "", bridgeHeaders(h))
+		if r.StatusCode != 200 || decode[thumbnailIdentity](t, b).URL == "" {
+			t.Fatal("viewport cache miss")
+		}
+	}
+	r, _ := h.do(c, "GET", "/api/artifacts/"+a.ID+"/thumbnail?scheme=light&lang=en&viewport=1234x987", "", bridgeHeaders(h))
+	if r.StatusCode != 400 {
+		t.Fatal("unbounded viewport accepted")
+	}
+}
