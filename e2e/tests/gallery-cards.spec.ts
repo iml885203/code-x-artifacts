@@ -207,7 +207,7 @@ test("carol does not see bob's pin, groups the library by owner as a list, and f
   await other.close();
 });
 
-test("gallery cards reuse image thumbnails across formats without loading artifact documents", async ({ page, expectConsoleErrors }) => {
+test("gallery cards reuse image thumbnails across formats without loading artifact documents", async ({ page, browser, watch, expectConsoleErrors }) => {
   await signIn(page, "alice");
   const ids: string[] = [];
   const made = async (body: Parameters<typeof publish>[1]) => ids.push((await publish(page, body)).id);
@@ -285,17 +285,28 @@ test("gallery cards reuse image thumbnails across formats without loading artifa
   await expect(card(3).locator(".thumb-screen.loaded > img")).toHaveAttribute("src",/viewport=desktop/,{timeout:25000});
   // A loaded CSS image that cannot be embedded must not become a permanent incomplete thumbnail.
   expectConsoleErrors(/capture-background\.png/);
-  await page.route("**/capture-background.png", async (route) => {
-    if (route.request().resourceType() === "fetch") { await route.abort("failed"); return; }
-    await route.fulfill({contentType:"image/png",body:Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a0xkAAAAASUVORK5CYII=","base64")});
-  });
+  // This deliberately broken artifact belongs to a separate actor so other tests' galleries never load it.
   const origin = new URL(page.url()).origin;
-  const failed=await publish(page,{title:"Unembeddable background",content:`<!doctype html><body style="background-image:url('${origin}/capture-background.png')"><h1>Background must be included</h1>`});
-  await page.reload();
-  const failedCard=page.locator(`li.card[data-artifact-id="${failed.id}"]`);await failedCard.scrollIntoViewIfNeeded();
-  await expect(failedCard.locator("iframe")).toHaveCount(1);
-  await expect(failedCard.locator("iframe")).toHaveCount(0,{timeout:25000});
-  await expect(failedCard.locator(".thumb-screen > img")).toHaveCount(0);
-  await expect(failedCard.getByRole("link").first()).toHaveAttribute("href",`/a/${failed.id}`);
+  const isolated = await browser.newContext({baseURL:origin});
+  const failedPage = watch(await isolated.newPage());
+  try {
+    await failedPage.goto("/login");
+    await failedPage.getByLabel("Username").fill("dana");
+    await failedPage.getByLabel("Password").fill("unused-test-password");
+    await failedPage.getByRole("button",{name:"Sign in",exact:true}).click();
+    await expect(failedPage.getByRole("heading",{name:"Artifacts",exact:true})).toBeVisible();
+    await failedPage.route("**/capture-background.png", async (route) => {
+      if (route.request().resourceType() === "fetch") { await route.abort("failed"); return; }
+      await route.fulfill({contentType:"image/png",body:Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a0xkAAAAASUVORK5CYII=","base64")});
+    });
+    const failed=await publish(failedPage,{title:"Unembeddable background",content:`<!doctype html><body style="background-image:url('${origin}/capture-background.png')"><h1>Background must be included</h1>`});
+    await failedPage.reload();
+    const failedCard=failedPage.locator(`li.card[data-artifact-id="${failed.id}"]`);await failedCard.scrollIntoViewIfNeeded();
+    await expect(failedCard.locator("iframe")).toHaveCount(1);
+    await expect(failedCard.locator("iframe")).toHaveCount(0,{timeout:25000});
+    await expect(failedCard.locator(".thumb-screen > img")).toHaveCount(0);
+    await expect(failedCard.getByRole("link").first()).toHaveAttribute("href",`/a/${failed.id}`);
+  } finally { await isolated.close(); }
+
 
 });
