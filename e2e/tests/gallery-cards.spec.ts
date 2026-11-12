@@ -211,15 +211,32 @@ test("gallery cards reuse image thumbnails across formats without loading artifa
   await signIn(page, "alice");
   const ids: string[] = [];
   const made = async (body: Parameters<typeof publish>[1]) => ids.push((await publish(page, body)).id);
-  await made({ title: "Image HTML", content: '<!doctype html><style>body{background:#ffe0e8}.scroller{width:150px;height:80px;overflow:scroll;scrollbar-width:auto!important}</style><h1>HTML thumbnail</h1><div class="scroller"><div style="height:800px">Scroll content</div></div>' });
+  await made({ title: "Image HTML", content: '<!doctype html><style>body{background:#ffe0e8}.scroller{width:150px;height:80px;overflow:scroll;scrollbar-width:auto!important}</style><h1>HTML thumbnail</h1><p id="thumbnail-ready" aria-busy="true">Preparing capture</p><div class="scroller"><div style="height:800px">Scroll content</div></div>' });
   await made({ title: "Image canvas", content: '<!doctype html><h1>Canvas thumbnail</h1><canvas id=c width=160 height=100></canvas><script>const ctx=document.getElementById("c").getContext("2d");ctx.fillStyle="red";ctx.fillRect(0,0,160,100)</script>' });
   await made({ title: "Image doc", kind: "doc", content: "# Document 縮圖\n\nA paragraph.\n" });
-  await made({ title: "Image React", kind: "react", content: 'export default function App(){const dark=matchMedia("(prefers-color-scheme: dark)").matches;return <div style={{height:"720px",background:navigator.language!=="en"?"rgb(0,255,0)":dark?"rgb(0,0,255)":"rgb(255,0,0)"}}><h1>{dark?"Dark thumbnail":"Light thumbnail"}</h1></div>}' });
+  await made({ title: "Image React", kind: "react", content: 'export default function App(){const dark=matchMedia("(prefers-color-scheme: dark)").matches;return <div style={{height:"900px",background:navigator.language!=="en"?"rgb(0,255,0)":innerWidth<=640?"rgb(255,255,0)":innerWidth<=1024?"rgb(255,0,255)":dark?"rgb(0,0,255)":"rgb(255,0,0)"}}><h1>{dark?"Dark thumbnail":"Light thumbnail"}</h1></div>}' });
   await made({ title: "Image design", kind: "design", content: JSON.stringify({version:1,pages:[{id:"p",name:"Page",rows:[[{id:"f",name:"Frame",file:"frames/f.html",w:400,h:300}]]}]}), files:{"frames/f.html":"<!doctype html><body><h1>Design thumbnail</h1></body>"} });
   await made({ title: "Image board", kind: "board", content: JSON.stringify({version:1,elements:[{id:"box",type:"rectangle",x:0,y:0,label:"Board thumbnail"}]}) });
   await made({ title: "Image slides", kind: "slides", content: JSON.stringify({version:1,slides:[{layout:"title",title:"Slides thumbnail"}]}) });
   const card=(index:number)=>page.locator(`li.card[data-artifact-id="${ids[index]}"]`);
+  let finishUpload: (()=>void) | undefined;
+  const uploadGate=new Promise<void>((resolve)=>{finishUpload=resolve;});
+  await page.route("**/api/artifacts/*/thumbnail?*",async(route)=>{
+    if(route.request().method()==="POST"&&new URL(route.request().url()).pathname===`/api/artifacts/${ids[0]}/thumbnail`)await uploadGate;
+    await route.continue();
+  });
+  const pendingUpload=page.waitForRequest((request)=>request.method()==="POST"&&new URL(request.url()).pathname===`/api/artifacts/${ids[0]}/thumbnail`);
+
   await page.goto("/");
+  await card(0).scrollIntoViewIfNeeded();
+  try {
+    await expect(card(0).locator(".thumb-screen")).toHaveClass(/loaded/);
+    await expect(card(0).frameLocator("iframe").getByRole("heading",{name:"HTML thumbnail"})).toBeVisible();
+    expect(await card(0).frameLocator("iframe").locator("html").evaluate(()=>innerWidth)).toBeGreaterThanOrEqual(1200);
+    await expect(card(0).locator(".thumb-screen > img")).toHaveCount(0);
+    await card(0).frameLocator("iframe").locator("#thumbnail-ready").evaluate((node)=>{node.remove();});
+    await pendingUpload;
+  } finally { finishUpload?.(); }
   for (let i=0;i<ids.length;i++) {
     await card(i).scrollIntoViewIfNeeded();
     await expect(card(i).locator(".thumb-screen > img")).toBeVisible({timeout:25000});
@@ -258,6 +275,14 @@ test("gallery cards reuse image thumbnails across formats without loading artifa
   await page.evaluate(()=>{localStorage.removeItem("pictor-theme");});
   await page.emulateMedia({colorScheme:"light"});
   await expect(card(3).locator(".thumb-screen.loaded > img")).toHaveAttribute("src",/scheme=light/,{timeout:25000});
+  await page.setViewportSize({width:390,height:844});await card(3).scrollIntoViewIfNeeded();
+  await expect(card(3).locator(".thumb-screen.loaded > img")).toHaveAttribute("src",/viewport=mobile/,{timeout:25000});
+  const mobilePixel=await reactPixel();expect(mobilePixel[0]).toBeGreaterThan(240);expect(mobilePixel[1]).toBeGreaterThan(240);expect(mobilePixel[2]).toBeLessThan(15);
+  await page.setViewportSize({width:900,height:900});await card(3).scrollIntoViewIfNeeded();
+  await expect(card(3).locator(".thumb-screen.loaded > img")).toHaveAttribute("src",/viewport=tablet/,{timeout:25000});
+  const tabletPixel=await reactPixel();expect(tabletPixel[0]).toBeGreaterThan(240);expect(tabletPixel[1]).toBeLessThan(15);expect(tabletPixel[2]).toBeGreaterThan(240);
+  await page.setViewportSize({width:1280,height:720});await card(3).scrollIntoViewIfNeeded();
+  await expect(card(3).locator(".thumb-screen.loaded > img")).toHaveAttribute("src",/viewport=desktop/,{timeout:25000});
   // A loaded CSS image that cannot be embedded must not become a permanent incomplete thumbnail.
   expectConsoleErrors(/capture-background\.png/);
   await page.route("**/capture-background.png", async (route) => {

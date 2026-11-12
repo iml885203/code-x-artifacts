@@ -1,9 +1,15 @@
 import { call } from "../api";
 export interface Thumbnail { key: string; url?: string | undefined; source?: string | undefined; path: string }
-export function thumbnailMedia(): MediaQueryList | null { return typeof window.matchMedia === "function" ? window.matchMedia("(prefers-color-scheme: dark)") : null; }
+export type ThumbnailViewport = "mobile" | "tablet" | "desktop";
+export const thumbnailDimensions = { mobile: { width: 420, height: 270 }, tablet: { width: 980, height: 630 }, desktop: { width: 1400, height: 900 } } as const;
+export function thumbnailMedia(query = "(prefers-color-scheme: dark)"): MediaQueryList | null { return typeof window.matchMedia === "function" ? window.matchMedia(query) : null; }
+export function thumbnailViewport(): ThumbnailViewport {
+  if (thumbnailMedia("(max-width: 640px)")?.matches ?? window.innerWidth <= 640) return "mobile";
+  return (thumbnailMedia("(max-width: 1024px)")?.matches ?? window.innerWidth <= 1024) ? "tablet" : "desktop";
+}
 export function thumbnailVariant(theme: "system" | "light" | "dark", lang: string): string {
   const scheme = theme !== "system" ? theme : (thumbnailMedia()?.matches ? "dark" : "light");
-  return `scheme=${scheme}&lang=${lang.startsWith("zh") ? "zh-TW" : "en"}`;
+  return `scheme=${scheme}&lang=${lang.startsWith("zh") ? "zh-TW" : "en"}&viewport=${thumbnailViewport()}`;
 }
 export async function thumbnailSource(id: string, variant: string, signal: AbortSignal): Promise<Thumbnail | null> {
   const path = `/api/artifacts/${encodeURIComponent(id)}/thumbnail?${variant}`;
@@ -15,21 +21,25 @@ export async function thumbnailSource(id: string, variant: string, signal: Abort
     return { key: data.key, url: data.url, source: data.source, path };
   } catch { return null; }
 }
-// Only two cold documents exist at once; warm images bypass the generation queue.
-const pending: (() => void)[] = [];
-let running = 0;
-export function queueThumbnail(signal: AbortSignal, start: (release: () => void) => void): void {
-  const run = () => {
-    if (signal.aborted) return;
-    running++;
-    let released = false;
-    const release = () => { if (released) return; released = true; running--; signal.removeEventListener("abort", release); drain(); };
-    signal.addEventListener("abort", release, { once: true });
-    start(release);
+// Bound visible cold documents separately from expensive bitmap captures.
+function thumbnailQueue(limit: number) {
+  const pending: (() => void)[] = [];
+  let running = 0;
+  return (signal: AbortSignal, start: (release: () => void) => void): void => {
+    const run = () => {
+      if (signal.aborted) return;
+      running++;
+      let released = false;
+      const release = () => { if (released) return; released = true; running--; signal.removeEventListener("abort", release); drain(); };
+      signal.addEventListener("abort", release, { once: true });
+      start(release);
+    };
+    const drain = () => { while (running < limit && pending.length) pending.shift()?.(); };
+    pending.push(run); drain();
   };
-  const drain = () => { while (running < 2 && pending.length) pending.shift()?.(); };
-  pending.push(run); drain();
 }
+export const queueThumbnail = thumbnailQueue(6);
+export const queueThumbnailCapture = thumbnailQueue(2);
 export async function captureThumbnail(frame: HTMLIFrameElement, source: Thumbnail, signal: AbortSignal): Promise<Thumbnail | null> {
   const target = frame.contentWindow;
   if (!target || signal.aborted) return null;
@@ -55,6 +65,8 @@ export async function captureThumbnail(frame: HTMLIFrameElement, source: Thumbna
     const timer = window.setTimeout(() => { stop(null); }, 25000);
     signal.addEventListener("abort", abort, { once: true });
     window.addEventListener("message", receive);
-    target.postMessage({ pictorPreview: "thumbnail-capture", request, width: 560, height: 360, outputWidth: 1120, outputHeight: 720 }, "*");
+    const viewport = new URLSearchParams(source.path.split("?")[1]).get("viewport");
+    const size = thumbnailDimensions[viewport === "mobile" || viewport === "tablet" ? viewport : "desktop"];
+    target.postMessage({ pictorPreview: "thumbnail-capture", request, ...size, outputWidth: 1120, outputHeight: 720 }, "*");
   });
 }

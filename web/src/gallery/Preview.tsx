@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useLang } from "../i18n";
 import { useThemeChoice } from "../shell/theme";
-import { captureThumbnail, queueThumbnail, thumbnailMedia, thumbnailSource, thumbnailVariant, type Thumbnail } from "./thumbnails";
-interface View { identity: string; source: Thumbnail; signal: AbortSignal; loaded: boolean; release?: (() => void) | undefined }
-/** Warm cards are images. Cold generation is hidden, bounded and never blocks opening a card. */
+import { captureThumbnail, queueThumbnail, queueThumbnailCapture, thumbnailMedia, thumbnailSource, thumbnailVariant, type Thumbnail } from "./thumbnails";
+interface View { identity: string; source: Thumbnail; signal: AbortSignal; loaded: boolean; pending?: Thumbnail | undefined; deadline?: ((ms: number) => void) | undefined; release?: (() => void) | undefined }
+/** Warm cards are images. Cold documents are visible while bounded generation runs and never blocks opening a card. */
 export function Preview({ id, version }: { id: string; version: number }) {
   const lang = useLang();
   const [theme] = useThemeChoice();
+  const captures = useRef(new WeakSet<HTMLIFrameElement>());
   const host = useRef<HTMLSpanElement>(null);
   const [view, setView] = useState<View | null>(null);
   const identity = `${id}/${String(version)}`;
@@ -34,10 +35,15 @@ export function Preview({ id, version }: { id: string; version: number }) {
       if (source.url) { setView((old) => old?.identity === identity && old.source.url === source.url ? old : { identity, source, signal, loaded: false }); return; }
       setView(null);
       if (source.source) queueThumbnail(signal, (release) => {
-        const timer = window.setTimeout(() => { generation?.abort(); release(); setView((old) => old?.signal === signal ? null : old); }, 30000);
+        let timer: number;
+        const deadline = (ms: number) => {
+          window.clearTimeout(timer);
+          timer = window.setTimeout(() => { generation?.abort(); release(); setView((old) => old?.signal === signal ? null : old); }, ms);
+        };
+        deadline(15000);
         const done = () => { window.clearTimeout(timer); release(); };
         signal.addEventListener("abort", done, { once: true });
-        setView({ identity, source, signal, loaded: false, release: done });
+        setView({ identity, source, signal, loaded: false, deadline, release: done });
       });
     };
     const intersection = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver((entries) => {
@@ -46,23 +52,37 @@ export function Preview({ id, version }: { id: string; version: number }) {
     intersection?.observe(element);
     const refresh = () => { void load(true); };
     const focus = () => { void load(); };
-    const scheme = thumbnailMedia();
-    scheme?.addEventListener("change", refresh);
+    const media = [thumbnailMedia(), thumbnailMedia("(max-width: 640px)"), thumbnailMedia("(max-width: 1024px)")];
+    media.forEach((query) => { query?.addEventListener("change", refresh); });
     window.addEventListener("languagechange", refresh); window.addEventListener("focus", focus);
     void load();
-    return () => { controller.abort(); generation?.abort(); intersection?.disconnect(); scheme?.removeEventListener("change", refresh); window.removeEventListener("languagechange", refresh); window.removeEventListener("focus", focus); };
+    return () => { controller.abort(); generation?.abort(); intersection?.disconnect(); media.forEach((query) => { query?.removeEventListener("change", refresh); }); window.removeEventListener("languagechange", refresh); window.removeEventListener("focus", focus); };
   }, [id, version, identity, theme, lang]);
+  const image = current?.pending ?? (current?.source.url ? current.source : null);
+  const viewport = new URLSearchParams(current?.source.path.split("?")[1]).get("viewport") ?? "desktop";
   return <span className="thumb" data-thumb="">
     <span ref={host} className={current?.loaded ? "thumb-screen loaded" : "thumb-screen"}>
-      {current?.source.url && <img src={current.source.url} alt="" aria-hidden="true" decoding="async" onLoad={() => { setView((old) => old && old.source.url === current.source.url ? { ...old, loaded: true } : old); }} onError={() => { setView(null); }} />}
-    </span>
-    {current?.source.source && <iframe className="thumbnail-generator" data-thumbnail-scheme={current.source.path.includes("scheme=dark") ? "dark" : "light"} src={current.source.source} sandbox="allow-scripts" tabIndex={-1} aria-hidden="true" title="" onLoad={(event) => {
-      const source = current.source;
-      void captureThumbnail(event.currentTarget, source, current.signal).then((result) => {
+      {image?.url && <img src={image.url} alt="" aria-hidden="true" decoding="async" onLoad={() => {
+        if (!current) return;
         current.release?.();
-        if (current.signal.aborted) return;
-        setView((old) => old?.signal !== current.signal ? old : result ? { ...old, source: result, loaded: false, release: undefined } : null);
-      });
-    }} />}
+        setView((old) => old?.signal === current.signal ? { ...old, source: image, pending: undefined, loaded: true, deadline: undefined, release: undefined } : old);
+      }} onError={() => { current?.release?.(); setView(null); }} />}
+      {current?.source.source && <iframe key={`${identity}/${current.source.key}`} className="thumbnail-generator" data-thumbnail-viewport={viewport} data-thumbnail-scheme={current.source.path.includes("scheme=dark") ? "dark" : "light"} src={current.source.source} sandbox="allow-scripts" tabIndex={-1} aria-hidden="true" title="" onLoad={(event) => {
+        const frame = event.currentTarget;
+        setView((old) => old?.signal === current.signal ? { ...old, loaded: true } : old);
+        if (captures.current.has(frame)) return;
+        captures.current.add(frame);
+        current.deadline?.(60000);
+        queueThumbnailCapture(current.signal, (releaseCapture) => {
+          current.deadline?.(30000);
+          void captureThumbnail(frame, current.source, current.signal).then((result) => {
+            releaseCapture();
+            if (current.signal.aborted) return;
+            if (!result) current.release?.();
+            setView((old) => old?.signal !== current.signal ? old : result ? { ...old, pending: result } : null);
+          });
+        });
+      }} />}
+    </span>
   </span>;
 }

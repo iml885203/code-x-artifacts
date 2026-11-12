@@ -25,6 +25,14 @@ func (s *Server) thumbnailIdentity(w http.ResponseWriter, r *http.Request) (thum
 		jsonError(w, 400, "invalid thumbnail variant")
 		return thumbnailIdentity{}, false
 	}
+	viewport := q.Get("viewport")
+	if viewport == "" {
+		viewport = "legacy"
+	}
+	if viewport != "legacy" && viewport != "mobile" && viewport != "tablet" && viewport != "desktop" {
+		jsonError(w, 400, "invalid thumbnail viewport")
+		return thumbnailIdentity{}, false
+	}
 	a, err := s.svc.Artifact(r.Context(), currentViewer(r), r.PathValue("id"))
 	if err != nil {
 		s.fail(w, err)
@@ -35,9 +43,9 @@ func (s *Server) thumbnailIdentity(w http.ResponseWriter, r *http.Request) (thum
 		s.fail(w, err)
 		return thumbnailIdentity{}, false
 	}
-	context := "thumbnail-jpeg-v1\x00" + scriptHash(s.thumbnailScript) + "\x00" + s.bundle.Entry + "\x00" + baseURL(r) + "\x00" + scheme + "\x00" + lang
+	context := "thumbnail-jpeg-v2\x00" + viewport + "\x00" + scriptHash(s.thumbnailScript) + "\x00" + s.bundle.Entry + "\x00" + baseURL(r) + "\x00" + scheme + "\x00" + lang
 	key := previewKey(currentUser(r), a, assets, thumbnailWidth, thumbnailHeight, context, time.Unix(0, 0))
-	sum := sha256.Sum256([]byte(currentUser(r) + "\x00" + a.ID + "\x00" + scheme + "\x00" + lang))
+	sum := sha256.Sum256([]byte(currentUser(r) + "\x00" + a.ID + "\x00" + scheme + "\x00" + lang + "\x00" + viewport))
 	group := hex.EncodeToString(sum[:])
 	return thumbnailIdentity{Key: key, group: group}, true
 }
