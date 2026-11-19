@@ -95,8 +95,11 @@ sharing platforms choose when to refresh their cached copies.
 Gallery and Recently opened cards use account-scoped JPEG thumbnails at a fixed
 1120×720 image size. A cold card queues an opaque-origin preview in the viewer's browser (at most six at once),
 showing it as soon as its document loads while at most two bitmap captures run. The preview uses bundled html-to-image to
-rasterize settled content, including canvas and supported nested Design frames;
-it never gets the viewer's API bridge or session credentials. Successful uploads
+rasterize settled content, including canvas and supported nested Design frames.
+Preview capture starts lazy images before waiting for image readiness. Only nested
+frames intersecting the captured viewport must answer the capture protocol;
+offscreen or hidden frames are omitted from the bitmap and cannot block it.
+The preview never gets the viewer's API bridge or session credentials. Successful uploads
 are decoded and reencoded as JPEG by Go, then the temporary iframe is removed only once the image has loaded.
 A warm card loads only an image, without running the artifact or loading its fonts.
 No server browser, Node runtime or external screenshot service is required.
