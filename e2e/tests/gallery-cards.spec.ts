@@ -247,11 +247,31 @@ test("gallery cards reuse image thumbnails across formats without loading artifa
   }
   const reactPixel=async()=>card(3).locator(".thumb-screen > img").evaluate((node)=>{const canvas=document.createElement("canvas");canvas.width=1120;canvas.height=720;const context=canvas.getContext("2d");if(!context)throw Error("no canvas");context.drawImage(node as HTMLImageElement,0,0);return [...context.getImageData(1000,500,1,1).data];});
   expect(await reactPixel()).toEqual([254,0,0,255]);
+  // Request routing disables the browser cache. Remove the capture gate and
+  // prime the HTTP cache before observing a genuine conditional reload.
+  await page.unrouteAll({behavior:"wait"});
+  await page.reload();
+  for(let i=0;i<ids.length;i++){await card(i).scrollIntoViewIfNeeded();await expect(card(i).locator(".thumb-screen.loaded > img")).toBeVisible();}
+  const network=await page.context().newCDPSession(page);
+  await network.send("Network.enable");
+  const thumbnailRequests=new Map<string,string>();
+  const revalidated=new Set<string>();
+  network.on("Network.requestWillBeSent",event=>{
+    const path=new URL(event.request.url).pathname;
+    if(ids.some(id=>path===`/thumbnail/${id}`))thumbnailRequests.set(event.requestId,path);
+  });
+  // Playwright exposes the cache-combined 200; CDP exposes the wire's 304.
+  network.on("Network.responseReceivedExtraInfo",event=>{
+    const path=thumbnailRequests.get(event.requestId);
+    if(path&&event.statusCode===304)revalidated.add(path);
+  });
   const warmRequests:string[]=[];
   page.on("request",request=>{const path=new URL(request.url()).pathname;if(request.resourceType()==="document"&&ids.some((id)=>path===`/raw/${id}`||path.startsWith(`/raw/${id}/`)||path===`/preview/${id}`))warmRequests.push(path);});
   await page.reload();
   for(let i=0;i<ids.length;i++){await card(i).scrollIntoViewIfNeeded();await expect(card(i).locator(".thumb-screen.loaded > img")).toBeVisible();}
   expect(warmRequests).toEqual([]);
+  await expect.poll(()=>[...revalidated].sort()).toEqual(ids.map(id=>`/thumbnail/${id}`).sort());
+  await network.detach();
   // Only opened artifacts have interactive scrolling.
   await card(0).getByRole("link").first().click();
   const scroller=page.frameLocator("iframe[data-artifact-frame]").locator(".scroller");
@@ -308,5 +328,16 @@ test("gallery cards reuse image thumbnails across formats without loading artifa
     await expect(failedCard.getByRole("link").first()).toHaveAttribute("href",`/a/${failed.id}`);
   } finally { await isolated.close(); }
 
-
+  // The same browser cache must not substitute old pixels for a refused request.
+  const cachedImage=await card(3).locator(".thumb-screen > img").getAttribute("src");
+  if(!cachedImage)throw Error("missing cached thumbnail");
+  expectConsoleErrors(new RegExp(`/thumbnail/${ids[3]}`));
+  await page.request.post("/logout",{headers:{Origin:origin}});
+  const readCachedImage=()=>page.evaluate(async(url)=>{
+    const response=await fetch(url);
+    return {status:response.status,policy:response.headers.get("cache-control"),type:response.headers.get("content-type")};
+  },cachedImage);
+  expect(await readCachedImage()).toMatchObject({status:401,policy:"no-store"});
+  await signIn(page,"bob");
+  expect(await readCachedImage()).toMatchObject({status:404,policy:"no-store"});
 });

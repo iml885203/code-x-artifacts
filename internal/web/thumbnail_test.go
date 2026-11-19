@@ -7,6 +7,8 @@ import (
 	"image/jpeg"
 	"io/fs"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -57,15 +59,14 @@ func TestImageThumbnailsRemainPrivateAndRejectStaleVersions(t *testing.T) {
 	}
 	r, b := h.do(alice, "GET", warm.URL, "", nil)
 	assertThumbnailImage(t, r, b)
+	conditional := map[string]string{"If-None-Match": r.Header.Get("ETag")}
 
 	if thumbnailMeta(t, h, bob, a.ID).URL != "" {
 		t.Fatal("shared account cache")
 	}
 	for _, c := range []*http.Client{nil, bob} {
-		r, _ = h.do(c, "GET", warm.URL, "", nil)
-		if r.StatusCode == 200 {
-			t.Fatal("foreign image served")
-		}
+		r, _ = h.do(c, "GET", warm.URL, "", conditional)
+		assertThumbnailRefusal(t, r)
 	}
 	// An invalidation independent of saved version is covered by the existing previewKey asset tests.
 	r, _ = h.do(alice, "PUT", "/api/artifacts/"+a.ID, `{"title":"Changed","content":"<!doctype html><p>Changed</p>","baseVersion":1}`, bridgeHeaders(h))
@@ -76,9 +77,10 @@ func TestImageThumbnailsRemainPrivateAndRejectStaleVersions(t *testing.T) {
 	if next.Key == cold.Key || next.URL != "" {
 		t.Fatal("stale image identity")
 	}
-	r, _ = h.do(alice, "GET", warm.URL, "", nil)
+	r, _ = h.do(alice, "GET", warm.URL, "", conditional)
+	assertThumbnailRefusal(t, r)
 	if r.StatusCode != 404 {
-		t.Fatalf("stale read %d", r.StatusCode)
+		t.Fatal(r.StatusCode)
 	}
 	r, _ = h.do(alice, "POST", "/api/artifacts/"+a.ID+"/thumbnail?scheme=light&lang=en&key="+cold.Key, thumbnailJPEG(t), bridgeHeaders(h))
 	if r.StatusCode != 409 {
@@ -89,7 +91,7 @@ func TestImageThumbnailsRemainPrivateAndRejectStaleVersions(t *testing.T) {
 	if r.StatusCode != 204 {
 		t.Fatalf("delete %d", r.StatusCode)
 	}
-	r, _ = h.do(alice, "GET", thumbnailMetaURL(a.ID, next.Key), "", nil)
+	r, _ = h.do(alice, "GET", thumbnailMetaURL(a.ID, next.Key), "", conditional)
 	if r.StatusCode != 404 {
 		t.Fatalf("deleted read %d", r.StatusCode)
 	}
@@ -195,12 +197,13 @@ func TestImageThumbnailsCheckRevokedAccessAndAssetChangesWithoutHourlyExpiry(t *
 	}
 	reader := thumbnailMeta(t, h, bob, a.ID)
 	uploadThumbnail(t, h, bob, a.ID, reader)
+	image, _ := h.do(bob, "GET", thumbnailMetaURL(a.ID, reader.Key), "", nil)
 	r, _ = h.do(alice, "PATCH", "/api/artifacts/"+a.ID, `{"visibility":"private"}`, bridgeHeaders(h))
 	if r.StatusCode != 200 {
 		t.Fatal(r.StatusCode)
 	}
-	r, _ = h.do(bob, "GET", thumbnailMetaURL(a.ID, reader.Key), "", nil)
-	if r.StatusCode != 404 {
+	r, _ = h.do(bob, "GET", thumbnailMetaURL(a.ID, reader.Key), "", map[string]string{"If-None-Match": image.Header.Get("ETag")})
+	if r.StatusCode != 404 || r.Header.Get("Cache-Control") != "no-store" {
 		t.Fatal("revoked image served")
 	}
 	r, _ = h.do(bob, "POST", "/api/artifacts/"+a.ID+"/thumbnail?scheme=light&lang=en&key="+reader.Key, thumbnailJPEG(t), bridgeHeaders(h))
@@ -211,7 +214,7 @@ func TestImageThumbnailsCheckRevokedAccessAndAssetChangesWithoutHourlyExpiry(t *
 
 func assertThumbnailImage(t *testing.T, r response, b string) {
 	t.Helper()
-	if r.StatusCode != 200 || r.Header.Get("Content-Type") != "image/jpeg" || r.Header.Get("Cache-Control") != "no-store" {
+	if r.StatusCode != 200 || r.Header.Get("Content-Type") != "image/jpeg" || r.Header.Get("Cache-Control") != "private, no-cache" || r.Header.Get("ETag") == "" {
 		t.Fatalf("image %d", r.StatusCode)
 	}
 	cfg, err := jpeg.DecodeConfig(strings.NewReader(b))
@@ -249,5 +252,115 @@ func TestThumbnailViewportsNeverShareImagesAndRejectUnboundedVariants(t *testing
 	r, _ := h.do(c, "GET", "/api/artifacts/"+a.ID+"/thumbnail?scheme=light&lang=en&viewport=1234x987", "", bridgeHeaders(h))
 	if r.StatusCode != 400 {
 		t.Fatal("unbounded viewport accepted")
+	}
+}
+
+func TestThumbnailValidatorsReuseOnlyMatchingBytes(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t)
+	a := h.publishShared(h.token("alice"), "Revalidation", page)
+	alice := h.browser("alice", "pw-a")
+	meta := thumbnailMeta(t, h, alice, a.ID)
+	uploadThumbnail(t, h, alice, a.ID, meta)
+	path := thumbnailMetaURL(a.ID, meta.Key)
+	first, body := h.do(alice, "GET", path, "", nil)
+	assertThumbnailImage(t, first, body)
+	etag := first.Header.Get("ETag")
+	for _, tc := range []struct {
+		name, validator string
+		status          int
+	}{
+		{"strong", etag, 304},
+		{"weak", "W/" + etag, 304},
+		{"list", `"other,tag", W/` + etag, 304},
+		{"empty list members", `, "other", , W/` + etag + `,`, 304},
+		{"wildcard", "*", 304},
+		{"different", `"different"`, 200},
+		{"absent", "", 200},
+		{"unquoted", strings.Trim(etag, `"`), 200},
+		{"unterminated", `"unterminated, ` + etag, 200},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			res, b := h.do(alice, "GET", path, "", map[string]string{"If-None-Match": tc.validator})
+			if res.StatusCode != tc.status || res.Header.Get("ETag") != etag || res.Header.Get("Cache-Control") != "private, no-cache" || !strings.Contains(res.Header.Get("Vary"), "Cookie") {
+				t.Fatalf("revalidation %d headers %v", res.StatusCode, res.Header)
+			}
+			for _, header := range []string{"Content-Security-Policy", "X-Content-Type-Options", "Referrer-Policy"} {
+				if res.Header.Get(header) != first.Header.Get(header) {
+					t.Fatalf("lost %s", header)
+				}
+			}
+			if tc.status == 304 && b != "" {
+				t.Fatal("304 sent image bytes")
+			}
+			if tc.status == 200 && b != body {
+				t.Fatal("200 lost image bytes")
+			}
+		})
+	}
+}
+
+func TestUnchangedThumbnailBytesRevalidateButRecapturedBytesDoNot(t *testing.T) {
+	t.Parallel()
+	dir := t.TempDir()
+	h := newHarness(t, func(c *Config) { c.ThumbnailDir = dir })
+	a := h.publishShared(h.token("alice"), "Revalidation", page)
+	alice := h.browser("alice", "pw-a")
+	meta := thumbnailMeta(t, h, alice, a.ID)
+	uploadThumbnail(t, h, alice, a.ID, meta)
+	path := thumbnailMetaURL(a.ID, meta.Key)
+	first, body := h.do(alice, "GET", path, "", nil)
+	assertThumbnailImage(t, first, body)
+	etag := first.Header.Get("ETag")
+	// Eviction must refuse validation even when the browser still has pixels.
+	entries, err := os.ReadDir(dir)
+	if err != nil || len(entries) != 1 {
+		t.Fatalf("cached files: %v %v", entries, err)
+	}
+	if err := os.Remove(filepath.Join(dir, entries[0].Name())); err != nil {
+		t.Fatal(err)
+	}
+	res, _ := h.do(alice, "GET", path, "", map[string]string{"If-None-Match": "*"})
+	assertThumbnailRefusal(t, res)
+	if res.StatusCode != 404 {
+		t.Fatal(res.StatusCode)
+	}
+	// Regenerate a different JPEG for exactly the same render identity.
+	im := image.NewRGBA(image.Rect(0, 0, thumbnailWidth, thumbnailHeight))
+	for y := 0; y < thumbnailHeight; y++ {
+		for x := 0; x < thumbnailWidth; x++ {
+			im.SetRGBA(x, y, color.RGBA{80, 120, 200, 255})
+		}
+	}
+	var replacement bytes.Buffer
+	if err := jpeg.Encode(&replacement, im, nil); err != nil {
+		t.Fatal(err)
+	}
+	meta = thumbnailMeta(t, h, alice, a.ID)
+	res, _ = h.do(alice, "POST", "/api/artifacts/"+a.ID+"/thumbnail?scheme=light&lang=en&key="+meta.Key, replacement.String(), bridgeHeaders(h))
+	if res.StatusCode != 204 || res.Header.Get("Cache-Control") != "no-store" {
+		t.Fatalf("recapture %v", res)
+	}
+	res, updated := h.do(alice, "GET", path, "", map[string]string{"If-None-Match": etag})
+	assertThumbnailImage(t, res, updated)
+	if res.Header.Get("ETag") == etag || updated == body {
+		t.Fatal("changed bytes retained old validator")
+	}
+	res, _ = h.do(alice, "POST", "/logout", "", map[string]string{"Origin": h.srv.URL})
+	if res.StatusCode != 303 {
+		t.Fatal(res.StatusCode)
+	}
+	res, _ = h.do(alice, "GET", path, "", map[string]string{"If-None-Match": "*"})
+	assertThumbnailRefusal(t, res)
+	if res.StatusCode != 401 {
+		t.Fatal(res.StatusCode)
+	}
+}
+
+func assertThumbnailRefusal(t *testing.T, r response) {
+	t.Helper()
+	if r.StatusCode < 400 || r.Header.Get("Cache-Control") != "no-store" || r.Header.Get("ETag") != "" {
+		t.Fatalf("thumbnail refusal: %v", r)
 	}
 }

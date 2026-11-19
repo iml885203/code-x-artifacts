@@ -116,7 +116,11 @@ wait, and 30 seconds from capture admission for generation/upload/image handover
 Saved version, relevant asset hashes, visibility, render script and frontend build,
 request origin, account, theme/language and device mode participate in identity. Hour boundaries
 and expired embedded grants do not invalidate pixels. Generation/upload/delivery
-recheck current access; image responses are `no-store`, not public CDN objects.
+recheck current access; successful image responses use `Cache-Control: private, no-cache` and a SHA-256
+ETag of the encoded JPEG bytes. Browsers may store images but must revalidate
+before reuse; matching `If-None-Match` returns a bodyless 304 only after current
+session, access, identity and file-existence checks. Errors, thumbnail metadata
+and uploads remain `no-store`; images are never public CDN objects.
 Already delivered pixels cannot be recalled. Persisted thumbnails contain no live
 resource URLs. A cache miss initially shows a lightweight placeholder, followed
 by the loaded live preview while its image is generated. Failed captures return
