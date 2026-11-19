@@ -259,7 +259,9 @@
         width, height, canvasWidth: width, canvasHeight: height, pixelRatio: 1,
         backgroundColor: getComputedStyle(document.documentElement).backgroundColor === "rgba(0, 0, 0, 0)" ? "#ffffff" : getComputedStyle(document.documentElement).backgroundColor,
         imagePlaceholder: missingResource, includeQueryParams: true, fontEmbedCSS: await embeddedFonts(), preferredFontFormat: "woff2", fetchRequestInit: { credentials: "omit" },
-        filter: (node) => !["SCRIPT", "NOSCRIPT", "HEAD", "IFRAME"].includes(node.nodeName),
+        // Closed dialogs often contain an empty image for a future lightbox.
+        // It has no painted box and must not be decoded by the rasterizer.
+        filter: (node) => !["SCRIPT", "NOSCRIPT", "HEAD", "IFRAME"].includes(node.nodeName) && (!(node instanceof HTMLImageElement) || node.getClientRects().length > 0),
       });
       const markup = decodeURIComponent(svg).replace(/&quot;/g, '"');
       if (markup.includes(missingResource) || /url\(\s*["']?(?:https?:|blob:)/i.test(markup)) throw Error("resource embedding failed");
