@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -143,6 +144,16 @@ func (s *Server) serveThumbnail(w http.ResponseWriter, r *http.Request) {
 		jsonError(w, 404, "thumbnail missing")
 		return
 	}
+	// Only an authorized, current, readable image can validate browser bytes.
+	sum := sha256.Sum256(data)
+	etag := `"` + hex.EncodeToString(sum[:]) + `"`
+	w.Header().Set("Cache-Control", "private, no-cache")
+	w.Header().Set("ETag", etag)
+	w.Header().Add("Vary", "Cookie")
+	if thumbnailETagMatches(r.Header.Values("If-None-Match"), etag) {
+		w.WriteHeader(http.StatusNotModified)
+		return
+	}
 	w.Header().Set("Content-Type", "image/jpeg")
 	_, _ = w.Write(data)
 }
@@ -159,4 +170,37 @@ func (s *Server) routesThumbnails(mux *http.ServeMux) {
 		}
 		s.serveThumbnail(w, s.signedIn(r, user))
 	})
+}
+
+// thumbnailETagMatches uses weak comparison for GET/HEAD. Parse quoted tags
+// rather than splitting on commas, which are allowed inside an opaque tag.
+func thumbnailETagMatches(values []string, etag string) bool {
+	for _, value := range values {
+		value = strings.TrimSpace(value)
+		if value == "*" {
+			return true
+		}
+		for value != "" {
+			// HTTP list fields tolerate empty members between separators.
+			value = strings.TrimLeft(value, " \t,")
+			value = strings.TrimPrefix(value, "W/")
+			if len(value) < 2 || value[0] != '"' {
+				break
+			}
+			end := strings.IndexByte(value[1:], '"')
+			if end < 0 {
+				break
+			}
+			tag := value[:end+2]
+			rest := strings.TrimSpace(value[end+2:])
+			if rest != "" && rest[0] != ',' {
+				break
+			}
+			if tag == etag {
+				return true
+			}
+			value = strings.TrimPrefix(rest, ",")
+		}
+	}
+	return false
 }
