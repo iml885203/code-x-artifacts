@@ -99,6 +99,8 @@ rasterize settled content, including canvas and supported nested Design frames.
 Preview capture starts lazy images before waiting for image readiness. Only nested
 frames intersecting the captured viewport must answer the capture protocol;
 offscreen or hidden frames are omitted from the bitmap and cannot block it.
+Images without layout boxes, such as unused images inside closed lightbox dialogs,
+are also omitted rather than decoded.
 The preview never gets the viewer's API bridge or session credentials. Successful uploads
 are decoded and reencoded as JPEG by Go, then the temporary iframe is removed only once the image has loaded.
 A warm card loads only an image, without running the artifact or loading its fonts.
