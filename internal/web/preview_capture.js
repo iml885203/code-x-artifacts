@@ -42,6 +42,9 @@
   async function settled() {
     await bounded(document.fonts.ready, 2000);
     const pictures = [...document.images].filter(visible);
+    // Rasterization embeds the document's images, including lazy images below
+    // the fold. Start them before waiting; a cold preview never scrolls there.
+    for (const image of pictures) image.loading = "eager";
     await bounded(Promise.all(pictures.map((image) => image.complete ? Promise.resolve() : new Promise((resolve) => {
       image.addEventListener("load", resolve, { once: true });
       image.addEventListener("error", resolve, { once: true });
@@ -213,7 +216,10 @@
     await settled();
     const nodes = [...document.querySelectorAll("*")];
     if (nodes.length > 20000 || nodes.some((node) => node.shadowRoot || node.matches("video,object,embed") || (node.scrollTop || 0) !== 0 || (node.scrollLeft || 0) !== 0)) throw Error("unsupported content");
-    const frames = [...document.querySelectorAll("iframe")];
+    const frames = [...document.querySelectorAll("iframe")].filter((frame) => {
+      const rect = frame.getBoundingClientRect();
+      return visible(frame) && rect.width > 0 && rect.height > 0 && rect.right > 0 && rect.bottom > 0 && rect.left < width && rect.top < height;
+    });
     if (frames.length > 16) throw Error("too many frames");
     const replacements = [];
     try {
@@ -253,7 +259,7 @@
         width, height, canvasWidth: width, canvasHeight: height, pixelRatio: 1,
         backgroundColor: getComputedStyle(document.documentElement).backgroundColor === "rgba(0, 0, 0, 0)" ? "#ffffff" : getComputedStyle(document.documentElement).backgroundColor,
         imagePlaceholder: missingResource, includeQueryParams: true, fontEmbedCSS: await embeddedFonts(), preferredFontFormat: "woff2", fetchRequestInit: { credentials: "omit" },
-        filter: (node) => !["SCRIPT", "NOSCRIPT", "HEAD"].includes(node.nodeName),
+        filter: (node) => !["SCRIPT", "NOSCRIPT", "HEAD", "IFRAME"].includes(node.nodeName),
       });
       const markup = decodeURIComponent(svg).replace(/&quot;/g, '"');
       if (markup.includes(missingResource) || /url\(\s*["']?(?:https?:|blob:)/i.test(markup)) throw Error("resource embedding failed");

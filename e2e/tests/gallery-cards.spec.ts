@@ -1,4 +1,4 @@
-import { expect, publish, republish, signIn, test } from "./support";
+import { expect, png, publish, republish, signIn, test, upload } from "./support";
 
 test("a card's time moves from now to a minute ago without a reload", async ({ page }) => {
   await signIn(page, "alice");
@@ -211,9 +211,12 @@ test("gallery cards reuse image thumbnails across formats without loading artifa
   await signIn(page, "alice");
   const ids: string[] = [];
   const made = async (body: Parameters<typeof publish>[1]) => ids.push((await publish(page, body)).id);
-  await made({ title: "Image HTML", content: '<!doctype html><style>body{background:#ffe0e8}.scroller{width:150px;height:80px;overflow:scroll;scrollbar-width:auto!important}</style><h1>HTML thumbnail</h1><p id="thumbnail-ready" aria-busy="true">Preparing capture</p><div class="scroller"><div style="height:800px">Scroll content</div></div>' });
+  await made({ title: "Image HTML", content: '<!doctype html><style>body{background:#ffe0e8}.scroller{width:150px;height:80px;overflow:scroll;scrollbar-width:auto!important}</style><h1>HTML thumbnail</h1><p id="thumbnail-ready" aria-busy="true">Preparing capture</p><div class="scroller"><div style="height:800px">Scroll content</div></div><div style="height:2000px"></div><iframe title="Offscreen authored frame" sandbox="allow-scripts" srcdoc="&lt;p&gt;No capture protocol&lt;/p&gt;"></iframe>' });
   await made({ title: "Image canvas", content: '<!doctype html><h1>Canvas thumbnail</h1><canvas id=c width=160 height=100></canvas><script>const ctx=document.getElementById("c").getContext("2d");ctx.fillStyle="red";ctx.fillRect(0,0,160,100)</script>' });
   await made({ title: "Image doc", kind: "doc", content: "# Document 縮圖\n\nA paragraph.\n" });
+  const docID=ids[2]??"";
+  await upload(page,docID,"lazy.png",png);
+  await republish(page,docID,{title:"Image doc",content:`# Document 縮圖\n\n${"Offscreen content.\n\n".repeat(80)}![Lazy illustration](/files/${docID}/lazy.png)\n`,baseVersion:1});
   await made({ title: "Image React", kind: "react", content: 'export default function App(){const dark=matchMedia("(prefers-color-scheme: dark)").matches;return <div style={{height:"900px",background:navigator.language!=="en"?"rgb(0,255,0)":innerWidth<=640?"rgb(255,255,0)":innerWidth<=1024?"rgb(255,0,255)":dark?"rgb(0,0,255)":"rgb(255,0,0)"}}><h1>{dark?"Dark thumbnail":"Light thumbnail"}</h1></div>}' });
   await made({ title: "Image design", kind: "design", content: JSON.stringify({version:1,pages:[{id:"p",name:"Page",rows:[[{id:"f",name:"Frame",file:"frames/f.html",w:400,h:300}]]}]}), files:{"frames/f.html":"<!doctype html><body><h1>Design thumbnail</h1></body>"} });
   await made({ title: "Image board", kind: "board", content: JSON.stringify({version:1,elements:[{id:"box",type:"rectangle",x:0,y:0,label:"Board thumbnail"}]}) });
